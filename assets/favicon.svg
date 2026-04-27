@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <!-- Rounded square background -->
+  <rect x="0" y="0" width="100" height="100" rx="20" fill="#1a5f7a"/>
+
+  <!-- Edges -->
+  <line x1="28" y1="50" x2="50" y2="32" stroke="#ffffff" stroke-width="4" stroke-opacity="0.7" stroke-linecap="round"/>
+  <line x1="28" y1="50" x2="50" y2="68" stroke="#ffffff" stroke-width="4" stroke-opacity="0.7" stroke-linecap="round"/>
+  <line x1="50" y1="32" x2="72" y2="50" stroke="#ffffff" stroke-width="4" stroke-opacity="0.7" stroke-linecap="round"/>
+  <line x1="50" y1="68" x2="72" y2="50" stroke="#ffffff" stroke-width="4" stroke-opacity="0.7" stroke-linecap="round"/>
+
+  <!-- Left node (amber — input) -->
+  <circle cx="28" cy="50" r="11" fill="#f5a623"/>
+
+  <!-- Mid nodes (white) -->
+  <circle cx="50" cy="32" r="9" fill="#ffffff"/>
+  <circle cx="50" cy="68" r="9" fill="#ffffff"/>
+
+  <!-- Right node (amber — output) -->
+  <circle cx="72" cy="50" r="11" fill="#f5a623"/>
+</svg>
