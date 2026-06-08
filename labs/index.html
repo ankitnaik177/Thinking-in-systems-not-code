@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Lab notebook from Ankit Anurag Naik — works in progress and finished projects across physical modeling, control, robotics integration, and surrogate modeling.">
+  <title>Labs · Ankit Anurag Naik</title>
+  <link rel="icon" type="image/png" href="../assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="../styles.css" rel="stylesheet">
+</head>
+
+<body>
+
+  <!--
+    Formspree endpoint and GitHub repo links use placeholders below.
+    Search this file for TODO to find every spot that needs filling in.
+    Single Formspree endpoint is reused for every card; the hidden `project`
+    field tells you which card the message came from.
+  -->
+
+  <nav>
+    <div class="inner">
+      <a class="logo" href="../index.html">Ankit Anurag Naik</a>
+      <ul>
+        <li><a href="../index.html#work">Work</a></li>
+        <li><a href="#" class="active">Labs</a></li>
+        <li><a href="../index.html#books">Books</a></li>
+        <li><a href="../index.html#community">Community</a></li>
+        <li><a href="../index.html#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <header class="labs-header">
+    <div class="wrap">
+      <p class="label">Labs</p>
+      <h1>Selected technical projects.</h1>
+      <p class="labs-intro">
+        A working notebook of physical modeling, control, and surrogate-modeling projects —
+        mostly built in Modelica and Wolfram Language. Each card is self-contained;
+        open the form on any project to get in touch about that specific piece of work.
+      </p>
+    </div>
+  </header>
+
+  <hr class="divider">
+
+  <section class="projects">
+    <div class="wrap">
+      <div class="project-list">
+
+        <!-- 1. Inverted Pendulum -->
+        <article class="project-card fade">
+          <div class="project-head">
+            <span class="project-tag">Control Theory · Robotics</span>
+            <span class="status-badge status-progress">In Progress</span>
+          </div>
+          <h2 class="project-title">Inverted Pendulum — LQR from First Principles</h2>
+          <p class="project-what">Five-notebook series walking through LQR controller design from first principles, using Wolfram System Modeler for the plant and Wolfram Language for the optimization.</p>
+          <p class="project-insight"><span class="insight-label">Why it matters</span> Shows the math underneath the controller, not just the toolbox.</p>
+          <details class="project-form">
+            <summary>Get in touch about this project</summary>
+            <form action="https://formspree.io/f/xvznajoz" method="POST">
+              <input type="hidden" name="project" value="Inverted Pendulum — LQR">
+              <input type="hidden" name="_subject" value="Labs inquiry: Inverted Pendulum — LQR">
+              <div class="form-row">
+                <label>Name<input type="text" name="name" required></label>
+                <label>Email<input type="email" name="email" required></label>
+              </div>
+              <label>Message<textarea name="message" rows="4" required></textarea></label>
+              <button type="submit">Send</button>
+            </form>
+          </details>
+        </article>
+
+        <!-- 2. ROSlink -->
+        <article class="project-card fade">
+          <div class="project-head">
+            <span class="project-tag">Robotics · Simulation Integration</span>
+            <span class="status-badge status-progress">In Progress</span>
+          </div>
+          <h2 class="project-title">ROSlink</h2>
+          <p class="project-what">A Modelica library that connects Modelica models to ROS 2 (Robot Operating System) on Linux — publishers, subscribers, and a working hardware-in-the-loop demo.</p>
+          <p class="project-insight"><span class="insight-label">Why it matters</span> Bridges physics-based simulation with the robotics software ecosystem, so a controller built against a ROS topic can be developed and tested entirely in simulation before touching real hardware.</p>
+          <details class="project-form">
+            <summary>Get in touch about this project</summary>
+            <form action="https://formspree.io/f/xnjydkqz" method="POST">
+              <input type="hidden" name="project" value="ROSlink">
+              <input type="hidden" name="_subject" value="Labs inquiry: ROSlink">
+              <div class="form-row">
+                <label>Name<input type="text" name="name" required></label>
+                <label>Email<input type="email" name="email" required></label>
+              </div>
+              <label>Message<textarea name="message" rows="4" required></textarea></label>
+              <button type="submit">Send</button>
+            </form>
+          </details>
+        </article>
+
+        <!-- 3. Driveline Modelica Library -->
+        <article class="project-card project-card--placeholder fade">
+          <div class="project-head">
+            <span class="project-tag">Mechanical Systems</span>
+            <span class="status-badge status-todo">Coming Soon</span>
+          </div>
+          <h2 class="project-title">Driveline Modelica Library</h2>
+          <p class="project-what">TODO — short description of what the library does and which problems it solves.</p>
+          <p class="project-insight"><span class="insight-label">Why it matters</span> TODO — one-line insight.</p>
+        </article>
+
+        <!-- 4. Universal Differential Equations -->
+        <article class="project-card project-card--placeholder fade">
+          <div class="project-head">
+            <span class="project-tag">Scientific Machine Learning</span>
+            <span class="status-badge status-todo">Coming Soon</span>
+          </div>
+          <h2 class="project-title">Universal Differential Equations</h2>
+          <p class="project-what">TODO — short description of the UDE work.</p>
+          <p class="project-insight"><span class="insight-label">Why it matters</span> TODO — one-line insight.</p>
+        </article>
+
+        <!-- 5. CTESN Surrogate Modeling -->
+        <article class="project-card fade">
+          <div class="project-head">
+            <span class="project-tag">Surrogate Modeling · Optimization</span>
+            <span class="status-badge status-complete">Complete</span>
+          </div>
+          <h2 class="project-title">CTESN Surrogate Modeling for Modelica Calibration</h2>
+          <p class="project-what">Continuous-Time Echo State Networks trained on Modelica simulation data to replace expensive physics models inside calibration and optimization loops.</p>
+          <p class="project-insight"><span class="insight-label">Why it matters</span> Matches full-model dynamics, runs orders of magnitude faster, and exports as a native System Modeler component — so the surrogate slots back into the workflow it replaced.</p>
+          <div class="project-links">
+            <a class="work-link" href="https://community.wolfram.com/groups/-/m/t/3459092" target="_blank" rel="noopener">Wolfram Community post →</a>
+          </div>
+          <details class="project-form">
+            <summary>Get in touch about this project</summary>
+            <form action="https://formspree.io/f/mlgkbyez" method="POST">
+              <input type="hidden" name="project" value="CTESN Surrogate Modeling">
+              <input type="hidden" name="_subject" value="Labs inquiry: CTESN">
+              <div class="form-row">
+                <label>Name<input type="text" name="name" required></label>
+                <label>Email<input type="email" name="email" required></label>
+              </div>
+              <label>Message<textarea name="message" rows="4" required></textarea></label>
+              <button type="submit">Send</button>
+            </form>
+          </details>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <footer>
+    <div class="wrap">&copy; <span id="year"></span> Ankit Anurag Naik</div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); } });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.fade').forEach(el => obs.observe(el));
+  </script>
+
+</body>
+</html>
