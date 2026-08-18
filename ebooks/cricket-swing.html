@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bowled by a Late Swinger — Thinking in Systems</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,400;0,600;0,700;1,700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ===================== COVER ===================== -->
+<section class="page cover has-hero">
+  <div class="hero" style="background-image:url('figures/cricket-hero.png')"></div>
+  <div class="inner">
+    <div class="wordmark">
+      <img src="assets/logo-dark.svg" alt="Thinking in Systems, Not Code">
+      <span class="txt">Thinking in Systems<small>Not Code</small></span>
+    </div>
+
+    <div style="margin-top:1.0in">
+      <span class="kicker">Field note &middot; Cricket</span>
+      <h1>Bowled by a<br>Late Swinger</h1>
+      <p class="subtitle">I got out to a ball that pitched on middle and hit off
+      stump. So I modelled it &mdash; and found the movement was never the part
+      I should have been trying to predict.</p>
+    </div>
+
+    <div class="byline">
+      <span class="name">Ankit Naik</span> &nbsp;&middot;&nbsp; Thinking in Systems &nbsp;&middot;&nbsp; August 2026
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TL;DR ===================== -->
+<section class="page">
+  <span class="kicker">The 60-second version</span>
+  <h1 class="section-title">If you read nothing else</h1>
+  <hr class="rule">
+
+  <ul class="tick">
+    <li><strong>The finding</strong> &mdash; length barely changes how much an outswinger moves. Full, good or short, it swings the same <b>0.38&nbsp;m</b>. What length changes is how long you get to read it.</li>
+    <li><strong>Why it matters</strong> &mdash; you are not judging a variable amount of movement. You are judging a starting line and adding a near-constant offset.</li>
+    <li><strong>The mechanism</strong> &mdash; the sideways force is aerodynamic. It is set by pace and seam angle. It does not know where the ball bounced.</li>
+    <li><strong>Do this</strong> &mdash; meet it further out. Take guard outside the crease, stride to the pitch of the ball, or both &mdash; it halves the movement that arrives after you have committed.</li>
+  </ul>
+
+  <div class="tiles">
+    <div class="tile"><div class="num">0.38<small>&nbsp;m</small></div><div class="label">Sideways movement &mdash; the same at every length</div></div>
+    <div class="tile"><div class="num">96<small>&nbsp;mm</small></div><div class="label">The ball that bowled me: middle to off stump, after pitching</div></div>
+    <div class="tile"><div class="num">2<small>&times;</small></div><div class="label">Late movement you take on by playing back instead of at the pitch</div></div>
+  </div>
+
+  <div class="callout">
+    <span class="k">So what</span>
+    <p>Stop trying to predict <em>how much</em> it will swing. Predict the line it
+    started on, add about a ball and a half towards the off side, and meet it as far
+    out as you can so that less of the movement happens after you have committed.</p>
+  </div>
+
+  <div class="footer">
+    <div class="wordmark"><img src="assets/logo.svg" alt=""><span class="txt">Thinking in Systems</span></div>
+    <span>&copy; Ankit Naik 2026</span>
+    <span class="page-no">2</span>
+  </div>
+</section>
+
+<!-- ===================== CH 1 ===================== -->
+<section class="page">
+  <span class="kicker">Chapter 1</span>
+  <h1 class="section-title"><span class="n">01</span> &nbsp;Length changes the timing, not the total</h1>
+  <hr class="rule">
+
+  <p class="lead">My assumption walking off: a fuller ball pitches closer to me, so
+  there is less room left for it to move. Pitch it up and the problem shrinks.</p>
+
+  <table class="tbl">
+    <thead><tr><th>Length</th><th>Pitches from stumps</th><th>Total swing</th><th>Moves after pitching</th><th>Time to read it</th></tr></thead>
+    <tbody>
+      <tr><td>Overpitched</td><td>2.0 m</td><td><b>+0.39 m</b></td><td>+74 mm</td><td>81 ms</td></tr>
+      <tr><td>Good length</td><td>4.8 m</td><td><b>+0.38 m</b></td><td>+165 mm</td><td>191 ms</td></tr>
+      <tr><td>Short</td><td>8.0 m</td><td><b>+0.38 m</b></td><td>+261 mm</td><td>324 ms</td></tr>
+    </tbody>
+  </table>
+
+  <figure>
+    <img src="figures/cricket-lengths.png" alt="Three lengths compared, plan view and batsman's eye">
+    <figcaption><b>Figure 1.</b> Notice the plan view at the bottom: the three
+    coloured paths lie almost on top of each other. Only the crosses &mdash; where
+    each ball pitches &mdash; separate. Half right: the fuller ball really does move
+    less after pitching (74 mm against 261 mm), but it gives you 81 ms to see it
+    instead of 324 ms. The <em>total</em> is the same either way.</figcaption>
+  </figure>
+
+  <div class="footer">
+    <div class="wordmark"><img src="assets/logo.svg" alt=""><span class="txt">Thinking in Systems</span></div>
+    <span>&copy; Ankit Naik 2026</span>
+    <span class="page-no">3</span>
+  </div>
+</section>
+
+<!-- ===================== CH 2 ===================== -->
+<section class="page">
+  <span class="kicker">Chapter 2</span>
+  <h1 class="section-title"><span class="n">02</span> &nbsp;Read the line, not the movement</h1>
+  <hr class="rule">
+
+  <p class="lead">If the movement is fixed, the only thing left to read is where
+  the ball started. So I changed the release angle and left everything else alone.</p>
+
+  <table class="tbl">
+    <thead><tr><th>Released</th><th>Pitches</th><th>Reaches the stumps</th><th>Swing</th></tr></thead>
+    <tbody>
+      <tr><td>&minus;3.0&deg;</td><td>0.45 m outside leg</td><td>0.49 m down the leg side</td><td>+0.38 m</td></tr>
+      <tr><td>&minus;1.0&deg;</td><td>on middle</td><td><b>off stump</b></td><td>+0.38 m</td></tr>
+      <tr><td>+1.5&deg;</td><td>0.55 m outside off</td><td>0.82 m outside off, to slip</td><td>+0.38 m</td></tr>
+    </tbody>
+  </table>
+
+  <ul class="tick">
+    <li>The release angle slides the whole line sideways. It does not change the swing.</li>
+    <li>The middle row is the ball that bowled me &mdash; aimed one degree inside the stumps.</li>
+    <li>So the movement is an offset you can learn, not a variable you must guess.</li>
+  </ul>
+
+  <figure>
+    <img src="figures/cricket-line.png" alt="Three release angles, plan view and batsman's eye">
+    <figcaption><b>Figure 2.</b> Three aims, three parallel curves. Each solid
+    path sits the same distance from its own dotted twin &mdash; the twin being the
+    same ball with the swing switched off.</figcaption>
+  </figure>
+
+  <div class="footer">
+    <div class="wordmark"><img src="assets/logo.svg" alt=""><span class="txt">Thinking in Systems</span></div>
+    <span>&copy; Ankit Naik 2026</span>
+    <span class="page-no">4</span>
+  </div>
+</section>
+
+<!-- ===================== CH 3 ===================== -->
+<section class="page">
+  <span class="kicker">Chapter 3</span>
+  <h1 class="section-title"><span class="n">03</span> &nbsp;Where to meet it</h1>
+  <hr class="rule">
+
+  <p class="lead">Movement accumulates with distance flown. So the question is not
+  how much it swings &mdash; it is how much is still to come once you have committed.</p>
+
+  <table class="tbl">
+    <thead><tr><th>Meet the ball</th><th>At</th><th>Movement to cover</th><th>Arrives after you commit</th></tr></thead>
+    <tbody>
+      <tr><td>At its pitch</td><td>405 ms</td><td>215 mm</td><td><b>51 mm</b></td></tr>
+      <tr><td>2.5 m down the pitch</td><td>495 ms</td><td>287 mm</td><td>79 mm</td></tr>
+      <tr><td>At the crease</td><td>546 ms</td><td>334 mm</td><td>92 mm</td></tr>
+      <tr><td>Back, at the stumps</td><td>592 ms</td><td>379 mm</td><td><b>102 mm</b></td></tr>
+    </tbody>
+  </table>
+
+  <ul class="tick">
+    <li>Standing deep buys about <b>97 ms</b> more watching time.</li>
+    <li>It also doubles the late movement &mdash; 51 mm becomes 102 mm. A cricket ball is 71 mm across, so that is the difference between the middle of the bat and an edge.</li>
+  </ul>
+
+  <figure>
+    <img src="figures/cricket-intercept.png" alt="One delivery, three interception points">
+    <figcaption><b>Figure 3.</b> Each panel freezes when the ball reaches that
+    point. The shaded wedges are the movement still to come.</figcaption>
+  </figure>
+
+  <div class="footer">
+    <div class="wordmark"><img src="assets/logo.svg" alt=""><span class="txt">Thinking in Systems</span></div>
+    <span>&copy; Ankit Naik 2026</span>
+    <span class="page-no">5</span>
+  </div>
+</section>
+
+<!-- ===================== CLOSING ===================== -->
+<section class="page closing">
+  <div style="max-width:82%">
+    <span class="kicker">The takeaway</span>
+    <h1>Judge the line.<br>Meet it early.</h1>
+    <p>I went looking for a way to predict the swing and found there was nothing to
+    predict &mdash; it is very nearly the same every ball. What varies is where the
+    bowler aimed, and how much of the movement is still ahead of me when I commit.</p>
+  </div>
+
+  <ul class="tick" style="max-width:84%; margin-top:22px">
+    <li>Read the release and the pitch, then allow about a ball and a half to the off side.</li>
+    <li>Meet it as close to its pitch as you can &mdash; guard outside the crease, a full stride, or both. That halves the late movement.</li>
+    <li>Do not play across it. Bat and ball are already diverging.</li>
+    <li>Stop treating "it swung late" as the explanation. It swung all the way.</li>
+  </ul>
+
+  <div style="margin-top:26px"><a class="cta" href="#">Next: inswing, a different beast &rarr;</a></div>
+
+  <div class="foot">
+    <div class="wordmark"><img src="assets/logo-dark.svg" alt=""><span class="txt">Thinking in Systems<small>Not Code</small></span></div>
+    <span>&copy; Ankit Naik 2026</span>
+  </div>
+</section>
+
+<!-- ===================== METHOD & LIMITS ===================== -->
+<section class="page">
+  <h1 class="section-title">Method &amp; limits</h1>
+  <hr class="rule">
+
+  <p class="lead">Every number here comes from one configuration: a new ball at
+  119 km/h, seam angled 20&deg;, released 2.2 m up. Read the limits before you
+  trust the conclusions.</p>
+
+  <ul class="tick">
+    <li><strong>Movement off the seam at the bounce is not modelled.</strong> The ball is a smooth sphere, so the pitch gives bounce and friction but cannot catch a raised seam. That effect <em>is</em> length-dependent, and it is the one thing that would undercut Chapter 1.</li>
+    <li><strong>Aerodynamic swing only</strong> &mdash; drag, a seam-driven side force, and a Magnus force from backspin.</li>
+    <li><strong>Surface state is a single number</strong>, set here to a new ball. Reverse swing exists in the model but is switched off for this study.</li>
+    <li><strong>The 200 ms commit window is my assumption</strong>, not a measurement. It sets the "arrives after you commit" column; change it and those numbers scale.</li>
+    <li><strong>The model only says <em>where</em> the ball is met, not how you get there.</strong> Taking guard outside the crease and striding to the pitch reach the same point. It says nothing about what standing out costs you &mdash; being stumped, or handing the bowler a different effective length.</li>
+    <li><strong>The side-force coefficients are semi-empirical</strong> &mdash; chosen to reproduce observed magnitudes, not fitted to wind-tunnel data.</li>
+  </ul>
+
+  <div class="notes">
+    <h3>How it was built</h3>
+    <ol>
+      <li>Ball flight and bounce as a Modelica model &mdash; multibody dynamics with a contact model for the pitch, solved in Wolfram System Modeler.</li>
+      <li>Aerodynamics as a custom component: drag, seam side force, Magnus lift, fed by the ball's own velocity and spin.</li>
+      <li>Trajectories exported and rendered in Blender, driven headlessly from the simulated data. Nothing in the animations is hand-animated.</li>
+      <li>The dotted line in every figure is the same delivery with the side force set to zero &mdash; the honest control.</li>
+    </ol>
+  </div>
+
+  <div class="footer">
+    <div class="wordmark"><img src="assets/logo.svg" alt=""><span class="txt">Thinking in Systems</span></div>
+    <span>&copy; Ankit Naik 2026</span>
+    <span class="page-no">6</span>
+  </div>
+</section>
+
+</body>
+</html>

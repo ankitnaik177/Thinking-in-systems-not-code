@@ -1,0 +1,206 @@
+/* ============================================================
+   THINKING IN SYSTEMS, NOT CODE — Ebook design system
+   Skimmable-first. Short lines, bullets, stat tiles, tables,
+   arrow-flows, callouts. You give away the story and the
+   understanding — not the code.
+   Palette = the logo: deep navy frames + amber nodes.
+   ============================================================ */
+
+:root {
+  /* Brand palette (from the logo) */
+  --deep:   #12222e;   /* navy — cover + back cover + logo frames */
+  --ink:    #17242f;   /* headings + body text                   */
+  --amber:  #f5a623;   /* THE accent — nodes, rules, numbers      */
+  --amber-d:#b9770c;   /* amber that stays legible on white       */
+  --muted:  #5d6b76;   /* captions, labels, footnotes             */
+  --band:   #f2f4f6;   /* callout / summary backgrounds           */
+  --line:   #e3e7ea;   /* hairlines                               */
+  --paper:  #ffffff;
+
+  /* Type */
+  --display: "Titillium Web", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --body:    "Source Sans 3", "Source Sans Pro", "Segoe UI", system-ui, sans-serif;
+
+  /* Page geometry (US Letter) */
+  --pw: 8.5in;
+  --ph: 11in;
+  --pad: 0.9in;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: #46545d;
+  font-family: var(--body);
+  color: var(--ink);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* ---------- The page ---------- */
+.page {
+  position: relative;
+  width: var(--pw);
+  height: var(--ph);
+  margin: 24px auto;
+  padding: var(--pad);
+  background: var(--paper);
+  box-shadow: 0 6px 30px rgba(0,0,0,.35);
+  overflow: hidden;
+}
+
+/* ---------- Type scale ---------- */
+p { font-size: 11.5pt; line-height: 1.5; margin: 0 0 12px; }
+.lead {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 15pt;
+  line-height: 1.35;
+  color: var(--ink);
+  margin: 0 0 18px;
+}
+strong { font-weight: 700; }
+em { font-style: italic; }
+
+h1, h2, h3 { font-family: var(--display); color: var(--ink); margin: 0; font-weight: 700; }
+
+.section-title {
+  font-size: 24pt;
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+.section-title .n { color: var(--amber-d); }
+.rule { height: 3px; width: 64px; background: var(--amber); margin: 12px 0 22px; border: 0; }
+
+.kicker {
+  font-family: var(--display);
+  font-weight: 700;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  font-size: 9pt;
+  color: var(--amber-d);
+}
+.cover .kicker { color: var(--amber); }
+
+/* ---------- Wordmark (glasses mark + name) ---------- */
+.wordmark { display: flex; align-items: center; gap: 11px; }
+.wordmark img { width: 46px; height: auto; display: block; }
+.wordmark .txt { font-family: var(--display); font-weight: 700; line-height: 1.05; font-size: 12pt; }
+.wordmark .txt small { display: block; font-weight: 400; font-size: .62em; letter-spacing: .06em; opacity: .75; text-transform: uppercase; }
+
+/* ---------- Cover ---------- */
+.cover { background: var(--deep); color: #fff; padding: 0; }
+.cover .inner { position: absolute; inset: var(--pad); display: flex; flex-direction: column; }
+.cover .wordmark { color: #fff; }
+.cover .wordmark img { width: 64px; }
+.cover h1 { color: #fff; font-size: 44pt; line-height: 1.04; margin: 16px 0 0; }
+.cover .subtitle {
+  color: #b9c6cf; font-family: var(--display); font-weight: 400;
+  font-size: 15.5pt; line-height: 1.4; margin-top: 20px; max-width: 84%;
+}
+.cover .byline { margin-top: auto; color: #8a9aa4; font-size: 10.5pt; }
+.cover .byline .name { color: #fff; font-weight: 600; }
+.cover .glyph { position: absolute; right: -70px; bottom: 8%; width: 360px; opacity: .12; }
+
+/* Optional cover hero image: add class "has-hero" to .cover and a
+   <div class="hero" style="background-image:url('figures/x.png')"></div>.
+   Sits as a bottom band and melts into the navy at its top edge. */
+.cover .hero {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 45%;
+  background-position: center; background-size: cover; background-repeat: no-repeat;
+}
+.cover .hero::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(to bottom,
+    #12222e 0%, rgba(18,34,46,.65) 10%, rgba(18,34,46,0) 32%);
+}
+.cover.has-hero .inner { bottom: 48%; }
+.cover.has-hero .glyph { display: none; }
+
+/* ---------- Running footer ---------- */
+.footer {
+  position: absolute; left: var(--pad); right: var(--pad); bottom: 0.55in;
+  display: flex; align-items: center; justify-content: space-between;
+  border-top: 1px solid var(--line); padding-top: 9px;
+  font-size: 8pt; color: var(--muted);
+}
+.footer .wordmark img { width: 28px; }
+.footer .wordmark .txt { font-size: 8.5pt; }
+.footer .page-no { font-family: var(--display); font-weight: 700; color: var(--ink); }
+
+/* ---------- TL;DR / summary band ---------- */
+.band { background: var(--band); border-left: 4px solid var(--amber); padding: 20px 24px; margin-bottom: 26px; }
+.band h2 { font-size: 16pt; margin-bottom: 12px; }
+
+/* ---------- Bulleted takeaways (parallel, skimmable) ---------- */
+.tick { list-style: none; margin: 0; padding: 0; }
+.tick li { position: relative; padding-left: 24px; margin-bottom: 11px; font-size: 12pt; line-height: 1.45; }
+.tick li::before { content: ""; position: absolute; left: 0; top: .42em; width: 10px; height: 10px; border-radius: 3px; background: var(--amber); }
+.tick li strong { font-family: var(--display); }
+
+/* ---------- Stat tiles (KPI row) ---------- */
+.tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 4px 0 24px; }
+.tiles.two { grid-template-columns: repeat(2, 1fr); }
+.tile { border: 1px solid var(--line); border-top: 4px solid var(--amber); border-radius: 8px; padding: 16px 16px 14px; }
+.tile .num { font-family: var(--display); font-weight: 700; color: var(--deep); font-size: 34pt; line-height: .95; }
+.tile .num small { font-size: 17pt; }
+.tile .label { font-size: 9.5pt; color: var(--muted); line-height: 1.35; margin-top: 6px; }
+
+/* ---------- Arrow flow (before -> shift -> after) ---------- */
+.flow { display: flex; align-items: stretch; gap: 0; margin: 6px 0 24px; }
+.flow .step { flex: 1; background: var(--band); border-radius: 8px; padding: 14px 16px; }
+.flow .step .h { font-family: var(--display); font-weight: 700; color: var(--ink); font-size: 11pt; margin-bottom: 4px; }
+.flow .step .d { font-size: 10pt; color: var(--muted); line-height: 1.35; }
+.flow .arrow { display: flex; align-items: center; padding: 0 10px; color: var(--amber); font-size: 20pt; font-weight: 700; }
+
+/* ---------- Comparison table ---------- */
+.tbl { width: 100%; border-collapse: collapse; margin: 4px 0 24px; font-size: 11pt; }
+.tbl th, .tbl td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.tbl thead th { font-family: var(--display); font-size: 9.5pt; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); border-bottom: 2px solid var(--ink); }
+.tbl tbody tr td:first-child { font-weight: 600; }
+
+/* ---------- "So what" callout ---------- */
+.callout { background: var(--deep); color: #fff; border-radius: 10px; padding: 18px 22px; margin: 6px 0 22px; }
+.callout .k { font-family: var(--display); font-weight: 700; color: var(--amber); font-size: 9pt; letter-spacing: .18em; text-transform: uppercase; }
+.callout p { color: #dbe4ea; font-size: 12.5pt; line-height: 1.4; margin: 6px 0 0; }
+
+/* ---------- Pull quote ---------- */
+.pullquote { font-family: var(--display); font-style: italic; font-weight: 700; color: var(--ink); font-size: 17pt; line-height: 1.35; border-left: 4px solid var(--amber); padding: 2px 0 2px 18px; margin: 8px 0 22px; }
+.pullquote .attr { display: block; font-style: normal; font-weight: 400; font-size: 10pt; color: var(--muted); margin-top: 8px; }
+
+/* ---------- Figure ---------- */
+figure { margin: 0 0 14px; }
+figure img { width: 100%; display: block; border-radius: 8px; border: 1px solid var(--line); }
+.figph { width: 100%; aspect-ratio: 16/9; background: repeating-linear-gradient(45deg, var(--band), var(--band) 12px, #e7ebee 12px, #e7ebee 24px); border: 1px dashed var(--line); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--muted); font-family: var(--display); font-size: 10pt; }
+figcaption { font-size: 9.5pt; color: var(--muted); margin-top: 8px; line-height: 1.4; }
+figcaption b { color: var(--amber-d); font-family: var(--display); }
+
+/* ---------- Footnotes ---------- */
+sup.fn { color: var(--amber-d); font-weight: 700; font-size: .66em; }
+.notes { border-top: 1px solid var(--line); padding-top: 12px; }
+.notes h3 { font-size: 10pt; color: var(--muted); text-transform: uppercase; letter-spacing: .12em; margin-bottom: 10px; }
+.notes ol { margin: 0; padding-left: 18px; }
+.notes li { font-size: 8.5pt; color: var(--muted); line-height: 1.45; margin-bottom: 6px; }
+
+/* ---------- Back cover / closing ---------- */
+.closing { background: var(--deep); color: #fff; }
+.closing h1 { color: #fff; font-size: 32pt; line-height: 1.08; margin-bottom: 16px; }
+.closing p { color: #cdd8df; font-size: 12.5pt; line-height: 1.5; max-width: 82%; }
+.closing .tick li { color: #eaf1f4; }
+.closing .cta { display: inline-block; margin-top: 4px; background: var(--amber); color: var(--deep); font-family: var(--display); font-weight: 700; font-size: 11.5pt; padding: 12px 24px; border-radius: 7px; }
+.closing .foot { position: absolute; left: var(--pad); right: var(--pad); bottom: 0.55in; color: #8a9aa4; font-size: 9pt; display: flex; justify-content: space-between; align-items: center; }
+.closing .wordmark { color: #fff; }
+
+/* ---------- Helpers ---------- */
+.spacer { height: 16px; }
+.muted { color: var(--muted); }
+
+/* ============================================================
+   PRINT — clean PDF pages
+   ============================================================ */
+@page { size: Letter; margin: 0; }
+@media print {
+  body { background: #fff; }
+  .page { margin: 0; box-shadow: none; page-break-after: always; break-after: page; }
+  .page:last-child { page-break-after: auto; }
+}
