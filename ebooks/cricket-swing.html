@@ -24,8 +24,8 @@
       <span class="kicker">Field note &middot; Cricket</span>
       <h1>Bowled by a<br>Late Swinger</h1>
       <p class="subtitle">I got out to a ball that pitched on middle and hit off
-      stump. So I modelled it &mdash; and found the movement was never the part
-      I should have been trying to predict.</p>
+      stump. What could I have done differently? Let me check with some
+      simulations.</p>
     </div>
 
     <div class="byline">
@@ -42,7 +42,7 @@
   <hr class="rule">
 
   <ul class="tick">
-    <li><strong>The finding</strong> &mdash; length barely changes how much an outswinger moves. Full, good or short, it swings the same <b>0.38&nbsp;m</b>. What length changes is how long you get to read it.</li>
+    <li><strong>The finding</strong> &mdash; length barely changes how much an outswinger moves. Full, good or short, it swings the same <b>0.38&nbsp;m</b>. What length changes is how much of that movement lands after the bounce &mdash; perhaps that is what creates the illusion of late swing.</li>
     <li><strong>Why it matters</strong> &mdash; you are not judging a variable amount of movement. You are judging a starting line and adding a near-constant offset.</li>
     <li><strong>The mechanism</strong> &mdash; the sideways force is aerodynamic. It is set by pace and seam angle. It does not know where the ball bounced.</li>
     <li><strong>Do this</strong> &mdash; meet it further out. Take guard outside the crease, stride to the pitch of the ball, or both &mdash; it halves the movement that arrives after you have committed.</li>
@@ -71,7 +71,7 @@
 <!-- ===================== CH 1 ===================== -->
 <section class="page">
   <span class="kicker">Chapter 1</span>
-  <h1 class="section-title"><span class="n">01</span> &nbsp;Length changes the timing, not the total</h1>
+  <h1 class="section-title"><span class="n">01</span> &nbsp;Length changes the timing</h1>
   <hr class="rule">
 
   <p class="lead">My assumption walking off: a fuller ball pitches closer to me, so
@@ -123,7 +123,7 @@
   <ul class="tick">
     <li>The release angle slides the whole line sideways. It does not change the swing.</li>
     <li>The middle row is the ball that bowled me &mdash; aimed one degree inside the stumps.</li>
-    <li>So the movement is an offset you can learn, not a variable you must guess.</li>
+    <li>So the movement is an offset you can learn or predict.</li>
   </ul>
 
   <figure>
@@ -161,7 +161,7 @@
 
   <ul class="tick">
     <li>Standing deep buys about <b>97 ms</b> more watching time.</li>
-    <li>It also doubles the late movement &mdash; 51 mm becomes 102 mm. A cricket ball is 71 mm across, so that is the difference between the middle of the bat and an edge.</li>
+    <li>It also doubles the late movement &mdash; 51 mm becomes 102 mm. A cricket ball is 71 mm in diameter, so that is the difference between the middle of the bat and an edge.</li>
   </ul>
 
   <figure>
@@ -207,7 +207,7 @@
   <h1 class="section-title">Method &amp; limits</h1>
   <hr class="rule">
 
-  <p class="lead">Every number here comes from one configuration: a new ball at
+  <p class="lead">The numbers here come from one configuration: a new ball at
   119 km/h, seam angled 20&deg;, released 2.2 m up. Read the limits before you
   trust the conclusions.</p>
 
@@ -215,9 +215,8 @@
     <li><strong>Movement off the seam at the bounce is not modelled.</strong> The ball is a smooth sphere, so the pitch gives bounce and friction but cannot catch a raised seam. That effect <em>is</em> length-dependent, and it is the one thing that would undercut Chapter 1.</li>
     <li><strong>Aerodynamic swing only</strong> &mdash; drag, a seam-driven side force, and a Magnus force from backspin.</li>
     <li><strong>Surface state is a single number</strong>, set here to a new ball. Reverse swing exists in the model but is switched off for this study.</li>
-    <li><strong>The 200 ms commit window is my assumption</strong>, not a measurement. It sets the "arrives after you commit" column; change it and those numbers scale.</li>
     <li><strong>The model only says <em>where</em> the ball is met, not how you get there.</strong> Taking guard outside the crease and striding to the pitch reach the same point. It says nothing about what standing out costs you &mdash; being stumped, or handing the bowler a different effective length.</li>
-    <li><strong>The side-force coefficients are semi-empirical</strong> &mdash; chosen to reproduce observed magnitudes, not fitted to wind-tunnel data.</li>
+    <li><strong>The side-force coefficients are semi-empirical</strong> &mdash; chosen to reproduce observed magnitudes, not fitted to actual data.</li>
   </ul>
 
   <div class="notes">
@@ -225,7 +224,7 @@
     <ol>
       <li>Ball flight and bounce as a Modelica model &mdash; multibody dynamics with a contact model for the pitch, solved in Wolfram System Modeler.</li>
       <li>Aerodynamics as a custom component: drag, seam side force, Magnus lift, fed by the ball's own velocity and spin.</li>
-      <li>Trajectories exported and rendered in Blender, driven headlessly from the simulated data. Nothing in the animations is hand-animated.</li>
+      <li>Trajectories exported and rendered in Blender, driven headlessly from the simulated data.</li>
       <li>The dotted line in every figure is the same delivery with the side force set to zero &mdash; the honest control.</li>
     </ol>
   </div>
