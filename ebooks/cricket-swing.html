@@ -8,6 +8,18 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,400;0,600;0,700;1,700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<style>
+/* Figures play on screen and print as the still. .page has a fixed height, so the
+   video is capped by height and sizes to its own aspect rather than the column. */
+.fig-video { display:block; margin:0 auto; width:auto; height:auto;
+             max-width:100%; max-height:3.5in;
+             border-radius:8px; border:1px solid var(--line); background:#0f1620; }
+.fig-still { display:none; }
+@media print {
+  .fig-video { display:none; }
+  .fig-still { display:block; }
+}
+</style>
 </head>
 <body>
 
@@ -87,7 +99,9 @@
   </table>
 
   <figure>
-    <img src="figures/cricket-lengths.png" alt="Three lengths compared, plan view and batsman's eye">
+    <video class="fig-video" src="video/outswinger_compare.mp4" poster="figures/cricket-lengths-poster.jpg"
+           controls loop muted playsinline preload="metadata"></video>
+    <img class="fig-still" src="figures/cricket-lengths.png" alt="Three lengths compared, plan view and batsman's eye">
     <figcaption><b>Figure 1.</b> The short ball is airborne 304 ms against 496 ms for a
     full one, and still swings the same 0.38 m. Look at the plan view: the three paths
     sit almost on top of each other, and only the crosses where they pitch separate.
@@ -127,7 +141,9 @@
   </ul>
 
   <figure>
-    <img src="figures/cricket-line.png" alt="Three release angles, plan view and batsman's eye">
+    <video class="fig-video" src="video/outswinger_line.mp4" poster="figures/cricket-line-poster.jpg"
+           controls loop muted playsinline preload="metadata"></video>
+    <img class="fig-still" src="figures/cricket-line.png" alt="Three release angles, plan view and batsman's eye">
     <figcaption><b>Figure 2.</b> Three aims, three parallel curves. Each dotted line is
     that same ball with the swing switched off, and every solid path sits the same
     distance from its own twin.</figcaption>
@@ -165,7 +181,9 @@
   </ul>
 
   <figure>
-    <img src="figures/cricket-intercept.png" alt="One delivery, three interception points">
+    <video class="fig-video" src="video/outswinger_intercept.mp4" poster="figures/cricket-intercept-poster.jpg"
+           controls loop muted playsinline preload="metadata"></video>
+    <img class="fig-still" src="figures/cricket-intercept.png" alt="One delivery, three interception points">
     <figcaption><b>Figure 3.</b> Each panel freezes when the ball reaches that
     point. The shaded wedges are the movement still to come.</figcaption>
   </figure>
