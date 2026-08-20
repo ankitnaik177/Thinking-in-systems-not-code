@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Can the Transformer Be Smaller and Safer? — Thinking in Systems</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,400;0,600;0,700;1,700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+/* Figures play on screen and print as the still. .page has a fixed height, so the
+   video is capped by height and sizes to its own aspect rather than the column. */
+.fig-video { display:block; margin:0 auto; width:auto; height:auto;
+             max-width:100%; max-height:3.1in;
+             border-radius:8px; border:1px solid var(--line); background:#0f1620; }
+.fig-still { display:none; max-height:3.1in; width:auto; margin:0 auto; }
+@media print {
+  .fig-video { display:none; }
+  .fig-still { display:block; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== COVER ===================== -->
+<section class="page cover has-hero">
+  <div class="hero" style="background-image:url('figures/sst-hero.png')"></div>
+  <div class="inner">
+    <div class="wordmark">
+      <img src="assets/logo-dark.svg" alt="Thinking in Systems, Not Code">
+      <span class="txt">Thinking in Systems<small>Not Code</small></span>
+    </div>
+
+    <div style="margin-top:1.0in">
+      <span class="kicker">Field note &middot; What's next in transformers</span>
+      <h1>Can the transformer be<br>smaller and safer?</h1>
+      <p class="subtitle">The transformer on your street is a 140-year-old design:
+      iron, copper and a tank of oil. The new solid state version is much lighter
+      and compact. Let's compare them using simulations.</p>
+    </div>
+
+    <div class="byline">
+      <span class="name">Ankit Naik</span> &nbsp;&middot;&nbsp; Thinking in Systems &nbsp;&middot;&nbsp; August 2026
+      &nbsp;&middot;&nbsp; <a href="solid-state-transformer.pdf" download style="color:inherit">Download PDF</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TL;DR ===================== -->
+<section class="page">
+  <span class="kicker">The 60-second version</span>
+  <h1 class="section-title">If you read nothing else</h1>
+  <hr class="rule">
+
+  <ul class="tick">
+    <li><strong>The finding.</strong> I introduced a fault. With the old transformer and breaker, about <b>6&nbsp;000&nbsp;A</b> ran for a tenth of a second before the fault cleared. With the solid state transformer the current never got past <b>430&nbsp;A</b>.</li>
+    <li><strong>Why it matters.</strong> Almost all the damage a fault does, it does while you wait for the breaker. Cut the wait and there is not much damage left.</li>
+    <li><strong>The mechanism.</strong> The old breaker is a machine. A relay decides, contacts swing apart, then an arc keeps conducting until the AC happens to cross zero. The electronic one just stops.</li>
+    <li><strong>Do this.</strong> If your work touches data centers, EV charging or solar-heavy feeders, get familiar with this technology now. That is where it arrives first.</li>
+  </ul>
+
+  <div class="tiles">
+    <div class="tile"><div class="num">100<small>&times;</small></div><div class="label">Smaller magnetics: run the core at 20 kHz instead of 50 Hz</div></div>
+    <div class="tile"><div class="num">6 000 &rarr; 430<small>&nbsp;A</small></div><div class="label">The same fault, old iron vs solid state</div></div>
+    <div class="tile"><div class="num">98<small>%</small></div><div class="label">Less fault wear absorbed by the equipment</div></div>
+  </div>
+
+  <div class="callout">
+    <span class="k">So what</span>
+    <p>Once it is made of electronics, fault protection is a control decision.</p>
+  </div>
+
+  <div class="footer">
+    <div class="wordmark"><img src="assets/logo.svg" alt=""><span class="txt">Thinking in Systems</span></div>
+    <span>&copy; Ankit Naik 2026</span>
+    <span class="page-no">2</span>
+  </div>
+</section>
+
+<!-- ===================== CH 1 ===================== -->
+<section class="page">
+  <span class="kicker">Chapter 1</span>
+  <h1 class="section-title"><span class="n">01</span> &nbsp;High voltage for the journey</h1>
+  <hr class="rule">
+
+  <p class="lead">Losses in a wire grow with the <em>square</em> of the current, so the
+  grid moves power at high voltage and steps it down near your house. The stepping is
+  the transformer's job.</p>
+
+  <div class="flow">
+    <div class="step"><div class="h">Power plant</div><div class="d">15 kV at the generator terminals</div></div>
+    <div class="arrow">&rarr;</div>
+    <div class="step"><div class="h">Transmission</div><div class="d">220 kV, tiny current, cool wires</div></div>
+    <div class="arrow">&rarr;</div>
+    <div class="step"><div class="h">Feeder</div><div class="d">11 kV through the neighborhood</div></div>
+    <div class="arrow">&rarr;</div>
+    <div class="step"><div class="h">Home</div><div class="d">230 V at the wall socket</div></div>
+  </div>
+
+  <ul class="tick">
+    <li>Ten times the voltage means one hundredth the loss in the same wire.</li>
+    <li>At 50 Hz each cycle is slow, so the iron core has to swallow a lot of magnetic flux per cycle. <b>Core size scales as 1/frequency.</b> Keep that in mind for chapter 3.</li>
+    <li>The losses come out as heat and the windings need insulation. A tank of mineral oil does both jobs, and it is also why these boxes can leak and burn.</li>
+  </ul>
+
+  <figure>
+    <video class="fig-video" src="video/sst-normal-day.mp4" poster="figures/sst-normal-day-poster.jpg"
+           controls loop muted playsinline preload="metadata"></video>
+    <img class="fig-still" src="figures/sst-normal-day.png" alt="A normal day: the feeder, the pole-top transformer and the houses, with the data panel green">
+    <figcaption><b>Figure 1.</b> A normal day in the model: 11&nbsp;kV comes in, the
+    pole-top transformer delivers 230&nbsp;V and 50&nbsp;kW to the street, and the dial
+    sits at 218&nbsp;A in the green. Nothing happens. That is what normal looks
+    like.</figcaption>
+  </figure>
+
+  <div class="footer">
+    <div class="wordmark"><img src="assets/logo.svg" alt=""><span class="txt">Thinking in Systems</span></div>
+    <span>&copy; Ankit Naik 2026</span>
+    <span class="page-no">3</span>
+  </div>
+</section>
+
+<!-- ===================== CH 2 ===================== -->
+<section class="page">
+  <span class="kicker">Chapter 2</span>
+  <h1 class="section-title"><span class="n">02</span> &nbsp;When the street shorts out</h1>
+  <hr class="rule">
+
+  <p class="lead">At t&nbsp;=&nbsp;0.5&nbsp;s a branch falls across the wires. From that
+  moment the only thing limiting the current is the cable itself, and it jumps from
+  217&nbsp;A to about 6&nbsp;000.</p>
+
+  <ul class="tick">
+    <li>The relay notices within milliseconds. Then the machine takes over: <b>60&nbsp;ms</b> pass before the contacts even begin to part.</li>
+    <li>When they part the current does not stop. An <b>electric arc</b> keeps conducting between the contacts until the alternating current happens to cross zero.</li>
+    <li>All that time, heat and magnetic force are going into the transformer windings and the cable. The "wear" bar in the film integrates that punishment (&int;i&sup2;dt) and fills for as long as the fault runs.</li>
+  </ul>
+
+  <figure>
+    <video class="fig-video" src="video/sst-old-breaker.mp4" poster="figures/sst-old-breaker-poster.jpg"
+           controls loop muted playsinline preload="metadata"></video>
+    <img class="fig-still" src="figures/sst-old-breaker.png" alt="The fault under the old breaker: arc burning at the pole, dial pegged red, wear bar full">
+    <figcaption><b>Figure 2.</b> The contacts are open but the arc still carries the
+    full fault current. The dial reads 3&nbsp;619&nbsp;A&mdash;a smoothed average; the raw
+    peaks reach about 6&nbsp;000&nbsp;A&mdash;and the wear bar is filling. By the time the
+    arc dies the street is dark, and the equipment has taken its worst beating in
+    years.</figcaption>
+  </figure>
+
+  <div class="pullquote">
+    The grid's reflexes are mechanical. Between the fault and the cure, the
+    transformer just has to survive.
+  </div>
+
+  <div class="footer">
+    <div class="wordmark"><img src="assets/logo.svg" alt=""><span class="txt">Thinking in Systems</span></div>
+    <span>&copy; Ankit Naik 2026</span>
+    <span class="page-no">4</span>
+  </div>
+</section>
+
+<!-- ===================== CH 3 ===================== -->
+<section class="page">
+  <span class="kicker">Chapter 3</span>
+  <h1 class="section-title"><span class="n">03</span> &nbsp;The transformer gets a brain</h1>
+  <hr class="rule">
+
+  <p class="lead">A solid state transformer does the same job with power electronics on
+  either side of a much smaller transformer. The size gain comes from speed.</p>
+
+  <div class="flow">
+    <div class="step"><div class="h">AC &rarr; DC</div><div class="d">Electronics rectify the incoming 11 kV</div></div>
+    <div class="arrow">&rarr;</div>
+    <div class="step"><div class="h">20 kHz link</div><div class="d">A fist-sized transformer does the ratio and isolation</div></div>
+    <div class="arrow">&rarr;</div>
+    <div class="step"><div class="h">DC &rarr; AC</div><div class="d">Clean 230 V out—or DC directly, if you want it</div></div>
+  </div>
+
+  <ul class="tick">
+    <li>The 1/frequency rule from chapter 1 is where the 100&times; comes from: 20&nbsp;kHz is 400&times; faster than 50&nbsp;Hz, so the core shrinks by roughly two orders of magnitude.</li>
+    <li>There is no oil tank, so no fire risk and no containment basin. It can go indoors, on a pole or in a rack.</li>
+    <li>In an iron transformer the ratio is fixed by the windings. Here the ratio, the output voltage and the <b>current limit</b> live in control software and can change in microseconds.</li>
+  </ul>
+
+  <figure>
+    <img src="figures/sst-electronics.jpg" alt="Power electronics board" style="max-height:2.1in; width:auto; margin:0 auto; display:block; border-radius:8px">
+    <figcaption><b>Figure 3.</b> Switching semiconductors and their gate drives now do
+    the work the iron used to do. <span class="muted">(Photo: Pixabay.)</span></figcaption>
+  </figure>
+
+  <div class="footer">
+    <div class="wordmark"><img src="assets/logo.svg" alt=""><span class="txt">Thinking in Systems</span></div>
+    <span>&copy; Ankit Naik 2026</span>
+    <span class="page-no">5</span>
+  </div>
+</section>
+
+<!-- ===================== CH 4 ===================== -->
+<section class="page">
+  <span class="kicker">Chapter 4</span>
+  <h1 class="section-title"><span class="n">04</span> &nbsp;Same branch, same moment</h1>
+  <hr class="rule">
+
+  <p class="lead">I ran the chapter 2 fault again with the solid state transformer on
+  the pole. Same street, same branch, same instant. Its control loop caps the output at
+  430&nbsp;A and it just sits there.</p>
+
+  <table class="tbl">
+    <thead><tr><th>Protection</th><th>Peak current</th><th>Time at fault current</th><th>Fault wear absorbed</th></tr></thead>
+    <tbody>
+      <tr><td>Old breaker (moving parts)</td><td><b>~6 000 A</b></td><td>~100 ms, arc included</td><td>100%</td></tr>
+      <tr><td>Solid state breaker</td><td>650 A, then cut</td><td>under 1 ms</td><td>~2%</td></tr>
+      <tr><td>Solid state transformer</td><td><b>430 A, held</b></td><td>never exceeds its limit</td><td>~7%, still serving</td></tr>
+    </tbody>
+  </table>
+
+  <figure>
+    <video class="fig-video" src="video/sst-solid-state.mp4" poster="figures/sst-solid-state-poster.jpg"
+           controls loop muted playsinline preload="metadata"></video>
+    <img class="fig-still" src="figures/sst-solid-state.png" alt="The same fault under the solid state transformer: dial barely off the green, lamp green">
+    <figcaption><b>Figure 4.</b> The same instant as Figure 2. The dial reads
+    405&nbsp;A, the lamp is still green and the wear bar has barely moved. There is no
+    arc because nothing was interrupted.</figcaption>
+  </figure>
+
+  <div class="footer">
+    <div class="wordmark"><img src="assets/logo.svg" alt=""><span class="txt">Thinking in Systems</span></div>
+    <span>&copy; Ankit Naik 2026</span>
+    <span class="page-no">6</span>
+  </div>
+</section>
+
+<!-- ===================== CH 5 ===================== -->
+<section class="page">
+  <span class="kicker">Chapter 5</span>
+  <h1 class="section-title"><span class="n">05</span> &nbsp;The honest page</h1>
+  <hr class="rule">
+
+  <p class="lead">So why isn't this everywhere already? Five reasons, and they are all
+  real engineering.</p>
+
+  <ul class="tick">
+    <li><strong>Efficiency.</strong> A passive transformer is over 99% efficient, which is hard to beat. Three electronic conversion stages land at 96&ndash;98%, and at megawatt scale every lost percent is a heater somebody has to cool.</li>
+    <li><strong>Cost.</strong> Iron and copper are cheap. Medium-voltage silicon carbide is not, and today an SST costs several times more per kVA.</li>
+    <li><strong>Lifetime.</strong> Utilities expect 40+ years in the sun. Power electronics has proven closer to 15&ndash;20, and a semiconductor tolerates microseconds of overload where a tonne of copper and oil shrugs off seconds.</li>
+    <li><strong>Cooling.</strong> The losses are smaller in percent but they now come out of a box 100&times; smaller. That needs heat sinks, fans, sometimes liquid, and each is one more thing that can fail.</li>
+    <li><strong>Standards.</strong> A century of grid protection assumes big fault currents. A transformer that limits them can blind the legacy protection downstream, and certification moves slowly for good reasons.</li>
+  </ul>
+
+  <div class="callout">
+    <span class="k">Where it lands first</span>
+    <p>Wherever its extra functions pay for themselves: data centers taking DC straight
+    to the racks, EV fast-charging plazas, microgrids and solar-heavy feeders. Ordinary
+    street corners will be last.</p>
+  </div>
+
+  <div class="footer">
+    <div class="wordmark"><img src="assets/logo.svg" alt=""><span class="txt">Thinking in Systems</span></div>
+    <span>&copy; Ankit Naik 2026</span>
+    <span class="page-no">7</span>
+  </div>
+</section>
+
+<!-- ===================== CLOSING ===================== -->
+<section class="page closing">
+  <div style="max-width:82%">
+    <span class="kicker">The takeaway</span>
+    <h1>The old grid survives faults.<br>The new one refuses them.</h1>
+    <p>For 140 years the transformer has been a passive machine protected by another
+    machine. Both are turning into electronics. What I take from the simulations: the
+    damage was never in the fault itself, it was in the tenth of a second the old
+    hardware needed to respond.</p>
+  </div>
+
+  <ul class="tick" style="max-width:84%; margin-top:22px">
+    <li>Judge protection by what gets through while it acts, not by whether it eventually acts.</li>
+    <li>Where downtime is expensive, fast and small wins over big and rugged.</li>
+    <li>Data centers and EV charging will make this normal long before your street corner sees it.</li>
+  </ul>
+
+  <div style="margin-top:26px"><a class="cta" href="https://www.systemsnotcode.com/#work">More field notes at systemsnotcode.com &rarr;</a></div>
+
+  <div class="foot">
+    <div class="wordmark"><img src="assets/logo-dark.svg" alt=""><span class="txt">Thinking in Systems<small>Not Code</small></span></div>
+    <span>&copy; Ankit Naik 2026</span>
+  </div>
+</section>
+
+<!-- ===================== METHOD & LIMITS ===================== -->
+<section class="page">
+  <h1 class="section-title">Method &amp; limits</h1>
+  <hr class="rule">
+
+  <p class="lead">Every number in this note comes from one simulated neighborhood: an
+  11&nbsp;kV feeder, a 50&nbsp;kW street at 230&nbsp;V and a bolted short circuit at
+  t&nbsp;=&nbsp;0.5&nbsp;s. Read the limits before you trust the conclusions.</p>
+
+  <ul class="tick">
+    <li><strong>Single-phase equivalents.</strong> The grid is three-phase; these models are single-phase story versions. The protection physics—relay delay, arc-to-zero-crossing, current limiting—carries over; exact amps would not.</li>
+    <li><strong>Ideal transformers.</strong> No core saturation, no inrush, no losses. The mechanical breaker's arc uses the Modelica Standard Library arc model (arc voltage grows until a current zero quenches it).</li>
+    <li><strong>The SST is an averaged model:</strong> an ideal ratio stage plus an electronic current limit. Its converter losses and voltage regulation are not modeled—the 430 A clamp is the one behavior under test.</li>
+    <li><strong>Visual licence in the films:</strong> the physical arc in this run lasted about 1 ms (the contacts happened to part near a current zero) and is stretched to 120 ms on screen so the eye can see it. The dial shows a smoothed RMS current, not the raw 50 Hz waveform. Fault-window footage runs at 20&times; slow motion.</li>
+    <li><strong>"Wear" is the engineering quantity &int;i&sup2;dt</strong>—the standard measure of the thermal and magnetic stress a fault imposes while protection acts.</li>
+  </ul>
+
+  <div class="notes">
+    <h3>How it was built</h3>
+    <ol>
+      <li>A self-contained Modelica library (grid chain, arcing breaker, solid state breaker, averaged SST, fault and wear meters), built and simulated in Wolfram System Modeler.</li>
+      <li>Every component carries a unit test; the fault scenarios are the library's example models.</li>
+      <li>Simulated trajectories exported and rendered headlessly in Blender; the data panel is drawn per frame from the same trajectories.</li>
+    </ol>
+  </div>
+
+  <div class="footer">
+    <div class="wordmark"><img src="assets/logo.svg" alt=""><span class="txt">Thinking in Systems</span></div>
+    <span>&copy; Ankit Naik 2026</span>
+    <span class="page-no">8</span>
+  </div>
+</section>
+
+</body>
+</html>
