@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A Hundred Years in the Air — Thinking in Systems</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,400;0,600;0,700;1,700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+/* Figures play on screen and print as the still (see cricket ebook). */
+.fig-video { display:block; margin:0 auto; width:auto; height:auto;
+             max-width:100%; max-height:3.5in;
+             border-radius:8px; border:1px solid var(--line); background:#0f1620; }
+.fig-still { display:none; }
+@media print {
+  .fig-video { display:none; }
+  .fig-still { display:block; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== COVER ===================== -->
+<section class="page cover has-hero">
+  <div class="hero" style="background-image:url('figures/flight100-hero.png')"></div>
+  <div class="inner">
+    <div class="wordmark">
+      <img src="assets/logo-dark.svg" alt="Thinking in Systems, Not Code">
+      <span class="txt">Thinking in Systems<small>Not Code</small></span>
+    </div>
+
+    <div style="margin-top:1.0in">
+      <span class="kicker">Field note &middot; 1926&ndash;2026</span>
+      <h1>A Hundred Years<br>in the Air</h1>
+      <p class="subtitle">The Swedish Air Force turns 100 this weekend, and the
+      air show in Link&ouml;ping is themed past, present and future.
+      Let's see how we got here.</p>
+    </div>
+
+    <div class="byline">
+      <span class="name">Ankit Naik</span> &nbsp;&middot;&nbsp; Thinking in Systems &nbsp;&middot;&nbsp; August 2026
+      &nbsp;&middot;&nbsp; <a href="hundred-years-in-the-air.pdf" download style="color:inherit">Download PDF</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TL;DR ===================== -->
+<section class="page">
+  <span class="kicker">The 60-second version</span>
+  <h1 class="section-title">If you read nothing else</h1>
+  <hr class="rule">
+
+  <ul class="tick">
+    <li><strong>The idea.</strong> Fly the century in order, one simulation per era:
+    a glider, a piston trainer, a jet airliner, an interceptor, an autopilot, an
+    electric trainer and a drone.</li>
+    <li><strong>The pattern.</strong> Each aircraft fixes the biggest problem of the
+    one before it, and brings a new problem of its own. That handover, repeated seven
+    times, is the whole century.</li>
+    <li><strong>The numbers are real.</strong> Every figure in this book comes out of
+    the simulations &mdash; the same models, flown, measured and plotted.</li>
+    <li><strong>Why now.</strong> The show's future segment is drones and satellites:
+    aircraft that get designed and tested in simulation before any metal is cut.
+    This book is a small taste of how that works.</li>
+  </ul>
+
+  <div class="tiles">
+    <div class="tile"><div class="num">25</div><div class="label">Metres forward per metre of height &mdash; what a glider does with no engine at all</div></div>
+    <div class="tile"><div class="num">&#8776;70<small>&times;</small></div><div class="label">Energy per kilogram: avgas vs the battery in the same airframe</div></div>
+    <div class="tile"><div class="num">7.2<small>&nbsp;min</small></div><div class="label">The interceptor's climb to 11 km &mdash; the piston trainer needs 56 minutes to reach 8</div></div>
+  </div>
+
+  <div class="callout">
+    <span class="k">So what</span>
+    <p>The glider had no engine. The piston engine ran out of air. The jet fixed
+    that and ran out of fuel instead. The interceptor bought speed and got minutes
+    of it. The autopilot took over the hands. The battery brought back the oldest
+    problem &mdash; energy. And the drone removed the pilot. Seven aircraft, seven
+    problems, one century. That's how we got here.</p>
+  </div>
+
+  <div class="footer">
+    <div class="wordmark"><img src="assets/logo.svg" alt=""><span class="txt">Thinking in Systems</span></div>
+    <span>&copy; Ankit Naik 2026</span>
+    <span class="page-no">2</span>
+  </div>
+</section>
+
+<!-- ===================== CH 1: GLIDER ===================== -->
+<section class="page">
+  <span class="kicker">Chapter 1 &middot; 1900s&ndash;1920s</span>
+  <h1 class="section-title"><span class="n">01</span> &nbsp;Altitude is the only fuel</h1>
+  <hr class="rule">
+
+  <p class="lead">A hundred years ago you flew by borrowing height: Lilienthal
+  ran off hills, the Wrights glided from dunes, the 1920s clubs bungeed
+  gliders off hilltops. I released one in simulation at 1,000 m and let the
+  stick go.</p>
+
+  <table class="tbl">
+    <thead><tr><th>Released</th><th>Glide speed</th><th>Sink</th><th>Stays up</th><th>Reaches</th></tr></thead>
+    <tbody>
+      <tr><td>In trim, 31 m/s</td><td>29 m/s steady</td><td>1.1 m/s</td><td><b>14 min 39 s</b></td><td>23.1 km</td></tr>
+      <tr><td>15 m/s too fast</td><td>swings 12&ndash;46 m/s</td><td>&mdash;</td><td colspan="2">porpoises every 15 s, height swinging &#177;90 m</td></tr>
+    </tbody>
+  </table>
+
+  <ul class="tick">
+    <li>The glider is a Schweizer SGS 1-36 &mdash; a 1980 design, but the deal it flies is the era's: height in, distance out. Trimmed right it flies itself, <b>25 m</b> forward for every metre of height.</li>
+    <li>Released too fast, it porpoises: climbs, slows, dives, speeds up, climbs again, every 15 seconds. Gliders do this on their own; the pattern is called the phugoid.</li>
+    <li>Either way it ends on the ground &mdash; height is the only fuel. That's what an engine fixes.</li>
+  </ul>
+
+  <figure>
+    <video class="fig-video" src="video/flight100-glide.mp4" poster="video/flight100-glide-poster.jpg"
+           controls loop muted playsinline preload="metadata"></video>
+    <img class="fig-still" src="figures/flight100-glide.png" alt="Trimmed glide vs phugoid release">
+    <figcaption><b>Figure 1.</b> The same glider released twice &mdash; one in trim, one 15 m/s too fast.</figcaption>
+  </figure>
+
+  <div class="footer">
+    <div class="wordmark"><img src="assets/logo.svg" alt=""><span class="txt">Thinking in Systems</span></div>
+    <span>&copy; Ankit Naik 2026</span>
+    <span class="page-no">3</span>
+  </div>
+</section>
+
+<!-- ===================== CH 2: PISTON ===================== -->
+<section class="page">
+  <span class="kicker">Chapter 2 &middot; 1930s&ndash;1940s</span>
+  <h1 class="section-title"><span class="n">02</span> &nbsp;The engine breathes</h1>
+  <hr class="rule">
+
+  <p class="lead">So we bolted on an engine. A 60 kW piston on the same class of
+  light airframe, and suddenly height is something you can buy back. Until the
+  air runs thin.</p>
+
+  <ul class="tick">
+    <li>Full throttle from 500 m, the trainer climbs at <b>5.9 m/s</b>.</li>
+    <li>But a piston engine breathes the same air the wing flies in. Climb higher, the air gets thinner, and the engine gets weaker with it.</li>
+    <li>By 4,000 m half the climb is gone. At 9,000 m the engine is down to 18 kW &mdash; just enough to pay the drag bill, with nothing left to climb on. That's the ceiling.</li>
+  </ul>
+
+  <figure>
+    <video class="fig-video" src="video/flight100-climb.mp4" poster="video/flight100-climb-poster.jpg"
+           controls loop muted playsinline preload="metadata"></video>
+    <img class="fig-still" src="figures/flight100-climb.png" alt="Climb rate vs altitude, piston engine">
+    <figcaption><b>Figure 2.</b> Climb rate measured in short sawtooth segments, the flight-test way. The piston line dies almost linearly with air density &mdash; 53 kW near sea level, 18 kW at the 9 km ceiling. The dark line is the same airframe with an electric motor, which doesn't breathe; it waits in chapter 6.</figcaption>
+  </figure>
+
+  <div class="callout">
+    <span class="k">The era's limit</span>
+    <p>A bigger engine doesn't help &mdash; it suffocates too. What helps is an
+    engine that carries its own air compressor and squeezes the thin air back into
+    something it can burn. That engine is a jet, and it's the next chapter.</p>
+  </div>
+
+  <div class="footer">
+    <div class="wordmark"><img src="assets/logo.svg" alt=""><span class="txt">Thinking in Systems</span></div>
+    <span>&copy; Ankit Naik 2026</span>
+    <span class="page-no">4</span>
+  </div>
+</section>
+
+<!-- ===================== CH 3: JET ===================== -->
+<section class="page">
+  <span class="kicker">Chapter 3 &middot; 1950s&ndash;1960s</span>
+  <h1 class="section-title"><span class="n">03</span> &nbsp;Thin air becomes the point</h1>
+  <hr class="rule">
+
+  <p class="lead">The jet's compressor feeds the engine no matter how thin the
+  air gets &mdash; and thin air has less drag, so up high is suddenly the best
+  place to be. I put a DC-8 with four turbojets at 11,000 m and Mach 0.82 and
+  left the controls alone.</p>
+
+  <div class="tiles">
+    <div class="tile"><div class="num">2.9<small>&nbsp;t/h</small></div><div class="label">Fuel burned holding Mach 0.81 &mdash; 0.85 kg every second</div></div>
+    <div class="tile"><div class="num">876<small>&nbsp;km/h</small></div><div class="label">Ground covered per hour &mdash; the glider's whole flight, every 95 seconds</div></div>
+    <div class="tile"><div class="num">42<small>&nbsp;s</small></div><div class="label">How often it burns the little Alpha's entire 36 kg fuel load</div></div>
+  </div>
+
+  <figure>
+    <video class="fig-video" src="video/flight100-dc8.mp4" poster="video/flight100-dc8-poster.jpg"
+           controls loop muted playsinline preload="metadata"></video>
+    <img class="fig-still" src="figures/flight100-dc8.png" alt="DC-8 hands-fixed cruise">
+    <figcaption><b>Figure 3.</b> One simulated hour at 11 km, controls untouched. The tanks drain 2.9 tonnes; the aircraft, lighter every minute, drifts 1.7 km upward &mdash; the cruise-climb real DC-8s flew on purpose.</figcaption>
+  </figure>
+
+  <ul class="tick">
+    <li>It cruises happily where the piston engine died, covering the glider's whole flight every 95 seconds.</li>
+    <li>The new problems: three tonnes of fuel an hour &mdash; and watch the altitude trace: nobody is holding it, so it porpoises for the whole hour. Something has to fly it.</li>
+  </ul>
+
+  <div class="footer">
+    <div class="wordmark"><img src="assets/logo.svg" alt=""><span class="txt">Thinking in Systems</span></div>
+    <span>&copy; Ankit Naik 2026</span>
+    <span class="page-no">5</span>
+  </div>
+</section>
+
+<!-- ===================== CH 4: INTERCEPTOR ===================== -->
+<section class="page">
+  <span class="kicker">Chapter 4 &middot; 1950s&ndash;1970s</span>
+  <h1 class="section-title"><span class="n">04</span> &nbsp;Climb becomes a weapon</h1>
+  <hr class="rule">
+
+  <p class="lead">For 1950s Sweden the problem was time: unknown aircraft over
+  the Baltic at 11,000 m, and only minutes to meet them. That job shaped the
+  J&nbsp;35 Draken. I scrambled a Draken-class delta &mdash; 49 m&sup2; of wing,
+  78 kN of afterburning turbojet &mdash; from 500 m.</p>
+
+  <div class="tiles">
+    <div class="tile"><div class="num">7.2<small>&nbsp;min</small></div><div class="label">From 500 m to the bombers' 11,000 m</div></div>
+    <div class="tile"><div class="num">12<small>&times;</small></div><div class="label">Faster to 8 km than the piston trainer of chapter 2</div></div>
+    <div class="tile"><div class="num">30<small>%</small></div><div class="label">Of its internal fuel burned just getting up there</div></div>
+  </div>
+
+  <figure>
+    <video class="fig-video" src="video/flight100-draken.mp4" poster="video/flight100-draken-poster.jpg"
+           controls loop muted playsinline preload="metadata"></video>
+    <img class="fig-still" src="figures/flight100-draken.png" alt="Scramble climb vs the piston trainer">
+    <figcaption><b>Figure 4.</b> The scramble, flown at a 230 m/s climb schedule
+    (a speed-hold pitch loop stands in for the pilot, as the wing leveler does in
+    roll). The piston trainer's whole 56-minute struggle to 8 km fits under the
+    first bend of the Draken's curve.</figcaption>
+  </figure>
+
+  <ul class="tick">
+    <li>The speed costs twice: thin delta wings hold little fuel, and the afterburner burns 1.3 kg of it every second. Reaching the bombers eats 30% of the tank.</li>
+    <li>So the interceptor lives on minutes &mdash; of fuel, and of one very busy pilot doing intercept sums at nine kilometres a minute. Both problems have the same fix: hand some of the flying to a machine.</li>
+  </ul>
+
+  <div class="footer">
+    <div class="wordmark"><img src="assets/logo.svg" alt=""><span class="txt">Thinking in Systems</span></div>
+    <span>&copy; Ankit Naik 2026</span>
+    <span class="page-no">6</span>
+  </div>
+</section>
+
+<!-- ===================== CH 4: AUTOPILOT ===================== -->
+<section class="page">
+  <span class="kicker">Chapter 5 &middot; 1960s&ndash;1990s</span>
+  <h1 class="section-title"><span class="n">05</span> &nbsp;The hands come off</h1>
+  <hr class="rule">
+
+  <p class="lead">An autopilot is a smaller thing than it sounds: three simple
+  control loops, each reading one sensor and moving one control surface. I gave
+  the chapter-1 glider a set and asked for a 30&deg; left turn.</p>
+
+  <ul class="tick">
+    <li>It rolls in, flies the turn, and holds the new heading within two degrees for the rest of the flight. It never gets bored and never drifts off.</li>
+    <li>With the stick fixed instead, the same aircraft just goes wherever its trim points &mdash; and eventually starts weaving, the way the glider did at the end of chapter 1.</li>
+    <li>This is what fixed the DC-8's hour of porpoising and the interceptor pilot's overload: not more skill, just patience made of feedback.</li>
+  </ul>
+
+  <figure>
+    <video class="fig-video" src="video/flight100-autopilot.mp4" poster="video/flight100-autopilot-poster.jpg"
+           controls loop muted playsinline preload="metadata"></video>
+    <img class="fig-still" src="figures/flight100-autopilot.png" alt="Hands-off vs autopilot">
+    <figcaption><b>Figure 5.</b> The same glider as chapter 1, now flown by its autopilot. Commanded 30&deg;, it settles at 31.8&deg; and rules a dead-straight line across the sky; the dashed track is the hands-fixed aircraft.</figcaption>
+  </figure>
+
+  <div class="pullquote">
+    The autopilot didn't replace the pilot. It replaced the pilot's
+    <em>patience</em>.
+    <span class="attr">&mdash; what three PID loops actually buy</span>
+  </div>
+
+  <div class="footer">
+    <div class="wordmark"><img src="assets/logo.svg" alt=""><span class="txt">Thinking in Systems</span></div>
+    <span>&copy; Ankit Naik 2026</span>
+    <span class="page-no">7</span>
+  </div>
+</section>
+
+<!-- ===================== CH 5: ELECTRIC ===================== -->
+<section class="page">
+  <span class="kicker">Chapter 6 &middot; 2010s&ndash;today</span>
+  <h1 class="section-title"><span class="n">06</span> &nbsp;The fuel problem returns</h1>
+  <hr class="rule">
+
+  <p class="lead">Pipistrel sells the same little two-seater twice: the Alpha
+  Trainer burns petrol, the Alpha Electro carries a battery. Same wings, same
+  weight. I flew both at the same speed and watched the energy drain.</p>
+
+  <table class="tbl">
+    <thead><tr><th>Same airframe</th><th>Energy on board</th><th>Endurance</th><th>Lands</th></tr></thead>
+    <tbody>
+      <tr><td>Alpha Trainer &middot; 36 kg avgas</td><td>&#8776;1,570 MJ</td><td><b>6 h 50 min</b></td><td>36 kg lighter</td></tr>
+      <tr><td>Alpha Electro &middot; 22 kWh battery</td><td>79 MJ</td><td><b>1 h 3 min</b></td><td>same weight it took off at</td></tr>
+    </tbody>
+  </table>
+
+  <figure>
+    <video class="fig-video" src="video/flight100-electric.mp4" poster="video/flight100-electric-poster.jpg"
+           controls loop muted playsinline preload="metadata"></video>
+    <img class="fig-still" src="figures/flight100-electric.png" alt="Endurance comparison, avgas vs battery">
+    <figcaption><b>Figure 6.</b> Both aircraft at the same 48 m/s cruise &mdash; solid where flown, dashed continuing at the measured burn rate.</figcaption>
+  </figure>
+
+  <ul class="tick">
+    <li>A kilogram of petrol holds about 70 times more energy than a kilogram of this battery. The motor is far more efficient, which claws some back &mdash; but the petrol plane still flies 6.8 hours to the battery's one.</li>
+    <li>The motor has one trick no piston ever had: it doesn't breathe. At 9,000 m, where chapter 2's climb died, the electric version is still climbing at 3.9 m/s (figure 2). A hundred years on, the glider's arithmetic is back &mdash; the flight is a countdown of the energy you took off with.</li>
+  </ul>
+
+  <div class="footer">
+    <div class="wordmark"><img src="assets/logo.svg" alt=""><span class="txt">Thinking in Systems</span></div>
+    <span>&copy; Ankit Naik 2026</span>
+    <span class="page-no">8</span>
+  </div>
+</section>
+
+<!-- ===================== CH 6: DRONE ===================== -->
+<section class="page">
+  <span class="kicker">Chapter 7 &middot; 2020s &rarr;</span>
+  <h1 class="section-title"><span class="n">07</span> &nbsp;Remove the pilot</h1>
+  <hr class="rule">
+
+  <p class="lead">The last aircraft weighs a few kilograms and nobody is aboard.
+  Its battery holds 60 Wh &mdash; about a laptop's worth &mdash; and an autopilot
+  flies the whole mission.</p>
+
+  <ul class="tick">
+    <li>Told to hold 1,000 m, turn 30&deg; and keep 12 m/s, it does exactly that &mdash; altitude within half a metre, heading within a third of a degree &mdash; until the battery runs out, about an hour later.</li>
+    <li>It is chapter 5's autopilot plus one more loop, the throttle. Close that last loop and the pilot can stay home.</li>
+    <li>That's the air show's future segment &mdash; drones and satellites. Once the pilot is software, the aircraft can be any size the mission needs.</li>
+  </ul>
+
+  <figure>
+    <video class="fig-video" src="video/flight100-drone.mp4" poster="video/flight100-drone-poster.jpg"
+           controls loop muted playsinline preload="metadata"></video>
+    <img class="fig-still" src="figures/flight100-drone.png" alt="Autonomous mission">
+    <figcaption><b>Figure 7.</b> The whole mission, unmanned: altitude, heading and speed each pinned to its commanded value by its own loop, while the 60 Wh battery drains at about 1% a minute. The pilot isn't missing &mdash; the pilot is the left-hand column.</figcaption>
+  </figure>
+
+  <div class="footer">
+    <div class="wordmark"><img src="assets/logo.svg" alt=""><span class="txt">Thinking in Systems</span></div>
+    <span>&copy; Ankit Naik 2026</span>
+    <span class="page-no">9</span>
+  </div>
+</section>
+
+<!-- ===================== CLOSING ===================== -->
+<section class="page closing">
+  <div style="max-width:82%">
+    <span class="kicker">The takeaway</span>
+    <h1>Every era flies on the<br>last era's limitation.</h1>
+    <p>No engine, so we borrowed height. An engine, but it needed air. A compressor,
+    but it drank. Speed, but only for minutes. Feedback loops to hold the course.
+    A battery, and the old arithmetic came back. And at last, no pilot at all.
+    Every aircraft flying at Malmen this weekend is one of these answers, over the
+    field where the questions started.</p>
+  </div>
+
+  <ul class="tick" style="max-width:84%; margin-top:22px">
+    <li>Each era's aircraft is the answer to the era before it.</li>
+    <li>All seven flew from one component library &mdash; the century fits in a parts bin.</li>
+    <li>Happy 100th, Flygvapnet. The next hundred years will fly here first &mdash; in simulation.</li>
+  </ul>
+
+  <div style="margin-top:26px"><a class="cta" href="https://www.systemsnotcode.com/#work">More field notes at systemsnotcode.com &rarr;</a></div>
+
+  <div class="foot">
+    <div class="wordmark"><img src="assets/logo-dark.svg" alt=""><span class="txt">Thinking in Systems<small>Not Code</small></span></div>
+    <span>&copy; Ankit Naik 2026</span>
+  </div>
+</section>
+
+<!-- ===================== METHOD & LIMITS ===================== -->
+<section class="page">
+  <h1 class="section-title">Method &amp; limits</h1>
+  <hr class="rule">
+
+  <p class="lead">Every number in this study comes from a six-degree-of-freedom
+  flight simulation in Wolfram System Modeler, using one Modelica aircraft
+  library. Read the limits before trusting the conclusions.</p>
+
+  <ul class="tick">
+    <li><strong>The aircraft are calibrated replicas, not certified models.</strong> The glider and both Alphas trace to published data of real aircraft; the DC-8 and the J&nbsp;35-class delta carry known simplifications (an unswept wing on one, elevons modeled as a small tail surface on the other), so treat their numbers as era-typical, not type-accurate.</li>
+    <li><strong>Hands-fixed flight is eventually unstable in roll</strong>, as it is in reality &mdash; even the trimmed glider ends its 15-minute flight weaving. Powered scenarios add one proportional bank-to-aileron feedback, a wing leveler standing in for the pilot's lateral corrections; the interceptor also carries a proportional speed-hold pitch loop, the climb schedule a pilot would fly. The glider chapters fly genuinely hands-off.</li>
+    <li><strong>Piston vs electric endurance compares the model pair as built</strong>: same airframe, same takeoff mass, cruise at the same speed and altitude. Battery mass is inside the airframe's fixed mass; fuel mass genuinely burns off. The 70&times; energy-per-kilogram figure uses the real Alpha Electro pack's published &#8776;126 kg, not a model quantity.</li>
+    <li><strong>Engine fidelity is deliberately one equation per era</strong> &mdash; a density lapse for the piston, a Mach/altitude map for the turbojet, an efficiency chain for the electric motor. That is enough for ceilings and endurance, not for detailed performance charts.</li>
+    <li><strong>Climb and endurance use flight-test method, not marathon runs.</strong> Climb rate comes from short sawtooth segments at each altitude; endurance from the measured steady cruise burn rate. The DC-8 additionally needed a large fixed trim deflection, a consequence of its documented undersized elevator.</li>
+  </ul>
+
+  <div class="notes">
+    <h3>How it was built</h3>
+    <ol>
+      <li>Airframes, engines, sensors and autopilots from the FixedWing Modelica library; scenarios assembled as small top-level models.</li>
+      <li>Simulated in Wolfram System Modeler (DASSL), compiled and run headlessly through its kernel; plots and analysis from the raw result trajectories.</li>
+      <li>Atmosphere: US Standard Atmosphere 1976 throughout.</li>
+      <li>Engine lapse laws: Gagg-Ferrar (piston), &sigma;<sup>0.7</sup> (turboprop reference), thrust-ratio map at the design point (turbojet).</li>
+    </ol>
+  </div>
+
+  <div class="footer">
+    <div class="wordmark"><img src="assets/logo.svg" alt=""><span class="txt">Thinking in Systems</span></div>
+    <span>&copy; Ankit Naik 2026</span>
+    <span class="page-no">10</span>
+  </div>
+</section>
+
+</body>
+</html>
