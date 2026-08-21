@@ -299,7 +299,7 @@
   <ul class="tick">
     <li><strong>Single-phase equivalents.</strong> The grid is three-phase; these models are single-phase story versions. The protection physics—relay delay, arc-to-zero-crossing, current limiting—carries over; exact amps would not.</li>
     <li><strong>Ideal transformers.</strong> No core saturation, no inrush, no losses. The mechanical breaker's arc uses the Modelica Standard Library arc model (arc voltage grows until a current zero quenches it).</li>
-    <li><strong>The SST is an averaged model:</strong> an ideal ratio stage plus an electronic current limit. Its converter losses and voltage regulation are not modeled—the 430 A clamp is the one behavior under test.</li>
+    <li><strong>The SST is an averaged model:</strong> an ideal ratio stage plus an electronic current limit. Its converter losses and voltage regulation are not modeled—the 430 A clamp is the one behavior under test. In the real device that limit is enforced cycle-by-cycle by the converter's own switching, roughly every 50&nbsp;&micro;s at 20&nbsp;kHz, which is why the model can treat it as instantaneous.</li>
     <li><strong>Visual licence in the films:</strong> the physical arc in this run lasted about 1 ms (the contacts happened to part near a current zero) and is stretched to 120 ms on screen so the eye can see it. The dial shows a smoothed RMS current, not the raw 50 Hz waveform. Fault-window footage runs at 20&times; slow motion.</li>
     <li><strong>"Wear" is the engineering quantity &int;i&sup2;dt</strong>—the standard measure of the thermal and magnetic stress a fault imposes while protection acts.</li>
   </ul>
