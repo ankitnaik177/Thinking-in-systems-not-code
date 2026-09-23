@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="A digital twin of one winter-wheat field near Linkoping, built from free Sentinel-2 imagery and SMHI weather, modelled in Wolfram System Modeler.">
+<title>Linköping Field Twin</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter+Tight:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root{
+    --ink:#16211b; --ink-2:#48594f; --ink-3:#7b8b81;
+    --paper:#eef1ec; --card:#ffffff; --line:#d7ded7; --line-2:#c2ccc2;
+    --grow:#2f6d46; --grow-soft:#dfebe2;
+    --soil:#a8763f; --sun:#c9a227; --flag:#b3541e; --flag-soft:#f7e9df;
+    --measure:#2f6d46;
+    color-scheme:light;
+  }
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
+    --ink:#e7ece8; --ink-2:#a6b3aa; --ink-3:#7b8b81;
+    --paper:#0f1411; --card:#171d18; --line:#28312a; --line-2:#36423a;
+    --grow:#6bbd8a; --grow-soft:#1a261f;
+    --soil:#d09a5f; --sun:#dcbb47; --flag:#e08a52; --flag-soft:#251a12;
+    --measure:#6bbd8a;
+    color-scheme:dark;
+  }}
+  :root[data-theme="dark"]{
+    --ink:#e7ece8; --ink-2:#a6b3aa; --ink-3:#7b8b81;
+    --paper:#0f1411; --card:#171d18; --line:#28312a; --line-2:#36423a;
+    --grow:#6bbd8a; --grow-soft:#1a261f;
+    --soil:#d09a5f; --sun:#dcbb47; --flag:#e08a52; --flag-soft:#251a12;
+    --measure:#6bbd8a;
+    color-scheme:dark;
+  }
+
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:"Inter Tight",system-ui,-apple-system,Segoe UI,sans-serif;
+    font-size:16.5px;line-height:1.62;-webkit-font-smoothing:antialiased}
+  .page{max-width:1120px;margin:0 auto;padding:0 20px;padding-block:0 72px}
+  .col{max-width:680px}
+  h1,h2,h3{margin:0;font-family:"Fraunces",Georgia,serif;font-weight:600;
+    text-wrap:balance;letter-spacing:-0.012em;line-height:1.15}
+  p{margin:0 0 14px}
+  .mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+    font-variant-numeric:tabular-nums}
+  a{color:var(--grow)}
+
+  /* ---- masthead ---- */
+  .hero{padding-block:52px 34px;border-bottom:3px solid var(--ink);margin-bottom:0}
+  .kicker{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--grow);font-weight:600;margin-bottom:18px;
+    font-family:"IBM Plex Mono",monospace}
+  .hero h1{font-size:clamp(34px,6.2vw,62px);font-weight:700;margin-bottom:14px}
+  .hero .deck{font-size:clamp(17px,2.4vw,21px);color:var(--ink-2);max-width:40ch;
+    font-family:"Fraunces",Georgia,serif;font-weight:400;line-height:1.4}
+  .byline{margin-top:24px;font-size:13px;color:var(--ink-3);
+    display:flex;flex-wrap:wrap;gap:8px 18px;font-family:"IBM Plex Mono",monospace}
+
+  /* ---- sections ---- */
+  section{padding-block:46px;border-bottom:1px solid var(--line)}
+  section:last-of-type{border-bottom:none}
+  .num{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.14em;
+    color:var(--ink-3);font-weight:500;margin-bottom:10px;display:block}
+  section h2{font-size:clamp(23px,3.4vw,31px);margin-bottom:12px}
+  .lede{font-size:18px;color:var(--ink-2);margin-bottom:22px}
+
+  /* ---- figures ---- */
+  figure{margin:24px 0 0}
+  figure img{width:100%;height:auto;display:block;border-radius:8px;
+    border:1px solid var(--line-2);background:var(--card)}
+  figcaption,.credit{font-size:13.5px;color:var(--ink-3);margin-top:9px;max-width:72ch}
+  .credit{margin-bottom:0}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:760px){.two{grid-template-columns:1fr}}
+  .pin{position:relative}
+  .pin .mark{position:absolute;left:50%;top:50%;width:26px;height:26px;margin:-13px 0 0 -13px;
+    border:2.5px solid var(--flag);border-radius:50%;
+    box-shadow:0 0 0 3px rgba(255,255,255,.55)}
+  .pin .mark::after{content:"";position:absolute;inset:8px;border-radius:50%;background:var(--flag)}
+  .pin .tag{position:absolute;left:calc(50% + 20px);top:calc(50% - 32px);
+    background:var(--card);border:1px solid var(--line-2);border-radius:6px;
+    padding:3px 8px;font-size:11.5px;font-family:"IBM Plex Mono",monospace;white-space:nowrap}
+
+  /* ---- cards / panels ---- */
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:20px 22px;margin-top:22px}
+  .panel h3{font-size:17px;margin-bottom:8px}
+  .grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-top:22px}
+  .def{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+  .def .t{font-family:"Fraunces",serif;font-size:17px;font-weight:600;margin-bottom:5px}
+  .def .u{font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);
+    font-weight:600;margin-bottom:9px;font-family:"IBM Plex Mono",monospace}
+  .def p{font-size:14.5px;color:var(--ink-2);margin:0}
+
+  /* ---- code ---- */
+  pre.code{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--grow);
+    border-radius:8px;padding:16px 18px;overflow-x:auto;margin:20px 0 0;
+    font-family:"IBM Plex Mono",monospace;font-size:13px;line-height:1.6;color:var(--ink)}
+  pre.code .c{color:var(--ink-3)}
+  pre.code .s{color:var(--soil)}
+  pre.code .k{color:var(--grow);font-weight:500}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.88em;
+    background:var(--grow-soft);padding:1px 5px;border-radius:4px}
+
+  /* ---- mermaid ---- */
+  pre.mermaid{background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:20px;margin-top:22px;overflow-x:auto;text-align:center}
+
+  /* ---- tables ---- */
+  .tbl{overflow-x:auto;margin-top:22px}
+  table{width:100%;border-collapse:collapse;font-size:14.5px;background:var(--card)}
+  th,td{text-align:right;padding:10px 12px;border-bottom:1px solid var(--line)}
+  th:first-child,td:first-child{text-align:left}
+  th{font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);
+    font-weight:600;font-family:"IBM Plex Mono",monospace}
+  tbody tr:last-child td{border-bottom:none}
+  td.mono{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+
+  /* ---- charts ---- */
+  .chartwrap{background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:18px 20px 12px;margin-top:22px}
+  .chartwrap h3{font-size:16px;margin-bottom:4px}
+  .chartwrap .cap{font-size:13.5px;color:var(--ink-2);margin:0 0 12px;max-width:74ch}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12.5px;color:var(--ink-2);margin:2px 0 10px}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .sw{width:15px;height:3px;border-radius:2px;display:inline-block}
+  .sw.dot{height:9px;width:9px;border-radius:50%}
+  .sw.band{height:11px;opacity:.3}
+  .scroller{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  svg{display:block;max-width:100%;height:auto}
+  /* below these widths a chart stops shrinking and the strip scrolls instead:
+     squeezed to phone width the five-season stack gives each panel 41px of height */
+  .scroller > svg{min-width:700px}
+  .scroller > svg#seasons{min-width:860px}
+  .scroller > svg#liveChart{min-width:820px}
+  pre.mermaid > svg{min-width:800px;max-width:none}
+  .scroller::after,pre.mermaid::after{content:"";display:block}
+  @media (max-width:700px){
+    .scrollnote{display:block}
+  }
+  .scrollnote{display:none;font-size:12px;color:var(--ink-3);margin:2px 0 8px;
+    font-family:"IBM Plex Mono",monospace}
+
+  /* ---- flag ---- */
+  .alert{display:flex;gap:13px;align-items:flex-start;background:var(--flag-soft);
+    border:1px solid var(--flag);border-left-width:4px;border-radius:9px;padding:15px 18px;margin-top:22px}
+  .alert .d{width:8px;height:8px;border-radius:50%;background:var(--flag);margin-top:8px;flex:none}
+  .alert h4{margin:0 0 3px;font-size:15px;color:var(--flag);font-family:"Fraunces",serif}
+  .alert p{margin:0;font-size:14.5px;color:var(--ink-2)}
+
+  /* ---- tiles ---- */
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:11px;margin-top:18px}
+  .tile{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:13px 15px}
+  .tile .k{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);
+    font-weight:600;font-family:"IBM Plex Mono",monospace}
+  .tile .v{font-size:24px;font-weight:600;margin-top:4px;letter-spacing:-0.02em;
+    font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+  .tile .n{font-size:12px;color:var(--ink-2);margin-top:2px}
+  .tile.hot{border-color:var(--flag)} .tile.hot .v{color:var(--flag)}
+
+  ul.tight{margin:0 0 14px;padding-left:20px}
+  ul.tight li{margin-bottom:7px}
+  .chip{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:11.5px;
+    border:1px solid var(--line-2);border-radius:20px;padding:2px 10px;color:var(--ink-2);
+    margin:0 6px 6px 0}
+  footer{padding-block:32px 0;border-top:1px solid var(--line);margin-top:10px;
+    font-size:13px;color:var(--ink-3)}
+  :focus-visible{outline:2px solid var(--grow);outline-offset:2px}
+</style>
+<style>body{padding:0 20px}</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="hero">
+    <div class="kicker">Digital twin series · 1 of 5</div>
+    <h1>Modeling crop growth</h1>
+    <p class="deck">Combining satellite data with model data, on one field in Östergötland that neither of us has ever walked across.</p>
+    <div class="byline">
+      <span>58.40°N 15.35°E</span><span>winter wheat</span>
+      <span>Sentinel-2 + SMHI + Wolfram System Modeler</span>
+    </div>
+  </header>
+
+  <!-- 3 -->
+  <section>
+    <span class="num">01 — THE IDEA</span>
+    <div class="col">
+      <h2>What we are going to build</h2>
+      <p class="lede">A model of one specific field that runs on the weather that field actually got, and is checked against what the satellite actually saw.</p>
+      <p>Not a model of wheat in general. A model of <em>this</em> wheat, keeping pace with it, told when it is wrong.</p>
+    </div>
+
+    <pre class="mermaid">
+flowchart LR
+  F["🌾 The field<br/>58.40°N 15.35°E"]
+  S["🛰️ Sentinel-2<br/>greenness, every 2–3 days"]
+  W["🌡️ SMHI station 85240<br/>temperature, rain, sunlight"]
+  M["⚙️ CropTwin<br/>Modelica model"]
+  O["📊 State + forecast<br/>leaf area, biomass, harvest"]
+  F -->|observed| S
+  F -->|drives| W
+  S -->|corrects| M
+  W -->|feeds| M
+  M --> O
+  O -.->|"disagreement = information"| S
+    </pre>
+
+    <div class="grid3">
+      <div class="def"><div class="u">Free</div><div class="t">No new sensors</div>
+        <p>Every input is public and open: European satellite imagery, Swedish government weather, Swedish parcel records.</p></div>
+      <div class="def"><div class="u">Specific</div><div class="t">One field, five seasons</div>
+        <p>Calibrated on 2019, 2020, 2022, 2025 and 2026, then run forward on the season happening now.</p></div>
+      <div class="def"><div class="u">Honest</div><div class="t">It fails on one season</div>
+        <p>2025 does not fit, and the page says so rather than hiding it in an average.</p></div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="num">02 — THE PHYSICAL TWIN</span>
+    <div class="col">
+      <h2>The field itself</h2>
+      <p class="lede">West of Linköping, between Vikingstad and Västerlösa, on the Östergötland plain.</p>
+    </div>
+    <figure>
+      <div class="pin">
+        <img src="croptwin/map.jpg" alt="OpenStreetMap of the Östergötland plain west of Linköping, with the modelled field marked">
+        <div class="mark"></div>
+        <div class="tag">the field</div>
+      </div>
+      <figcaption>Flat, open arable land between the E4 and the Svartån. Jordbruksverket's parcel register gives the crop declared here each year — code 4, <em>vete (höst)</em>, winter wheat — for 2019, 2020, 2022 and 2025. The register only reaches the previous harvest year, so 2026 is inferred from its NDVI signature, and the season now running is an assumption until the 2027 register is published. Base map © OpenStreetMap contributors.</figcaption>
+    </figure>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="num">03 — THE SENSOR</span>
+    <div class="col">
+      <h2>What the satellite sees</h2>
+      <p class="lede">Sentinel-2 passes over every two to three days at 10 m resolution, free, since 2015.</p>
+      <p>The left image is what your eye would see. The right one is the same pixels in near-infrared — the band that tells you whether the green is alive and how much of it there is.</p>
+    </div>
+    <div class="two">
+      <figure><img src="croptwin/truecolor.jpg" alt="Sentinel-2 true colour image of farmland west of Linköping">
+        <figcaption><strong>True colour</strong> · 4 July 2026. Fields, forest, farmsteads.</figcaption></figure>
+      <figure><img src="croptwin/ndvi.jpg" alt="The same scene rendered as NDVI, green where vegetation is dense and red where it is bare">
+        <figcaption><strong>NDVI</strong> · same scene, same day. Deep green is a closed canopy; pale and red are bare soil, roads and roofs.</figcaption></figure>
+    </div>
+    <p class="credit">Contains modified Copernicus Sentinel data 2026, accessed through the Microsoft Planetary Computer.</p>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="num">04 — THE WEATHER</span>
+    <div class="col">
+      <h2>Climate data from SMHI</h2>
+      <p class="lede">Sweden's meteorological institute publishes every station's full record, open, no key, back to 1944.</p>
+      <p>Station 85240, Linköping-Malmslätt, is 13 km from the field. Two endpoints matter: <code>corrected-archive</code> for the quality-controlled history and <code>latest-months</code> for everything up to yesterday.</p>
+    </div>
+
+<pre class="code"><span class="c">(* daily Tmax (20) and Tmin (19) from SMHI, straight into an Association *)</span>
+station = <span class="s">85240</span>;
+url = <span class="k">StringTemplate</span>[<span class="s">"https://opendata-download-metobs.smhi.se/api/version/1.0/\
+parameter/`p`/station/`s`/period/latest-months/data.csv"</span>];
+
+smhi[p_] := <span class="k">Association</span> @ <span class="k">Cases</span>[
+   <span class="k">StringSplit</span>[<span class="k">StringSplit</span>[<span class="k">URLExecute</span>[url[&lt;|<span class="s">"p"</span> -> p, <span class="s">"s"</span> -> station|&gt;], <span class="s">"Text"</span>], <span class="s">"\n"</span>], <span class="s">";"</span>],
+   {_, _, d_ /; <span class="k">StringLength</span>[d] == <span class="s">10</span>, v_, ___} :> <span class="k">DateObject</span>[d] -> <span class="k">ToExpression</span>[v]];
+
+temperature = <span class="k">Merge</span>[{smhi[<span class="s">20</span>], smhi[<span class="s">19</span>]}, <span class="k">Mean</span>];   <span class="c">(* daily mean = (Tmax + Tmin)/2 *)</span>
+rain        = smhi[<span class="s">5</span>];
+
+<span class="c">(* 130 days to yesterday: {14.85, 14.95, 14., 12.7, 9.25} °C *)</span>
+<span class="k">Values</span>[<span class="k">Take</span>[<span class="k">KeySort</span>[temperature], -<span class="s">5</span>]]</pre>
+
+    <p style="margin-top:20px;font-size:14.5px;color:var(--ink-2);max-width:72ch">Sunlight comes from a second SMHI service, STRÅNG, which models radiation on a grid rather than measuring it at a station — so you can ask it for the field's own coordinates. Parameter 120 is photosynthetically active radiation, the half of sunlight a plant can actually use.</p>
+
+    <div class="alert">
+      <div class="d"></div>
+      <div>
+        <h4>The bug that hid in this data for weeks</h4>
+        <p>STRÅNG returns <code>-999</code> for a missing day, so the loader dropped anything failing <code>v&nbsp;&gt;&nbsp;0</code>. Correct for radiation. Applied to temperature, it silently deleted <strong>every frost day of every winter</strong> — 26 to 65 days a season — and the gap-filler then drew a smooth line at <em>+2&nbsp;°C</em> across a −10&nbsp;°C cold snap. No day was missing afterwards, so nothing flagged it. It fed phantom growing degree-days into the model all winter long.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="num">05 — THE VOCABULARY</span>
+    <div class="col">
+      <h2>Four terms, and what they actually mean</h2>
+      <p class="lede">Everything that follows is built from these.</p>
+    </div>
+
+    <div class="chartwrap">
+      <h3>NDVI — why infrared tells you about chlorophyll</h3>
+      <p class="cap">A leaf absorbs red light to run photosynthesis and reflects near-infrared because of its internal cell structure. Dead or absent vegetation does neither. The contrast between the two bands is the measurement.</p>
+      <p class="scrollnote">↔ swipe to see the whole diagram</p>
+      <div class="scroller">
+      <svg viewBox="0 0 900 300" role="img" aria-label="Diagram of how NDVI is computed from red and near-infrared reflectance">
+        <!-- sun -->
+        <circle cx="70" cy="52" r="20" fill="var(--sun)"/>
+        <g stroke="var(--sun)" stroke-width="2.5" stroke-linecap="round">
+          <line x1="70" y1="18" x2="70" y2="26"/><line x1="70" y1="78" x2="70" y2="86"/>
+          <line x1="36" y1="52" x2="44" y2="52"/><line x1="96" y1="52" x2="104" y2="52"/>
+          <line x1="46" y1="28" x2="52" y2="34"/><line x1="88" y1="70" x2="94" y2="76"/>
+          <line x1="46" y1="76" x2="52" y2="70"/><line x1="88" y1="34" x2="94" y2="28"/>
+        </g>
+        <text x="70" y="110" text-anchor="middle" font-size="13" fill="var(--ink-3)" font-family="IBM Plex Mono, monospace">sunlight</text>
+
+        <!-- healthy leaf -->
+        <g transform="translate(300,150)">
+          <path d="M0,0 C-58,-46 -58,-106 0,-120 C58,-106 58,-46 0,0 Z" fill="var(--grow)"/>
+          <path d="M0,-4 L0,-112" stroke="var(--card)" stroke-width="2.5" opacity=".75"/>
+          <path d="M0,-30 L-26,-48 M0,-30 L26,-48 M0,-58 L-24,-74 M0,-58 L24,-74"
+                stroke="var(--card)" stroke-width="1.8" opacity=".6" fill="none"/>
+        </g>
+        <text x="300" y="182" text-anchor="middle" font-size="14" fill="var(--ink)" font-weight="600">living canopy</text>
+
+        <!-- arrows in -->
+        <line x1="108" y1="62" x2="238" y2="96" stroke="var(--flag)" stroke-width="3" marker-end="url(#ar1)"/>
+        <text x="150" y="80" font-size="12.5" fill="var(--flag)" font-family="IBM Plex Mono, monospace">red in</text>
+        <!-- absorbed -->
+        <text x="300" y="72" text-anchor="middle" font-size="12.5" fill="var(--flag)"
+              font-family="IBM Plex Mono, monospace">red absorbed → sugar</text>
+        <!-- NIR out -->
+        <path d="M356,96 L470,58" stroke="#8a56c8" stroke-width="3" marker-end="url(#ar2)"/>
+        <text x="420" y="44" text-anchor="middle" font-size="12.5" fill="#8a56c8"
+              font-family="IBM Plex Mono, monospace">near-infrared out</text>
+
+        <defs>
+          <marker id="ar1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+            <path d="M0,0 L8,4 L0,8 Z" fill="var(--flag)"/></marker>
+          <marker id="ar2" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+            <path d="M0,0 L8,4 L0,8 Z" fill="#8a56c8"/></marker>
+        </defs>
+
+        <!-- formula -->
+        <g transform="translate(560,90)">
+          <rect x="0" y="0" width="310" height="76" rx="9" fill="var(--grow-soft)" stroke="var(--line-2)"/>
+          <text x="155" y="32" text-anchor="middle" font-size="17" fill="var(--ink)"
+                font-family="IBM Plex Mono, monospace">NIR − Red</text>
+          <line x1="52" y1="41" x2="258" y2="41" stroke="var(--ink)" stroke-width="1.6"/>
+          <text x="155" y="64" text-anchor="middle" font-size="17" fill="var(--ink)"
+                font-family="IBM Plex Mono, monospace">NIR + Red</text>
+        </g>
+        <text x="715" y="82" text-anchor="middle" font-size="13" fill="var(--ink-3)"
+              font-family="IBM Plex Mono, monospace">NDVI =</text>
+
+        <!-- scale -->
+        <g transform="translate(60,226)">
+          <defs>
+            <linearGradient id="ndvig" x1="0" x2="1">
+              <stop offset="0" stop-color="#b9793f"/><stop offset="0.28" stop-color="#ddd08a"/>
+              <stop offset="0.62" stop-color="#7fb069"/><stop offset="1" stop-color="#1d5c34"/>
+            </linearGradient>
+          </defs>
+          <rect x="0" y="0" width="780" height="20" rx="4" fill="url(#ndvig)"/>
+          <g font-size="12" fill="var(--ink-2)" font-family="IBM Plex Mono, monospace">
+            <text x="0" y="40">0.1</text><text x="190" y="40">0.3</text>
+            <text x="390" y="40" text-anchor="middle">0.5</text>
+            <text x="590" y="40" text-anchor="middle">0.7</text>
+            <text x="780" y="40" text-anchor="end">0.95</text>
+          </g>
+          <g font-size="12.5" fill="var(--ink)">
+            <text x="0" y="60">bare soil</text>
+            <text x="300" y="60" text-anchor="middle">emerging crop</text>
+            <text x="620" y="60" text-anchor="middle">full canopy</text>
+          </g>
+        </g>
+      </svg>
+      </div>
+    </div>
+
+    <div class="grid3">
+      <div class="def"><div class="u">LAI · m² / m²</div><div class="t">Leaf area index</div>
+        <p>Square metres of leaf over each square metre of ground. Winter wheat peaks near <strong>6</strong> — six layers of leaf. Above about 4 the canopy already catches nearly all the light, so more leaf buys very little.</p></div>
+      <div class="def"><div class="u">°C·d</div><div class="t">Thermal time</div>
+        <p>A plant has no calendar. It adds up warmth: each day contributes its mean temperature above 0&nbsp;°C. Flowering fires at a fixed total — here <strong>1800&nbsp;°C·d</strong> — which is why a warm autumn brings harvest forward.</p></div>
+      <div class="def"><div class="u">g / MJ</div><div class="t">Radiation use efficiency</div>
+        <p>Grams of dry matter made per megajoule of light the canopy intercepts. For wheat roughly <strong>3</strong>. This single number turns sunlight into biomass.</p></div>
+      <div class="def"><div class="u">degrees</div><div class="t">Solar elevation</div>
+        <p>How high the sun sits at the satellite's overpass. At 58°N it drops below 25° in early October — and that turns out to matter more than anything else on this page.</p></div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="num">06 — THE BIOLOGY</span>
+    <div class="col">
+      <h2>How a cereal crop actually grows</h2>
+      <p class="lede">Winter wheat is sown in autumn, survives the winter as a small plant, and does most of its growing in a five-week burst in spring.</p>
+    </div>
+
+    <pre class="mermaid">
+flowchart TD
+  subgraph drive[" what drives each step "]
+    direction LR
+    T["🌡️ warmth"]:::d
+    L["☀️ light"]:::d
+    R["💧 water"]:::d
+  end
+
+  A["Sowing · late September<br/><i>farmer's decision</i>"]
+  B["Emergence · ~10 days later<br/><i>seed reserve only, no leaves yet</i>"]
+  C["Tillering · October–November<br/><i>side shoots, canopy to LAI ~1</i>"]
+  D["Winter · December–February<br/><i>near standstill, clock barely ticks</i>"]
+  E["Stem extension · April–May<br/><i>the fast phase, LAI 1 → 6</i>"]
+  F["Flowering · mid-June · 1800 °C·d<br/><i>leaf growth stops</i>"]
+  G["Grain fill · late June–July<br/><i>canopy dies back, sugar moves to grain</i>"]
+  H["Harvest · August"]
+
+  A --> B --> C --> D --> E --> F --> G --> H
+  T -.-> B
+  T -.-> D
+  L -.-> E
+  R -.-> G
+
+  classDef d fill:#dfebe2,stroke:#2f6d46,color:#16211b;
+    </pre>
+
+    <div class="panel">
+      <h3>The one loop that matters</h3>
+      <p style="margin:0;color:var(--ink-2);font-size:15px">More leaf catches more light → more light makes more sugar → more sugar builds more leaf. That reinforcing loop is what makes the spring curve so steep. It is stopped by one thing: a canopy can never intercept more than 100% of the light falling on it. Everything else in the model is detail on top of those two sentences.</p>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="num">07 — THE MODEL</span>
+    <div class="col">
+      <h2>Built as stocks and flows</h2>
+      <p class="lede">System dynamics, in Modelica, in Wolfram System Modeler — using the Business Simulation Library.</p>
+      <p>A <strong>stock</strong> is something that accumulates: water in the soil, green leaf, dry matter, degree-days. A <strong>flow</strong> is a rate that fills or drains it. Draw those and the equations come with them.</p>
+    </div>
+
+    <figure>
+      <img src="croptwin/soilwater.png" alt="System Modeler diagram of the soil water subsystem: clouds, flows and one stock">
+      <figcaption>The soil-water subsystem, exactly as it appears in System Modeler. One stock (<code>soilWater</code>), rain flowing in, evapotranspiration and drainage flowing out, and clouds marking the model boundary. Read it left to right and you have read the water balance.</figcaption>
+    </figure>
+
+    <figure>
+      <img src="croptwin/diagram.png" alt="Top-level System Modeler diagram with six subsystems arranged around a central data bus">
+      <figcaption>The whole twin. Six subsystems — phenology, light interception, assimilation, canopy, soil water, establishment — arranged around a single bus in the middle. Every subsystem connects once, to the bus. Eleven connections instead of twenty-three, and no line crosses another.</figcaption>
+    </figure>
+
+    <div class="grid3">
+      <div class="def"><div class="u">R1 · reinforcing</div><div class="t">Leaf → light → leaf</div>
+        <p>The canopy publishes leaf area; the radiation block reads it and returns intercepted light. The engine of spring growth.</p></div>
+      <div class="def"><div class="u">B1 · balancing</div><div class="t">The interception ceiling</div>
+        <p>Beer's law. Intercepted fraction approaches one and the reinforcing loop starves. This is what stops LAI running to infinity.</p></div>
+      <div class="def"><div class="u">B2 · balancing</div><div class="t">Water stress</div>
+        <p>Present, and almost entirely dormant in these Swedish seasons: ~600 mm of rain against a 450–500 mm need.</p></div>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="num">08 — VALIDATION</span>
+    <div class="col">
+      <h2>Five seasons, checked against the archive</h2>
+      <p class="lede">The model gets the weather. The satellite gets the truth. Nothing in between is fitted except the sowing date and one flowering threshold.</p>
+    </div>
+
+    <figure>
+      <img src="croptwin/croptwin.gif" alt="Animation: the modelled NDVI curve draws across one crop year while Sentinel-2 readings land on it; low-sun readings are hollow and sit above the model" style="border:none">
+      <figcaption>Harvest 2022, the best-fitting season, as it unfolds. The satellite readings arrive in the order they were taken; the model was drawn from weather alone. Hollow points are the low-sun readings the fit ignores.</figcaption>
+    </figure>
+
+    <div class="chartwrap">
+      <h3>Modelled canopy against every clear Sentinel-2 reading</h3>
+      <p class="cap">Green line is the model. Filled dots are satellite observations with the sun at least 25° above the horizon. Hollow dots are low-sun readings, excluded — and notice they sit <em>above</em> the model in every single season.</p>
+      <div class="legend">
+        <span><i class="sw" style="background:var(--grow)"></i> modelled NDVI</span>
+        <span><i class="sw dot" style="background:var(--flag)"></i> Sentinel-2, sun ≥ 25°</span>
+        <span><i class="sw dot" style="background:transparent;border:1.6px solid var(--flag)"></i> low sun, not fitted</span>
+      </div>
+      <p class="scrollnote">↔ swipe to compare all five seasons</p>
+      <div class="scroller"><svg id="seasons" viewBox="0 0 1080 760" role="img"
+        aria-label="Five panels comparing modelled NDVI with Sentinel-2 observations"></svg></div>
+    </div>
+
+    <div class="tbl">
+      <table id="scores">
+        <thead><tr><th>Season</th><th>Emergence</th><th>RMSE</th><th>Peak LAI</th><th>Dry matter</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="alert">
+      <div class="d"></div>
+      <div>
+        <h4>Screen by sun angle, not by date</h4>
+        <p>Low sun deepens the canopy's own shadows, and red reflectance falls faster than infrared — so NDVI <em>rises</em> as the sun drops. In October 2018 the field read 0.55 at 23° and 0.80 at 12°, which would mean a canopy doubling its leaf area through November at 5&nbsp;°C. No crop does that. Fitting those points dragged the calibration off the end of its own parameter range. Screening on solar elevation instead of on date fixed it and cut RMSE from 0.128 to 0.076.</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Where it fails: 2025</h3>
+      <p style="margin:0;color:var(--ink-2);font-size:15px">Clear-sun NDVI goes from 0.23 on 20 September to 0.51 nine days later — faster than the model can green at any sowing date. The field is registered winter wheat, so it is not a crop mix-up. The fitted emergence for that season is a whole-season compromise, not a measurement, and it is reported here as a failure rather than averaged away.</p>
+    </div>
+  </section>
+
+  <!-- 11 + 13 -->
+  <section>
+    <span class="num">09 — RUNNING IT</span>
+    <div class="col">
+      <h2>The twin, live on a desktop</h2>
+      <p class="lede">One HTML file, one data file, no server and no account. Open it and it tells you what the field is doing today.</p>
+      <p>The layout is deliberately two-speed: an <strong>overview</strong> you can read in five seconds, and a <strong>details</strong> section you open only when the overview says something surprising.</p>
+    </div>
+
+    <div class="chartwrap">
+      <h3 style="margin-bottom:10px">Overview — what you see first</h3>
+      <div id="liveAlert"></div>
+      <div class="tiles" id="liveTiles"></div>
+      <div class="legend" style="margin-top:20px">
+        <span><i class="sw" style="background:var(--grow)"></i> ensemble median</span>
+        <span><i class="sw band" style="background:var(--grow)"></i> spread across five analogue years</span>
+        <span><i class="sw dot" style="background:var(--flag)"></i> Sentinel-2 this season</span>
+      </div>
+      <p class="scrollnote">↔ swipe to follow the whole crop year</p>
+      <div class="scroller"><svg id="liveChart" viewBox="0 0 1040 300" role="img"
+        aria-label="The season now running: measured weather then a five-member forecast ensemble"></svg></div>
+      <p class="cap" style="margin-top:12px">Left of the dashed line the model is driven by measured SMHI and STRÅNG data. Right of it, it is run five times — once with each completed season's real weather — and the band is the spread between them.</p>
+    </div>
+
+    <div class="panel">
+      <h3>How it stays alive: a notebook, a databin, a page</h3>
+      <p style="color:var(--ink-2);font-size:15px;margin-bottom:10px">The simulations need System Modeler, so they run on one computer, once a day, from a scheduled notebook. That run pushes <strong>one entry per day</strong> into a Wolfram Databin — the day's measured weather, any new satellite scene, and the model's state and forecast. The dashboard is a single HTML file that reads the bin over the public Data Drop API when it opens. No server, no deployment: the notebook is the twin's heartbeat, the bin is its memory, the page is its face, and the page can sit anywhere — a laptop, the Wolfram Cloud, a static host.</p>
+      <div><span class="chip">DailyUpdate.nb → update.wls</span><span class="chip">Databin 1Hx0aW5gf</span><span class="chip">croptwin_dashboard.html</span></div>
+    </div>
+
+    <div class="panel">
+      <h3>Details — what you open when the overview surprises you</h3>
+      <p style="color:var(--ink-2);font-size:15px;margin-bottom:12px">Every satellite reading with its sun angle and whether it was used; the weather driving the run; the crop's clock against the flowering threshold; the five calibrated seasons; and a line for every number saying where it came from.</p>
+      <div>
+        <span class="chip">observation log</span><span class="chip">driver weather</span>
+        <span class="chip">thermal time</span><span class="chip">calibration history</span>
+        <span class="chip">data provenance</span>
+      </div>
+    </div>
+
+    <div class="alert">
+      <div class="d"></div>
+      <div>
+        <h4>Do not average the weather — average the outcomes</h4>
+        <p>The first forecast used a 30-year day-of-year mean and predicted 9.1 peak LAI and 21 t/ha, well above any real season. Averaging daily temperature <em>before</em> <code>max(0, T)</code> destroys the winter: the mean sits near zero through midwinter, so the model saw 2 °C·d where a real year delivers 100–250. Running five real years instead gives 5.4–6.7 and 15–18 t/ha. Same class of mistake as the frost bug — a nonlinearity applied in the wrong order.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="num">10 — KEEPING IT CURRENT</span>
+    <div class="col">
+      <h2>Update it every day</h2>
+      <p class="lede">One script. SMHI publishes yesterday's weather each morning; Sentinel-2 delivers a new look every two to three days.</p>
+    </div>
+
+<pre class="code"><span class="c">(* update.wls — run once a day *)</span>
+
+<span class="c">(* 1. weather to yesterday *)</span>
+temperature = <span class="k">Merge</span>[{smhi[<span class="s">20</span>], smhi[<span class="s">19</span>]}, <span class="k">Mean</span>];
+par         = <span class="k">DeleteCases</span>[strang[<span class="s">120</span>], _?(# &lt; <span class="s">0</span> &amp;)];   <span class="c">(* -999 = missing *)</span>
+
+<span class="c">(* 2. any new clear scene over the field *)</span>
+observations = <span class="k">Select</span>[ndviOf /@ scenes, <span class="k">MemberQ</span>[{<span class="s">4</span>, <span class="s">5</span>}, #[<span class="s">"scl"</span>]] &amp;];
+
+<span class="c">(* 3. rebuild the driver table and re-simulate five analogue years *)</span>
+<span class="k">Export</span>[<span class="s">"linkoping_2027.txt"</span>, table, <span class="s">"Table"</span>];
+runs = <span class="k">Association</span> @ <span class="k">Table</span>[h -> <span class="k">WSMSimulate</span>[<span class="s">"CropTwin.Ensemble.Analogue"</span> &lt;&gt; <span class="k">ToString</span>[h]],
+    {h, {<span class="s">2019</span>, <span class="s">2020</span>, <span class="s">2022</span>, <span class="s">2025</span>, <span class="s">2026</span>}}];
+
+<span class="c">(* 4. hand the dashboard its new state *)</span>
+<span class="k">Export</span>[<span class="s">"state.js"</span>, <span class="s">"window.CROPTWIN_STATE = "</span> &lt;&gt; <span class="k">ExportString</span>[state, <span class="s">"JSON"</span>] &lt;&gt; <span class="s">";"</span>, <span class="s">"Text"</span>]</pre>
+
+    <div class="grid3">
+      <div class="def"><div class="u">Daily</div><div class="t">Weather</div>
+        <p>One more measured row, one fewer forecast row. The boundary in the chart moves right by a day.</p></div>
+      <div class="def"><div class="u">Every 2–3 days</div><div class="t">Satellite</div>
+        <p>A new NDVI reading, if the sky is clear and the sun is high enough to trust it.</p></div>
+      <div class="def"><div class="u">Twice a year</div><div class="t">Recalibration</div>
+        <p>Refit emergence once the autumn canopy is visible, and again when the season closes and the whole curve can be scored.</p></div>
+    </div>
+  </section>
+
+  <!-- 14 -->
+  <section>
+    <span class="num">11 — TOOLS</span>
+    <div class="col">
+      <h2>Everything used to build this</h2>
+      <p class="lede">All of it free to read from, and none of it requiring a login.</p>
+    </div>
+
+    <div class="tbl">
+      <table>
+        <thead><tr><th>Piece</th><th>What it does</th><th>Cost</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Wolfram System Modeler</strong></td><td style="text-align:left">Modelica simulation — the model itself</td><td>licensed</td></tr>
+          <tr><td><strong>Business Simulation Library</strong></td><td style="text-align:left">Stock-and-flow components, v2.2.0 — the one thing not bundled with System Modeler; a free download</td><td>free, open</td></tr>
+          <tr><td><strong>Wolfram Language</strong></td><td style="text-align:left"><code>URLExecute</code> for every API, calibration, the update script</td><td>licensed</td></tr>
+          <tr><td><strong>SMHI metobs</strong></td><td style="text-align:left">Station weather, back to 1944</td><td>free, no key</td></tr>
+          <tr><td><strong>SMHI STRÅNG</strong></td><td style="text-align:left">Modelled radiation and PAR at any point</td><td>free, no key</td></tr>
+          <tr><td><strong>Copernicus Sentinel-2</strong></td><td style="text-align:left">10 m imagery every 2–3 days</td><td>free</td></tr>
+          <tr><td><strong>Microsoft Planetary Computer</strong></td><td style="text-align:left">STAC search and point reads without GDAL</td><td>free, no key</td></tr>
+          <tr><td><strong>Jordbruksverket</strong></td><td style="text-align:left">Parcel register — which crop, which year</td><td>free</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <h3>The honest limitation</h3>
+      <p style="margin:0;color:var(--ink-2);font-size:15px">At 58°N the satellite is useless for roughly five months. The hard gap — zero clear pixels — is 64 days. Add the weeks either side where the sun sits too low to trust, and the twin is flying on weather data alone from early October to early March. The first clear image in spring is the exam, and it only comes once a year.</p>
+    </div>
+  </section>
+
+  <footer>
+    Week 1 of a five-week series on digital twins. Model, data and dashboard are in the CropTwin repository.<br>
+    Weather © SMHI (CC BY 4.0) · imagery contains modified Copernicus Sentinel data 2026 via Microsoft Planetary Computer ·
+    parcel data © Jordbruksverket · base map © OpenStreetMap contributors.
+  </footer>
+</div>
+
+<script>
+(function(){
+  var D = null;
+  fetch('croptwin/page_data.json').then(function(r){return r.json();}).then(function(j){D=j;draw();})
+    .catch(function(){
+      document.getElementById('seasons').insertAdjacentHTML('afterend',
+        '<p style="color:var(--ink-3);font-size:14px">Chart data could not be loaded.</p>');
+    });
+
+  var css = getComputedStyle(document.documentElement);
+  function C(n){return css.getPropertyValue(n).trim();}
+  function el(tag, a){var e=document.createElementNS('http://www.w3.org/2000/svg',tag);
+    for(var k in a) e.setAttribute(k,a[k]); return e;}
+  function txt(x,y,s,anchor,size,fill){
+    var t=el('text',{x:x,y:y,'text-anchor':anchor||'middle','font-size':size||11,
+      fill:fill||C('--ink-3'),'font-family':'IBM Plex Mono, monospace'});
+    t.textContent=s; return t;}
+  function monthsOf(startISO){
+    var out=[], d=new Date(startISO+'T00:00:00Z');
+    for(var i=0;i<380;i+=1){
+      var dd=new Date(d); dd.setUTCDate(dd.getUTCDate()+i);
+      if(dd.getUTCDate()===1 && dd.getUTCMonth()%2===0)
+        out.push([i, dd.toLocaleDateString('en-GB',{month:'short',timeZone:'UTC'})]);
+    }
+    return out;}
+
+  function draw(){
+    drawSeasons(); drawScores(); drawLive();
+  }
+
+  // ---------- five-season panel stack ----------
+  function drawSeasons(){
+    var svg=document.getElementById('seasons');
+    var years=Object.keys(D.seasons).sort();
+    var W=1080, PH=150, GAP=2, L=56, R=14, TOP=6, BOT=26;
+    years.forEach(function(y,idx){
+      var s=D.seasons[y], oy=idx*(PH+GAP);
+      var x=function(d){return L+(d/379)*(W-L-R);};
+      var yy=function(v){return oy+TOP+(1-v)*(PH-TOP-BOT);};
+
+      [0,0.5,1].forEach(function(v){
+        svg.appendChild(el('line',{x1:L,x2:W-R,y1:yy(v),y2:yy(v),
+          stroke:C('--line'),'stroke-width':1}));
+        svg.appendChild(txt(L-9,yy(v)+4,v.toFixed(1),'end',10.5));
+      });
+      monthsOf(s.start).forEach(function(m){
+        svg.appendChild(el('line',{x1:x(m[0]),x2:x(m[0]),y1:yy(1),y2:yy(0),
+          stroke:C('--line'),'stroke-width':1,opacity:.6}));
+        if(idx===years.length-1) svg.appendChild(txt(x(m[0]),oy+PH-8,m[1],'middle',10.5));
+      });
+
+      var p=s.grid.map(function(d,i){return (i?'L':'M')+x(d).toFixed(1)+' '+yy(s.ndvi[i]).toFixed(1);}).join(' ');
+      svg.appendChild(el('path',{d:p,fill:'none',stroke:C('--grow'),'stroke-width':2,'stroke-linejoin':'round'}));
+
+      s.obsLow.forEach(function(o){
+        svg.appendChild(el('circle',{cx:x(o[0]),cy:yy(o[1]),r:3.2,fill:'none',
+          stroke:C('--flag'),'stroke-width':1.5,opacity:.75}));});
+      s.obsHigh.forEach(function(o){
+        svg.appendChild(el('circle',{cx:x(o[0]),cy:yy(o[1]),r:3.6,fill:C('--flag')}));});
+
+      var lab=txt(L+6,oy+TOP+15,'Harvest '+y,'start',13,C('--ink'));
+      lab.setAttribute('font-family','Fraunces, Georgia, serif');
+      lab.setAttribute('font-weight','600');
+      svg.appendChild(lab);
+      svg.appendChild(txt(W-R-4,oy+TOP+15,'RMSE '+s.rmse.toFixed(3)+'  ·  peak LAI '+s.peakLai.toFixed(1),
+        'end',11,C('--ink-3')));
+    });
+  }
+
+  // ---------- score table ----------
+  function drawScores(){
+    var tb=document.querySelector('#scores tbody');
+    tb.innerHTML=Object.keys(D.seasons).sort().map(function(y){
+      var s=D.seasons[y];
+      var d=new Date(s.start+'T00:00:00Z'); d.setUTCDate(d.getUTCDate()+s.emergenceDay);
+      return '<tr><td><strong>'+y+'</strong></td><td class="mono">'+
+        d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'})+
+        '</td><td class="mono">'+s.rmse.toFixed(3)+'</td><td class="mono">'+s.peakLai.toFixed(1)+
+        '</td><td class="mono">'+(s.dm/100).toFixed(1)+' t/ha</td></tr>';
+    }).join('');
+  }
+
+  // ---------- live season ----------
+  function drawLive(){
+    var L2=D.live, i=Math.round(L2.today/4);
+    var latest=L2.obs[L2.obs.length-1];
+    var med=L2.med[i];
+
+    document.getElementById('liveAlert').innerHTML=
+      '<div class="alert" style="margin-top:0"><div class="d"></div><div>'+
+      '<h4>The field is green. The model says it should not be.</h4>'+
+      '<p>Sentinel-2 read <strong>'+latest.ndvi.toFixed(2)+'</strong> on '+
+      new Date(latest.date+'T00:00:00Z').toLocaleDateString('en-GB',
+        {day:'numeric',month:'long',year:'numeric',timeZone:'UTC'})+
+      ', against a modelled <strong>'+med.toFixed(2)+'</strong>. The crop of this season is not sown yet — '+
+      'so that green is what the <em>previous</em> crop left behind: volunteers and stubble, which the 2019 '+
+      'and 2022 seasons both show at 0.6 before cultivation knocks them back. A twin that disagrees with '+
+      'its sensor has told you something.</p></div></div>';
+
+    var tiles=[
+      ['Day of crop year', L2.today, 'since 1 Sep 2026'],
+      ['Satellite NDVI', latest.ndvi.toFixed(2), 'measured', 'hot'],
+      ['Modelled NDVI', med.toFixed(2), 'same day'],
+      ['Forecast peak LAI', L2.peakLai[0].toFixed(1)+'–'+L2.peakLai[2].toFixed(1),
+        'median '+L2.peakLai[1].toFixed(1)],
+      ['Forecast yield', (L2.dm[0]/100).toFixed(1)+'–'+(L2.dm[2]/100).toFixed(1)+' t/ha',
+        'dry matter at harvest']
+    ];
+    document.getElementById('liveTiles').innerHTML=tiles.map(function(t){
+      return '<div class="tile'+(t[3]?' '+t[3]:'')+'"><div class="k">'+t[0]+'</div>'+
+        '<div class="v">'+t[1]+'</div><div class="n">'+t[2]+'</div></div>';}).join('');
+
+    var svg=document.getElementById('liveChart');
+    var W=1040,H=300,L3=52,R=16,T=14,B=34;
+    var x=function(d){return L3+(d/379)*(W-L3-R);};
+    var y=function(v){return T+(1-v)*(H-T-B);};
+    [0,0.25,0.5,0.75,1].forEach(function(v){
+      svg.appendChild(el('line',{x1:L3,x2:W-R,y1:y(v),y2:y(v),stroke:C('--line'),'stroke-width':1}));
+      svg.appendChild(txt(L3-9,y(v)+4,v.toFixed(2),'end',10.5));
+    });
+    monthsOf(L2.base).forEach(function(m){
+      svg.appendChild(el('line',{x1:x(m[0]),x2:x(m[0]),y1:T,y2:H-B,stroke:C('--line'),'stroke-width':1,opacity:.6}));
+      svg.appendChild(txt(x(m[0]),H-B+16,m[1],'middle',10.5));
+    });
+    svg.appendChild(el('rect',{x:L3,y:T,width:x(L2.measuredDays-1)-L3,height:H-T-B,
+      fill:C('--grow-soft'),opacity:.8}));
+    svg.appendChild(el('line',{x1:x(L2.measuredDays-1),x2:x(L2.measuredDays-1),y1:T,y2:H-B,
+      stroke:C('--ink-3'),'stroke-width':1.5,'stroke-dasharray':'5 4'}));
+    svg.appendChild(txt(x(L2.measuredDays-1)+8,T+13,'forecast from here','start',11));
+
+    var up=L2.day.map(function(d,k){return (k?'L':'M')+x(d).toFixed(1)+' '+y(L2.hi[k]).toFixed(1);}).join(' ');
+    var dn=L2.day.slice().reverse().map(function(d,k){
+      var j=L2.day.length-1-k; return 'L'+x(d).toFixed(1)+' '+y(L2.lo[j]).toFixed(1);}).join(' ');
+    svg.appendChild(el('path',{d:up+' '+dn+' Z',fill:C('--grow'),opacity:.22}));
+    var p=L2.day.map(function(d,k){return (k?'L':'M')+x(d).toFixed(1)+' '+y(L2.med[k]).toFixed(1);}).join(' ');
+    svg.appendChild(el('path',{d:p,fill:'none',stroke:C('--grow'),'stroke-width':2.2}));
+    L2.obs.forEach(function(o){
+      svg.appendChild(el('circle',{cx:x(o.day),cy:y(o.ndvi),r:4,fill:C('--flag')}));});
+  }
+})();
+</script>
+<script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs"; mermaid.initialize({startOnLoad:true, theme:"neutral"});</script>
+</body>
+</html>
