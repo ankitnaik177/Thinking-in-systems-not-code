@@ -144,7 +144,7 @@ ndviOf[f_] := <span class="k">Module</span>[{red, nir, scl},
     <h2>The crop as a system</h2>
     <p class="lede">System dynamics: a <b>stock</b> accumulates, a <b>flow</b> fills or drains it. Soil water, green leaf, dry matter and thermal time are the stocks.</p>
     <figure><img src="croptwin/soilwater.png" alt="System Modeler diagram of the soil-water subsystem">
-      <figcaption>One phase in full: the soil-water bucket. Rain in; evapotranspiration and drainage out; the level sets how much the crop is held back. Business Simulation Library in System Modeler.</figcaption></figure>
+      <figcaption>One phase in full: the soil-water bucket. Purple is water, blue is information. Rain from the cloud at left fills the stock; evapotranspiration leaves to the right, drainage drops out below. The bus at top right brings in rain, sunlight and canopy cover, and takes back the water stress read from the level at bottom right. Business Simulation Library in System Modeler.</figcaption></figure>
     <p style="margin-top:18px">Leaf works the same way: intercepted light becomes sugar, a share becomes new leaf, which intercepts more light — until the canopy catches nearly all of it. After flowering the same stock drains.</p>
     <figure><img src="croptwin/diagram.png" alt="Top-level System Modeler diagram: six subsystems around a data bus">
       <figcaption>The whole twin: six subsystems around one bus. Each follows the process in 02.</figcaption></figure>
