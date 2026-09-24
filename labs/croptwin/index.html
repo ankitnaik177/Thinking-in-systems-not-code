@@ -157,7 +157,24 @@
       <button id="btnNdvi" aria-pressed="false">greenness</button>
     </div>
   </div>
-  <p class="howto" id="howto">The outlined field is the twin. <b>Photo</b> is what you would see; <b>greenness</b> is what the model is compared against. Press <b>replay</b> to watch last season pass over the field — pause any time to read, ← → step frame by frame.</p>
+  <p class="howto" id="howto">The outlined field is the twin. <b>Photo</b> is what you would see; <b>greenness</b> is what the model is compared against. Press <b>replay</b> to watch last season pass over the field while the chart below draws the same days — pause any time to read, ← → step frame by frame.</p>
+  <div class="panel" id="lastPanel" hidden>
+    <h2>Last season, replayed &mdash; did the model track the satellite?</h2>
+    <div class="replay">
+      <button id="lastPlay" class="play">&#9654; Replay harvest 2026 &middot; 13 s</button>
+      <button id="lastStop" hidden>&#9632; Stop</button>
+      <span class="rh" id="lastHud">the model is drawn from weather alone; every dot is a satellite pass</span>
+      <span class="story" id="lastStory"></span>
+    </div>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--grow)"></i> model</span>
+      <span><i class="sw dotv" style="background:var(--warn)"></i> satellite</span>
+      <span><i class="sw dotv" style="background:transparent;border:1.6px solid var(--warn)"></i> satellite, sun too low to trust</span>
+      <span><i class="sw" style="background:#c9a227;height:2px"></i> where we are in the replay</span>
+    </div>
+    <div class="chartbox"><svg class="chart" id="lastChart" viewBox="0 0 1120 330" role="img" aria-label="Last season: modelled greenness drawn over time with satellite observations"></svg></div>
+  </div>
+
   <div class="rotation" id="rotation"></div>
 
   <div id="flag"></div>
@@ -185,22 +202,6 @@
     <div class="chartbox"><svg class="chart" id="ndviChart" viewBox="0 0 1120 330" role="img" aria-label="Modelled greenness across the crop year with satellite observations"></svg></div>
   </div>
 
-  <div class="panel" id="lastPanel" hidden>
-    <h2>Last season, replayed &mdash; did the model track the satellite?</h2>
-    <div class="replay">
-      <button id="lastPlay" class="play">&#9654; Replay harvest 2026 &middot; 13 s</button>
-      <button id="lastStop" hidden>&#9632; Stop</button>
-      <span class="rh" id="lastHud">the model is drawn from weather alone; every dot is a satellite pass</span>
-      <span class="story" id="lastStory"></span>
-    </div>
-    <div class="legend">
-      <span><i class="sw" style="background:var(--grow)"></i> model</span>
-      <span><i class="sw dotv" style="background:var(--warn)"></i> satellite</span>
-      <span><i class="sw dotv" style="background:transparent;border:1.6px solid var(--warn)"></i> satellite, sun too low to trust</span>
-      <span><i class="sw" style="background:#c9a227;height:2px"></i> where we are in the replay</span>
-    </div>
-    <div class="chartbox"><svg class="chart" id="lastChart" viewBox="0 0 1120 330" role="img" aria-label="Last season: modelled greenness drawn over time with satellite observations"></svg></div>
-  </div>
 
   <details class="more" open>
     <summary>Details</summary>
