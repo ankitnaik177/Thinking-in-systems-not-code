@@ -40,7 +40,7 @@
   .note{display:flex;gap:12px;background:var(--flag-soft);border:1px solid var(--flag);border-left-width:4px;border-radius:9px;padding:12px 16px;margin-top:18px;font-size:14.5px;color:var(--ink-2)}
   .note b{color:var(--ink)}
   table{width:100%;border-collapse:collapse;font-size:14.5px;background:var(--card);margin-top:18px}
-  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top} td.n{font-family:"IBM Plex Mono",monospace;text-align:right}
   th{font:600 11.5px "IBM Plex Mono",monospace;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)}
   .cta{display:inline-block;margin-top:14px;background:var(--grow);color:#fff;text-decoration:none;font-weight:600;padding:10px 16px;border-radius:8px}
   footer{padding-top:22px;font-size:13px;color:var(--ink-3)}
@@ -69,7 +69,7 @@
     <span class="num">01 — THE CASE</span>
     <h2>One field, west of Linköping</h2>
     <p class="lede">Winter wheat. Sown in September, harvested the next August. Jordbruksverket's <em>jordbruksskiften</em> — the fields farmers declare each year, with a crop code, in their SAM subsidy application — say what grew; the satellite says how green it was.</p>
-    <figure><img src="croptwin/map.jpg" alt="Map of the plain west of Linköping with the field marked">
+    <figure><img src="croptwin/map_marked.jpg" alt="Map of the plain west of Linköping with the field marked">
       <figcaption>Declared to Jordbruksverket as <em>höstvete</em> (winter wheat) in 2019, 2020, 2022 and 2025, and <em>havre</em> (oats) in 2024. Base map © OpenStreetMap contributors.</figcaption></figure>
   </section>
 
@@ -77,22 +77,25 @@
     <span class="num">02 — THE PROCESS</span>
     <h2>How a crop grows, and how to watch it from space</h2>
     <p class="lede">The land is ploughed, sown and left. From then on the field is greener or browner — and a satellite sees that every two to three days.</p>
-    <figure><img src="croptwin/truecolor.jpg" alt="Sentinel-2 photo of the field and its neighbours">
-      <figcaption>Sentinel-2, 4 July 2026. 10 m per pixel, free. Contains modified Copernicus Sentinel data.</figcaption></figure>
+    <figure><img src="croptwin/truecolor_outlined.jpg" alt="Sentinel-2 photo with the field outlined and the read point marked">
+      <figcaption>Sentinel-2, 4 July 2026, the field outlined; the dot is where every number in this article is read. 10 m per pixel, free. Contains modified Copernicus Sentinel data.</figcaption></figure>
     <p style="margin-top:18px">One number turns the picture into something to track. Living leaf absorbs red light and reflects near-infrared; bare soil does neither. The contrast is the <b>NDVI</b>:</p>
     <figure><img src="croptwin/ndvi-explainer.png" alt="How NDVI is computed from red and near-infrared reflectance" style="border:0">
       <figcaption>Bare soil ≈ 0.2, a closed wheat canopy ≈ 0.95.</figcaption></figure>
-    <p style="margin-top:18px">Seven passes over the same field, one per phase. The outline is the parcel; the dot is where the number is read.</p>
+    <p style="margin-top:18px">Worked once, for the first frame below. Reflectance is the fraction of sunlight the ground sends back in each band, read at the dot: red 0.061, near-infrared 0.103. NDVI = (0.103 − 0.061) / (0.103 + 0.061) = <b>0.26</b> — bare soil. On 30 May the same point gives red <b>0.020</b> and near-infrared <b>0.469</b>: the canopy swallows nearly all the red and throws back the infrared, and the ratio is <b>0.92</b>.</p>
+    <p>Seven passes over the same field, one per phase, each with its two reflectances and the number they make. The outline is the parcel; the dot is where the bands are read.</p>
     <div class="phases">
-      <figure><img src="croptwin/phases/2025-09-22.jpg" alt=""><div class="t">Stubble after harvest</div><div class="m">22 Sep 2025 · NDVI <b>0.26</b></div><div class="w">bare soil with stubble; the model reads bare too</div></figure>
-      <figure><img src="croptwin/phases/2025-10-02.jpg" alt=""><div class="t">Sown, nothing up yet</div><div class="m">2 Oct 2025 · NDVI <b>0.23</b></div><div class="w">freshly worked soil; seedlings too small to see from orbit</div></figure>
-      <figure><img src="croptwin/phases/2025-11-24.jpg" alt=""><div class="t">Small plants, autumn</div><div class="m">24 Nov 2025 · NDVI <b>0.27</b></div><div class="w">a thin green haze at best; growth slows as days shorten</div></figure>
-      <figure><img src="croptwin/phases/2026-03-06.jpg" alt=""><div class="t">First image after winter</div><div class="m">6 Mar 2026 · NDVI <b>0.50</b></div><div class="w">the satellite is blind for months; the crop wintered under snow</div></figure>
-      <figure><img src="croptwin/phases/2026-04-09.jpg" alt=""><div class="t">Spring growth</div><div class="m">9 Apr 2026 · NDVI <b>0.44</b></div><div class="w">restarts as the soil warms; still thin</div></figure>
-      <figure><img src="croptwin/phases/2026-05-30.jpg" alt=""><div class="t">Peak canopy</div><div class="m">30 May 2026 · NDVI <b>0.92</b></div><div class="w">leaf area at its maximum, then flowering</div></figure>
-      <figure><img src="croptwin/phases/2026-08-11.jpg" alt=""><div class="t">Ripening and harvest</div><div class="m">11 Aug 2026 · NDVI <b>0.46</b></div><div class="w">canopy yellows; back toward bare soil</div></figure>
+      <figure><img src="croptwin/phases/2025-09-22.jpg" alt=""><div class="t">Stubble after harvest</div><div class="m">22 Sep 2025 · NDVI <b>0.26</b></div><div class="w">bare soil with stubble; the model reads bare too</div><div class="w" style="font-family:'IBM Plex Mono',monospace;font-size:11px;margin-top:2px">red 0.061 · NIR 0.103 → (0.103 − 0.061)/(0.103 + 0.061) = <b>0.26</b></div></figure>
+      <figure><img src="croptwin/phases/2025-10-02.jpg" alt=""><div class="t">Sown, nothing up yet</div><div class="m">2 Oct 2025 · NDVI <b>0.23</b></div><div class="w">freshly worked soil; seedlings too small to see from orbit</div><div class="w" style="font-family:'IBM Plex Mono',monospace;font-size:11px;margin-top:2px">red 0.088 · NIR 0.140 → (0.140 − 0.088)/(0.140 + 0.088) = <b>0.23</b></div></figure>
+      <figure><img src="croptwin/phases/2025-11-24.jpg" alt=""><div class="t">Small plants, autumn</div><div class="m">24 Nov 2025 · NDVI <b>0.27</b></div><div class="w">a thin green haze at best; growth slows as days shorten</div><div class="w" style="font-family:'IBM Plex Mono',monospace;font-size:11px;margin-top:2px">red 0.167 · NIR 0.289 → (0.289 − 0.167)/(0.289 + 0.167) = <b>0.27</b></div></figure>
+      <figure><img src="croptwin/phases/2026-03-06.jpg" alt=""><div class="t">First image after winter</div><div class="m">6 Mar 2026 · NDVI <b>0.49</b></div><div class="w">the satellite is blind for months; the crop wintered under snow</div><div class="w" style="font-family:'IBM Plex Mono',monospace;font-size:11px;margin-top:2px">red 0.063 · NIR 0.182 → (0.182 − 0.063)/(0.182 + 0.063) = <b>0.49</b></div></figure>
+      <figure><img src="croptwin/phases/2026-04-09.jpg" alt=""><div class="t">Spring growth</div><div class="m">9 Apr 2026 · NDVI <b>0.44</b></div><div class="w">restarts as the soil warms; still thin</div><div class="w" style="font-family:'IBM Plex Mono',monospace;font-size:11px;margin-top:2px">red 0.092 · NIR 0.236 → (0.236 − 0.092)/(0.236 + 0.092) = <b>0.44</b></div></figure>
+      <figure><img src="croptwin/phases/2026-05-30.jpg" alt=""><div class="t">Peak canopy</div><div class="m">30 May 2026 · NDVI <b>0.92</b></div><div class="w">leaf area at its maximum, then flowering</div><div class="w" style="font-family:'IBM Plex Mono',monospace;font-size:11px;margin-top:2px">red 0.020 · NIR 0.469 → (0.469 − 0.020)/(0.469 + 0.020) = <b>0.92</b></div></figure>
+      <figure><img src="croptwin/phases/2026-08-11.jpg" alt=""><div class="t">Ripening and harvest</div><div class="m">11 Aug 2026 · NDVI <b>0.46</b></div><div class="w">canopy yellows; back toward bare soil</div><div class="w" style="font-family:'IBM Plex Mono',monospace;font-size:11px;margin-top:2px">red 0.149 · NIR 0.402 → (0.402 − 0.149)/(0.402 + 0.149) = <b>0.46</b></div></figure>
     </div>
     <figcaption style="margin-top:10px">Red is bare, green is dense leaf. Contains modified Copernicus Sentinel data 2025–2026.</figcaption>
+    <table><thead><tr><th>Phase</th><th>Date</th><th>Red</th><th>Near-infrared</th><th>(NIR − Red) / (NIR + Red)</th><th>NDVI</th></tr></thead><tbody><tr><td>Stubble after harvest</td><td>2025-09-22</td><td class="n">0.061</td><td class="n">0.103</td><td>(0.103 − 0.061) / (0.103 + 0.061)</td><td class="n"><b>0.26</b></td></tr><tr><td>Sown, nothing up yet</td><td>2025-10-02</td><td class="n">0.088</td><td class="n">0.140</td><td>(0.140 − 0.088) / (0.140 + 0.088)</td><td class="n"><b>0.23</b></td></tr><tr><td>Small plants, autumn</td><td>2025-11-24</td><td class="n">0.167</td><td class="n">0.289</td><td>(0.289 − 0.167) / (0.289 + 0.167)</td><td class="n"><b>0.27</b></td></tr><tr><td>First image after winter</td><td>2026-03-06</td><td class="n">0.063</td><td class="n">0.182</td><td>(0.182 − 0.063) / (0.182 + 0.063)</td><td class="n"><b>0.49</b></td></tr><tr><td>Spring growth</td><td>2026-04-09</td><td class="n">0.092</td><td class="n">0.236</td><td>(0.236 − 0.092) / (0.236 + 0.092)</td><td class="n"><b>0.44</b></td></tr><tr><td>Peak canopy</td><td>2026-05-30</td><td class="n">0.020</td><td class="n">0.469</td><td>(0.469 − 0.020) / (0.469 + 0.020)</td><td class="n"><b>0.92</b></td></tr><tr><td>Ripening and harvest</td><td>2026-08-11</td><td class="n">0.149</td><td class="n">0.402</td><td>(0.402 − 0.149) / (0.402 + 0.149)</td><td class="n"><b>0.46</b></td></tr></tbody></table>
+    <figcaption style="margin-top:8px">The same seven readings as a table. Low red is the signature of living leaf; high near-infrared is its cell structure. Bare soil is fairly bright in both.</figcaption>
   </section>
 
   <section>
@@ -176,7 +179,7 @@ today = &lt;|<span class="s">"date"</span> -> <span class="k">DateString</span>[
     <p class="lede">Decide what matters, let an LLM write the HTML, host it anywhere. The page reads the databin when it opens.</p>
     <p>Here: the field itself, what the satellite sees against what the model expects, the warmth accumulated, the yield the model foresees — and a replay of last season over the field, with pause.</p>
     <figure><img src="croptwin/croptwin.gif" alt="The model drawn from weather alone while satellite passes land on it" style="border:0">
-      <figcaption>Last season as the dashboard replays it: the model never saw the dots — only the weather.</figcaption></figure>
+      <figcaption>Harvest 2022 as an animation: the model never saw the dots — only the weather. The live twin replays last season the same way, over the field itself.</figcaption></figure>
     <a class="cta" href="../labs/croptwin/index.html">Open the live twin →</a>
   </section>
 
