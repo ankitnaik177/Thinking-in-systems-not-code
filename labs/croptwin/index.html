@@ -214,11 +214,11 @@
       <div><h3>Model alone vs twin, today</h3><div id="syncRows"></div>
         <p class="small">After every clear pass the twin pulls its leaf area toward what the satellite implies, over two days, by a Kalman gain: far when the pass is informative, little near bare soil or a saturated canopy. The model alone never sees the satellite; the twin restarts its forecast from the field as it is.</p></div>
       <div><h3>Decisions, updated daily</h3><div id="syncDecisions"></div>
-        <p class="small">Ranges span the five weather years the forecast runs on. The alert fires when a pass lands more than 2.5 standard deviations from what the twin expected the day before.</p></div>
+        <p class="small">Ranges span the five weather years the forecast runs on; before the crop has emerged they are climatology. Grain is taken as 0.45 of the above-ground dry matter the model computes, quoted at 14 % moisture. The alert fires when a pass lands more than 2.5 standard deviations from what the twin expected the day before.</p></div>
       <div class="proj" id="projBlock" hidden><h3>Projections, re-issued every day</h3>
         <div class="two">
           <svg id="projDates" viewBox="0 0 560 230" role="img" aria-label="Expected flowering and harvest-ready dates, as issued each day"></svg>
-          <svg id="projYield" viewBox="0 0 560 230" role="img" aria-label="Expected yield, as issued each day"></svg>
+          <svg id="projYield" viewBox="0 0 560 230" role="img" aria-label="Expected grain yield, as issued each day"></svg>
         </div>
         <p class="small">Every day the twin re-issues its expected flowering date, harvest-ready date and yield. Bands span the five weather years, the line is the median. They should settle as the season delivers its weather and its passes; a jump is the satellite changing the model's mind.</p></div>
     </div>
@@ -258,7 +258,7 @@
     </div>
     <div class="panel">
       <h2>Past seasons — how well the model did</h2>
-      <div class="tblbox"><table id="histTable"><thead><tr><th>Season</th><th>Crop emerged</th><th>Error (NDVI)</th><th>Peak leaf area</th><th>Yield, dry matter</th></tr></thead><tbody></tbody></table></div>
+      <div class="tblbox"><table id="histTable"><thead><tr><th>Season</th><th>Crop emerged</th><th>Error (NDVI)</th><th>Peak leaf area</th><th>Grain yield</th></tr></thead><tbody></tbody></table></div>
     </div>
     <div class="panel">
       <h2>Sources</h2>
@@ -332,6 +332,8 @@
   function axisText(x,y,s,anchor,size){var t=svgEl('text',{x:x,y:y,'text-anchor':anchor||'middle','font-size':size||11,fill:C('--ink-3'),'font-family':'IBM Plex Mono, monospace'});t.textContent=s;return t;}
   function monthTicks(){var out=[];for(var i=0;i<380;i++){var d=new Date('2026-09-01T00:00:00Z');d.setUTCDate(d.getUTCDate()+i);if(d.getUTCDate()===1)out.push([i,d.toLocaleDateString('en-GB',{month:'short',timeZone:'UTC'})]);}return out;}
   function interp(xs, ys, x){ if (x<=xs[0]) return ys[0]; for (var i=1;i<xs.length;i++){ if (x<=xs[i]){ var f=(x-xs[i-1])/(xs[i]-xs[i-1]); return ys[i-1]+f*(ys[i]-ys[i-1]); } } return ys[ys.length-1]; }
+  // the model computes above-ground dry matter (g/m2); grain is ~0.45 of it, quoted at 14 % moisture, in t/ha
+  function grain(dm){ return dm/100*0.45/0.86; }
   function laiOf(ndvi){ var s=0.18, mx=0.95, k=0.6, f=(ndvi-s)/(mx-s); if (f<=0) return 0; if (f>=0.999) return 9; return -Math.log(1-f)/k; }
   // what is happening on the field at a given day of the crop year (1 Sep = day 0)
   function storyFor(day){
@@ -371,7 +373,7 @@
       {x:2, y:4,  k:'satellite sees', v: latest ? latest.ndvi.toFixed(2) : '—', n: latest ? 'greenness, '+fmt(latest.date) : 'no clear pass yet', hot:true},
       {x:2, y:30, k:'twin expects', v: D.modelNdvi.toFixed(2), n:'greenness today'},
       {x:64,y:4,  k:'warmth so far', v: Math.round(D.tt)+' °C·d', n: Math.round(100*D.tt/D.params.floweringThermalTime)+'% of the way to flowering'},
-      {x:64,y:30, k:'expected yield', v:(D.dryMatter[0]/100).toFixed(1)+'–'+(D.dryMatter[2]/100).toFixed(1)+' t/ha', n:'dry matter at harvest'}
+      {x:64,y:30, k:'expected grain yield', v:grain(D.dryMatter[0]).toFixed(1)+'–'+grain(D.dryMatter[2]).toFixed(1)+' t/ha', n:'at 14 % moisture · biomass '+(D.dryMatter[0]/100).toFixed(1)+'–'+(D.dryMatter[2]/100).toFixed(1)+' t/ha dry'}
     ].map(function(c){return '<div class="callout'+(c.hot?' hot':'')+'" style="left:'+c.x+'%;top:'+c.y+'%"><div class="k">'+c.k+'</div><div class="v">'+c.v+'</div><div class="n">'+c.n+'</div></div>';}).join('');
     var tc=document.getElementById('imgTc'), nd=document.getElementById('imgNdvi'), key=document.getElementById('key'),
         b1=document.getElementById('btnTc'), b2=document.getElementById('btnNdvi');
@@ -459,7 +461,7 @@
       ['Twin greenness', D.modelNdvi.toFixed(2), 'same day, after the sync'],
       ['Warmth accumulated', Math.round(D.tt)+' °C·d', Math.round(100*D.tt/D.params.floweringThermalTime)+'% to flowering'],
       ['Peak leaf area, forecast', D.peakLai[0].toFixed(1)+'–'+D.peakLai[2].toFixed(1), 'wheat usually ~6'],
-      ['Yield, forecast', (D.dryMatter[0]/100).toFixed(1)+'–'+(D.dryMatter[2]/100).toFixed(1)+' t/ha', 'dry matter at harvest']
+      ['Grain yield, forecast', grain(D.dryMatter[0]).toFixed(1)+'–'+grain(D.dryMatter[2]).toFixed(1)+' t/ha', 'at 14 % moisture, harvest index 0.45 · biomass '+(D.dryMatter[0]/100).toFixed(1)+'–'+(D.dryMatter[2]/100).toFixed(1)+' t/ha dry']
     ].map(function(t){return '<div class="tile'+(t[3]?' '+t[3]:'')+'"><div class="k">'+t[0]+'</div><div class="v mono">'+t[1]+'</div><div class="n">'+t[2]+'</div></div>';}).join('');
 
     // ---- the sync: what the satellite changed, what the twin decides ----
@@ -483,8 +485,9 @@
       document.getElementById('syncDecisions').innerHTML = [
         ['Flowering', rng(Dc.flowering, dfmt)],
         ['Harvest-ready', rng(Dc.harvestReady, dfmt)],
-        ['Yield, twin', (D.dryMatter[0]/100).toFixed(1) + ' – ' + (D.dryMatter[2]/100).toFixed(1) + ' t/ha'],
-        ['Yield, model alone', Dc.yieldOpen ? (Dc.yieldOpen[0]/100).toFixed(1) + ' – ' + (Dc.yieldOpen[2]/100).toFixed(1) + ' t/ha' : '—'],
+        ['Grain yield, twin', grain(D.dryMatter[0]).toFixed(1) + ' – ' + grain(D.dryMatter[2]).toFixed(1) + ' t/ha'],
+        ['Grain yield, model alone', Dc.yieldOpen ? grain(Dc.yieldOpen[0]).toFixed(1) + ' – ' + grain(Dc.yieldOpen[2]).toFixed(1) + ' t/ha' : '—'],
+        ['Above-ground biomass, twin', (D.dryMatter[0]/100).toFixed(1) + ' – ' + (D.dryMatter[2]/100).toFixed(1) + ' t/ha dry'],
         ['Divergence alert', S.alert ? '<span class="sat">on</span>' : 'off']
       ].map(function(r){ return '<div class="row"><span>' + r[0] + '</span><span class="mono">' + r[1] + '</span></div>'; }).join('');
 
@@ -517,8 +520,8 @@
         band(sd, fd, datePts, 'flo', 'fmed', 'fhi', C('--grow')); band(sd, fd, datePts, 'hlo', 'hmed', 'hhi', C('--soil'));
         sd.appendChild(axisText(560-18, fd.y(datePts[datePts.length-1].fmed)-8, 'flowering', 'end', 10.5));
         sd.appendChild(axisText(560-18, fd.y(datePts[datePts.length-1].hmed)-8, 'harvest-ready', 'end', 10.5));
-        var yPts = Hs.map(function(h){ return {day:h.day, lo:h.yield[0] === null ? null : h.yield[0]/100, hi:h.yield[1] === null ? null : h.yield[1]/100, med:(h.yield[0] === null || h.yield[1] === null) ? null : (h.yield[0]+h.yield[1])/200}; });
-        var sy = document.getElementById('projYield'), fy = frame(sy, 560, 230, 54, 16, 14, 40, 10, 20, 'yield, t/ha dry matter', [[10,'10'],[12,'12'],[14,'14'],[16,'16'],[18,'18'],[20,'20']]);
+        var yPts = Hs.map(function(h){ return {day:h.day, lo:h.yield[0] === null ? null : grain(h.yield[0]), hi:h.yield[1] === null ? null : grain(h.yield[1]), med:(h.yield[0] === null || h.yield[1] === null) ? null : grain((h.yield[0]+h.yield[1])/2)}; });
+        var sy = document.getElementById('projYield'), fy = frame(sy, 560, 230, 54, 16, 14, 40, 5, 12, 'grain yield, t/ha at 14 % moisture', [[5,'5'],[7,'7'],[9,'9'],[11,'11']]);
         band(sy, fy, yPts, 'lo', 'med', 'hi', C('--sun'));
         sy.appendChild(axisText(560-18, fy.y(yPts[yPts.length-1].hi)-8, 'range over five weather years', 'end', 10.5));
       }
@@ -616,7 +619,7 @@
         story.textContent = storyFor(Math.round(day));
       }
       function labels(){ btn.innerHTML = !active ? '&#8635; Replay harvest 2026 &middot; 13 s' : (paused ? '&#9654; Resume' : '&#10074;&#10074; Pause'); btnStop.hidden = !active; }
-      function finish(){ hud.innerHTML='<b>Season over.</b> Error across the year: twin <b>'+LS.rmse.toFixed(3)+'</b>' + (LS.rmseOpen ? ', model alone <b>'+LS.rmseOpen.toFixed(3)+'</b>' : '') + ' &middot; yield twin <b>'+(LS.dm/100).toFixed(1)+' t/ha</b>' + (LS.dmOpen ? ', model alone <b>'+(LS.dmOpen/100).toFixed(1)+' t/ha</b>' : ''); story.textContent='Every filled dot was a real satellite pass. The dotted line never saw them; the solid line was pulled toward each one as it arrived.'; active=false; paused=false; labels(); cursor.setAttribute('opacity',0); }
+      function finish(){ hud.innerHTML='<b>Season over.</b> Error across the year: twin <b>'+LS.rmse.toFixed(3)+'</b>' + (LS.rmseOpen ? ', model alone <b>'+LS.rmseOpen.toFixed(3)+'</b>' : '') + ' &middot; grain yield twin <b>'+grain(LS.dm).toFixed(1)+' t/ha</b>' + (LS.dmOpen ? ', model alone <b>'+grain(LS.dmOpen).toFixed(1)+' t/ha</b>' : ''); story.textContent='Every filled dot was a real satellite pass. The dotted line never saw them; the solid line was pulled toward each one as it arrived.'; active=false; paused=false; labels(); cursor.setAttribute('opacity',0); }
       function tick(){ if(!active||paused) return; drawTo(Math.min(379,t)); if (t>=379){ finish(); return; } t+=STEP; timer=setTimeout(tick,260); }
       function stop(){ active=false; paused=false; clearTimeout(timer); t=0; drawTo(379); cursor.setAttribute('opacity',0); labels(); hud.innerHTML='solid: the twin, corrected by every clear pass · dotted: the model alone, weather only · every dot is a satellite pass'; story.textContent=''; }
       function begin(){ active=true; paused=false; t=0; labels(); tick(); }
@@ -640,7 +643,7 @@
         '<td class="mono" style="color:'+(Math.abs(d)>0.15?C('--warn'):C('--ink-2'))+'">'+(d>=0?'+':'')+d.toFixed(2)+'</td><td class="mono">'+o.sun.toFixed(0)+'°</td><td>'+(used?'yes':'no, sun too low')+'</td></tr>';}).join('');
     var Hh = window.CROPTWIN_HISTORY || {};
     document.querySelector('#histTable tbody').innerHTML = Object.keys(Hh).sort().map(function(y){var h=Hh[y];var st=new Date(h.start+'T00:00:00Z');st.setUTCDate(st.getUTCDate()+h.emergenceDay);
-      return '<tr><td>'+y+'</td><td>'+st.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'})+'</td><td class="mono">'+h.rmse.toFixed(3)+'</td><td class="mono">'+h.peakLai.toFixed(1)+'</td><td class="mono">'+(h.dm/100).toFixed(1)+' t/ha</td></tr>';}).join('');
+      return '<tr><td>'+y+'</td><td>'+st.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'})+'</td><td class="mono">'+h.rmse.toFixed(3)+'</td><td class="mono">'+h.peakLai.toFixed(1)+'</td><td class="mono">'+grain(h.dm).toFixed(1)+' t/ha</td></tr>';}).join('');
     document.getElementById('prov').innerHTML = [
       ['Greenness','Copernicus Sentinel-2, 10 m, every 2–3 days; read at one point in the field; only clear pixels'],
       ['Weather','SMHI station '+D.site.station+' (temperature, rain) and STRÅNG (sunlight) at the field'],
