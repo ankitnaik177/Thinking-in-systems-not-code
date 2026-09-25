@@ -123,6 +123,18 @@
   .replay button.play{background:var(--sun);border-color:var(--sun);color:#15201a}
   .replay .rh{font:12.5px "IBM Plex Mono",monospace;color:var(--ink-2)} .replay .rh b{color:var(--ink);font-weight:500}
   .replay .story{font-size:13px;color:var(--ink);flex-basis:100%}
+  .sync{display:grid;grid-template-columns:1fr 1fr;gap:18px 28px;align-items:start}
+  @media (max-width:760px){.sync{grid-template-columns:1fr}}
+  .sync .verdict{grid-column:1/-1;font-size:15px;line-height:1.45;padding:12px 14px;border-radius:8px;background:var(--grow-soft);border-left:4px solid var(--grow)}
+  .sync .verdict.alert{background:var(--warn-soft);border-left-color:var(--warn)}
+  .sync .verdict b{font-weight:600}
+  .sync h3{font:600 12.5px "Inter Tight",system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin:0 0 8px}
+  .sync .row{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+  .sync .row:last-child{border-bottom:0}
+  .sync .row .mono{font-family:"IBM Plex Mono",monospace;color:var(--ink)}
+  .sync .row .sat{color:var(--warn);font-weight:600}
+  .sync .row .twin{color:var(--grow);font-weight:600}
+  .sync .small{font-size:12px;color:var(--ink-3);margin-top:8px;line-height:1.45}
   .err{background:var(--warn-soft);border:1px solid var(--warn);border-radius:var(--radius);padding:12px 16px;font-size:14px;margin-bottom:16px}
 </style>
 </head>
@@ -190,11 +202,23 @@
   <div class="eyebrow">Today</div>
   <div class="tiles" id="tiles"></div>
 
+  <div class="panel" id="syncPanel" hidden>
+    <h2>The sync &mdash; what the satellite changed, and what the twin decides</h2>
+    <div class="sync">
+      <div class="verdict" id="syncVerdict"></div>
+      <div><h3>Model alone vs twin, today</h3><div id="syncRows"></div>
+        <p class="small">After every clear pass the twin pulls its leaf area toward what the satellite implies, over two days, by a Kalman gain: far when the pass is informative, little near bare soil or a saturated canopy. The model alone never sees the satellite; the twin restarts its forecast from the field as it is.</p></div>
+      <div><h3>Decisions, updated daily</h3><div id="syncDecisions"></div>
+        <p class="small">Ranges span the five weather years the forecast runs on. The alert fires when a pass lands more than 2.5 standard deviations from what the twin expected the day before.</p></div>
+    </div>
+  </div>
+
   <div class="panel">
-    <h2>The crop year — measured so far, forecast ahead</h2>
+    <h2>The crop year — the twin so far, forecast ahead</h2>
     <div class="legend">
-      <span><i class="sw" style="background:var(--grow)"></i> model</span>
+      <span><i class="sw" style="background:var(--grow)"></i> twin: model corrected by every clear pass</span>
       <span><i class="sw" style="background:var(--grow);opacity:.35;height:10px"></i> spread of 5 weather years</span>
+      <span><i class="sw" style="background:transparent;height:0;border-top:2px dotted var(--ink-3)"></i> model without the satellite</span>
       <span><i class="sw dotv" style="background:var(--warn)"></i> satellite</span>
       <span><i class="sw dotv" style="background:transparent;border:1.6px solid var(--warn)"></i> satellite, sun too low to trust</span>
       <span><i class="sw" style="background:var(--ink-3);height:0;border-top:2px dashed var(--ink-3)"></i> today</span>
@@ -265,7 +289,8 @@
     return { source:'databin', today:T.day, generated:T.date, measuredThrough:T.measuredThrough, measuredDays:T.measuredDays,
       site:T.site, params:T.params, obs:T.obs || [], modelNdvi:T.modelNdvi, modelLai:T.modelLai, tt:T.tt,
       peakLai:T.peakLai, dryMatter:T.dryMatter, fDay:T.forecastDay, fLo:T.forecastLo, fMed:T.forecastMed, fHi:T.forecastHi,
-      ttCurve:T.ttCurve, drivers:drv, missingDays:missing, entries:entries.length };
+      ttCurve:T.ttCurve, drivers:drv, missingDays:missing, entries:entries.length,
+      sync:T.sync||null, decisions:T.decisions||null, fOpen:T.forecastOpen||null };
   }
   function fromLocal(S){
     if (!S || !S.ensemble) return null;
@@ -273,13 +298,15 @@
     for (var i = 0; i < S.day.length; i += 4){ g.push(S.day[i]);
       var v = M.map(function(m){return S.ensemble[m].ndvi[i];}).sort(function(a,b){return a-b;}); lo.push(v[0]); med.push(v[(v.length-1)>>1]); hi.push(v[v.length-1]);
       var w = M.map(function(m){return S.ensemble[m].tt[i];}).sort(function(a,b){return a-b;}); tt.push(w[(w.length-1)>>1]); }
+    var fo = null; if (S.ensembleOpen){ fo = []; for (var j = 0; j < S.day.length; j += 4){ var vo = M.map(function(m){return S.ensembleOpen[m].ndvi[j];}).sort(function(a,b){return a-b;}); fo.push(vo[(vo.length-1)>>1]); } }
     var pk = M.map(function(m){return Math.max.apply(null,S.ensemble[m].lai);}).sort(function(a,b){return a-b;});
     var dm = M.map(function(m){var b=S.ensemble[m].biomass; return b[b.length-1];}).sort(function(a,b){return a-b;});
     var t = S.today, mid = function(k){var v=M.map(function(m){return S.ensemble[m][k][t];}).sort(function(a,b){return a-b;}); return v[(v.length-1)>>1];};
     return { source:'local file', today:t, generated:S.generated, measuredThrough:S.measuredThrough, measuredDays:S.measuredDays,
       site:S.site, params:S.params, obs:S.obs, modelNdvi:mid('ndvi'), modelLai:mid('lai'), tt:mid('tt'),
       peakLai:[pk[0],pk[2],pk[4]], dryMatter:[dm[0],dm[2],dm[4]], fDay:g, fLo:lo, fMed:med, fHi:hi, ttCurve:tt,
-      drivers:{temp:S.drivers.temp.slice(0,S.measuredDays), par:S.drivers.par.slice(0,S.measuredDays), rain:S.drivers.rain.slice(0,S.measuredDays), sun:S.drivers.sun.slice(0,S.measuredDays)}, missingDays:0 };
+      drivers:{temp:S.drivers.temp.slice(0,S.measuredDays), par:S.drivers.par.slice(0,S.measuredDays), rain:S.drivers.rain.slice(0,S.measuredDays), sun:S.drivers.sun.slice(0,S.measuredDays)}, missingDays:0,
+      sync:S.sync||null, decisions:S.decisions||null, fOpen:fo };
   }
   function note(s){ document.getElementById('err').innerHTML = '<div class="err">'+s+'</div>'; }
   fetch('https://datadrop.wolframcloud.com/api/v1.0/Recent?bin=' + DATABIN + '&_=' + Date.now(), {cache:'no-store'})
@@ -331,7 +358,7 @@
     }
     document.getElementById('callouts').innerHTML = [
       {x:2, y:4,  k:'satellite sees', v: latest ? latest.ndvi.toFixed(2) : '—', n: latest ? 'greenness, '+fmt(latest.date) : 'no clear pass yet', hot:true},
-      {x:2, y:30, k:'model expects', v: D.modelNdvi.toFixed(2), n:'greenness today'},
+      {x:2, y:30, k:'twin expects', v: D.modelNdvi.toFixed(2), n:'greenness today'},
       {x:64,y:4,  k:'warmth so far', v: Math.round(D.tt)+' °C·d', n: Math.round(100*D.tt/D.params.floweringThermalTime)+'% of the way to flowering'},
       {x:64,y:30, k:'expected yield', v:(D.dryMatter[0]/100).toFixed(1)+'–'+(D.dryMatter[2]/100).toFixed(1)+' t/ha', n:'dry matter at harvest'}
     ].map(function(c){return '<div class="callout'+(c.hot?' hot':'')+'" style="left:'+c.x+'%;top:'+c.y+'%"><div class="k">'+c.k+'</div><div class="v">'+c.v+'</div><div class="n">'+c.n+'</div></div>';}).join('');
@@ -418,11 +445,38 @@
     // ---- tiles ----
     document.getElementById('tiles').innerHTML = [
       ['Satellite greenness', latest ? latest.ndvi.toFixed(2) : '—', latest ? fmt(latest.date) : 'no clear pass', 'alert'],
-      ['Model greenness', D.modelNdvi.toFixed(2), 'same day'],
+      ['Twin greenness', D.modelNdvi.toFixed(2), 'same day, after the sync'],
       ['Warmth accumulated', Math.round(D.tt)+' °C·d', Math.round(100*D.tt/D.params.floweringThermalTime)+'% to flowering'],
       ['Peak leaf area, forecast', D.peakLai[0].toFixed(1)+'–'+D.peakLai[2].toFixed(1), 'wheat usually ~6'],
       ['Yield, forecast', (D.dryMatter[0]/100).toFixed(1)+'–'+(D.dryMatter[2]/100).toFixed(1)+' t/ha', 'dry matter at harvest']
     ].map(function(t){return '<div class="tile'+(t[3]?' '+t[3]:'')+'"><div class="k">'+t[0]+'</div><div class="v mono">'+t[1]+'</div><div class="n">'+t[2]+'</div></div>';}).join('');
+
+    // ---- the sync: what the satellite changed, what the twin decides ----
+    if (D.sync){
+      var S = D.sync, Dc = D.decisions || {};
+      var rng = function(r, f){ return r ? (r[0] === r[2] ? f(r[1]) : f(r[0]) + ' – ' + f(r[2])) : 'not yet in reach'; };
+      var dfmt = function(iso){ return new Date(iso+'T00:00:00Z').toLocaleDateString('en-GB',{day:'numeric',month:'short',timeZone:'UTC'}); };
+      document.getElementById('syncPanel').hidden = false;
+      var v = document.getElementById('syncVerdict'); v.className = 'verdict' + (S.alert ? ' alert' : '');
+      v.innerHTML = '<b>' + (S.alert ? 'Alert. ' : '') + (Dc.message || '') + '</b>' +
+        (S.passes ? ' &nbsp;<span class="mono" style="color:var(--ink-3)">' + S.passes + ' clear pass' + (S.passes === 1 ? '' : 'es') + ' used' +
+          (S.lastPass ? ' · newest ' + fmt(S.lastPass) : '') + (S.z !== null && S.z !== undefined ? ' · ' + (S.z >= 0 ? '+' : '') + S.z.toFixed(1) + ' σ from expectation' : '') + '</span>' : ' &nbsp;<span class="mono" style="color:var(--ink-3)">no clear pass yet: the twin is running on weather alone</span>');
+      document.getElementById('syncRows').innerHTML = [
+        ['Greenness the satellite saw', latest ? '<span class="sat">' + latest.ndvi.toFixed(2) + '</span>' : '—'],
+        ['Greenness, model alone', S.ndviOpen.toFixed(2)],
+        ['Greenness, twin', '<span class="twin">' + S.ndviSynced.toFixed(2) + '</span>'],
+        ['Leaf area the satellite implies', S.satelliteLai ? S.satelliteLai.toFixed(1) : '—'],
+        ['Leaf area, model alone → twin', S.laiOpen.toFixed(1) + ' → <span class="twin">' + S.laiSynced.toFixed(1) + '</span>'],
+        ['Leaf the satellite has added since sowing', (S.correctionLai >= 0 ? '+' : '') + S.correctionLai.toFixed(1) + ' LAI  (' + Math.round(S.correctionTotal) + ' g/m²)']
+      ].map(function(r){ return '<div class="row"><span>' + r[0] + '</span><span class="mono">' + r[1] + '</span></div>'; }).join('');
+      document.getElementById('syncDecisions').innerHTML = [
+        ['Flowering', rng(Dc.flowering, dfmt)],
+        ['Harvest-ready', rng(Dc.harvestReady, dfmt)],
+        ['Yield, twin', (D.dryMatter[0]/100).toFixed(1) + ' – ' + (D.dryMatter[2]/100).toFixed(1) + ' t/ha'],
+        ['Yield, model alone', Dc.yieldOpen ? (Dc.yieldOpen[0]/100).toFixed(1) + ' – ' + (Dc.yieldOpen[2]/100).toFixed(1) + ' t/ha' : '—'],
+        ['Divergence alert', S.alert ? '<span class="sat">on</span>' : 'off']
+      ].map(function(r){ return '<div class="row"><span>' + r[0] + '</span><span class="mono">' + r[1] + '</span></div>'; }).join('');
+    }
 
     // ---- greenness chart ----
     (function(){
@@ -437,6 +491,7 @@
       var up=D.fDay.map(function(d,i){return (i?'L':'M')+x(d).toFixed(1)+' '+y(D.fHi[i]).toFixed(1);}).join(' ');
       var dn=D.fDay.slice().reverse().map(function(d,i){var k=D.fDay.length-1-i;return 'L'+x(d).toFixed(1)+' '+y(D.fLo[k]).toFixed(1);}).join(' ');
       svg.appendChild(svgEl('path',{d:up+' '+dn+' Z',fill:C('--grow'),opacity:.2}));
+      if (D.fOpen) svg.appendChild(svgEl('path',{d:D.fDay.map(function(d,i){return (i?'L':'M')+x(d).toFixed(1)+' '+y(D.fOpen[i]).toFixed(1);}).join(' '),fill:'none',stroke:C('--ink-3'),'stroke-width':1.6,'stroke-dasharray':'2 4','stroke-linejoin':'round'}));
       svg.appendChild(svgEl('path',{d:D.fDay.map(function(d,i){return (i?'L':'M')+x(d).toFixed(1)+' '+y(D.fMed[i]).toFixed(1);}).join(' '),fill:'none',stroke:C('--grow'),'stroke-width':2.2,'stroke-linejoin':'round'}));
       D.obs.forEach(function(o){var used=o.sun>=D.params.minSunElevation;svg.appendChild(svgEl('circle',{cx:x(o.day),cy:y(o.ndvi),r:used?4.5:3.5,fill:used?C('--warn'):'none',stroke:C('--warn'),'stroke-width':1.6,opacity:used?1:.55}));});
       svg.appendChild(axisText(L-38,T+(H-T-B)/2,'greenness (NDVI)','middle')).setAttribute('transform','rotate(-90 '+(L-38)+' '+(T+(H-T-B)/2)+')');
