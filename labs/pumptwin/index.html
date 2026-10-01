@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Digital Twin for Predictive Maintenance: a Hydraulic System, live — PumpTwin</title>
+<meta name="description" content="A live, physics-based digital twin of the UCI 'Condition monitoring of hydraulic systems' dataset (ZeMA): pump leakage, valve, accumulator and cooler condition read from the existing sensors, and an oil-temperature forecast. Built with Wolfram System Modeler and Wolfram Language.">
+<meta property="og:title" content="Digital Twin for Predictive Maintenance: a Hydraulic System, live">
+<meta property="og:description" content="Physics-based condition monitoring of the ZeMA hydraulic test rig: every component's health from its own sensors, replayed live from the Wolfram Cloud.">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/png" href="../../assets/favicon.svg">
+<style>
+  :root{
+    --bg:#0e1319; --panel:#151b23; --panel-2:#1a212b; --line:#27313d; --line-2:#344050;
+    --ink:#e3e8ee; --ink-2:#a3adb9; --ink-3:#6f7a87;
+    --meas:#eef2f6; --model:#62a0e6; --model-soft:#1b2a3c; --ok:#5cbf8a; --ok-soft:#16281f;
+    --res:#e2ad4a; --warn:#e08a52; --warn-soft:#33221a; --bad:#ec6a5a; --bad-soft:#3a1c19; --cool:#59b8d8;
+    --pipe:#4b5868; --pipe-live:#8fb8e8;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 "Inter Tight",system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+  .mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;font-variant-numeric:tabular-nums}
+  .wrap{max-width:1400px;margin:0 auto;padding:14px 16px 30px}
+  .bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:9px 14px}
+  .bar h1{font-size:16px;margin:0;font-weight:600}
+  .bar h1 span{color:var(--ink-3);font-weight:500}
+  .lamp{display:inline-flex;align-items:center;gap:7px;font:500 11.5px "IBM Plex Mono",monospace;color:var(--ink-2);text-transform:uppercase;letter-spacing:.05em}
+  .lamp i{width:9px;height:9px;border-radius:50%;background:var(--ink-3)}
+  .lamp.on i{background:var(--ok);box-shadow:0 0 6px var(--ok);animation:blink 2s infinite}
+  .lamp.local i{background:var(--res)}
+  @keyframes blink{50%{opacity:.35}}
+  .clock{margin-left:auto;font:600 15px "IBM Plex Mono",monospace;text-align:right}
+  .clock small{display:block;color:var(--ink-3);font-weight:500;font-size:11px}
+  .verdict{margin:10px 0 0;padding:10px 14px;border-radius:8px;border:1px solid var(--line-2);background:var(--panel-2);font-size:15px;display:flex;gap:12px;align-items:center}
+  .verdict b{font:600 11px "IBM Plex Mono",monospace;letter-spacing:.08em;padding:3px 8px;border-radius:4px;background:var(--ok-soft);color:var(--ok);white-space:nowrap}
+  .verdict.warn{border-color:var(--warn);background:var(--warn-soft)} .verdict.warn b{background:var(--warn);color:#0e1319}
+  .verdict.bad{border-color:var(--bad);background:var(--bad-soft)} .verdict.bad b{background:var(--bad);color:#fff}
+  .grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:12px;margin-top:12px}
+  .pane{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 12px;min-width:0}
+  .pane h2{margin:0 0 6px;font:600 11px "IBM Plex Mono",monospace;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);display:flex;justify-content:space-between;gap:8px}
+  .pane h2 em{font-style:normal;text-transform:none;letter-spacing:0}
+  svg.pid{width:100%;height:auto;display:block}
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+  .card{border:1px solid var(--line-2);border-left:4px solid var(--ok);border-radius:6px;padding:8px 10px;background:var(--panel-2)}
+  .card.warn{border-left-color:var(--warn)} .card.bad{border-left-color:var(--bad)}
+  .card .k{font:600 10.5px "IBM Plex Mono",monospace;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)}
+  .card .v{font:600 17px "IBM Plex Mono",monospace;margin-top:2px}
+  .card.warn .v{color:var(--warn)} .card.bad .v{color:var(--bad)}
+  .card .n{font-size:12px;color:var(--ink-2);margin-top:2px;min-height:17px}
+  .card .t{font:500 10.5px "IBM Plex Mono",monospace;color:var(--ink-3);margin-top:4px;border-top:1px dashed var(--line-2);padding-top:4px}
+  .card .t.match{color:var(--ok)} .card .t.miss{color:var(--warn)}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--ink-2);margin-top:4px}
+  .legend b{display:inline-block;width:22px;border-top:2px solid var(--meas);vertical-align:middle;margin-right:6px}
+  .legend b.m{border-top:2px dashed var(--model)} .legend b.f{border-top:2px solid var(--res)} .legend b.x{border-top:2px dashed var(--bad)}
+  canvas{width:100%;height:auto;display:block}
+  .forecast{font-size:13px;color:var(--ink-2);margin:6px 0 2px} .forecast b{color:var(--ink);font-family:"IBM Plex Mono",monospace}
+  .log{height:150px;overflow:auto;font:12px/1.55 "IBM Plex Mono",monospace;margin:0;padding:0;list-style:none}
+  .log li{padding:2px 4px;border-bottom:1px solid var(--line);color:var(--ink-2)} .log li.warn{color:var(--warn)} .log li.bad{color:var(--bad)}
+  .foot{margin-top:12px;color:var(--ink-3);font-size:12px;line-height:1.55} .foot b{color:var(--ink-2)} .foot a{color:var(--ink-2)}
+  label.tg{font-size:12px;color:var(--ink-2);display:inline-flex;gap:6px;align-items:center;cursor:pointer}
+  @media (max-width:1000px){.grid{grid-template-columns:1fr}}
+  @media (max-width:640px){.clock{margin-left:0;text-align:left}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="bar">
+    <h1>PumpTwin <span>· a live digital twin for predictive maintenance · ZeMA hydraulic test rig, Saarbrücken</span></h1>
+    <span class="lamp" id="lamp"><i></i><span id="src">connecting</span></span>
+    <label class="tg"><input type="checkbox" id="truth"> show what the rig's log says</label>
+    <div class="clock"><span id="clk">—</span><small id="cyc">—</small></div>
+  </div>
+  <div class="verdict" id="verdict"><b id="vk">TWIN</b><span id="vt">Waiting for the first cycle…</span></div>
+
+  <div class="grid">
+    <div class="pane">
+      <h2>The rig, as the twin sees it <em id="phase">—</em></h2>
+      <svg class="pid" id="pid" viewBox="0 0 900 470" aria-label="Schematic of the rig with live values">
+        <style>
+          .p{fill:none;stroke:var(--pipe);stroke-width:4;stroke-linejoin:round}
+          .p.flow{stroke:var(--pipe-live);stroke-dasharray:10 8;animation:run linear infinite;animation-duration:var(--dur,1s)}
+          .p.cool{stroke:#3b6a7c} .p.cool.flow{stroke:var(--cool)}
+          .p.thin{stroke-width:2.5}
+          @keyframes run{to{stroke-dashoffset:-36}}
+          .eq{fill:#1a212b;stroke:#8793a2;stroke-width:2;transition:stroke .3s,fill .3s}
+          .eq.ok{stroke:var(--ok)} .eq.warn{stroke:var(--warn);fill:var(--warn-soft)} .eq.bad{stroke:var(--bad);fill:var(--bad-soft)}
+          .eq.dim{stroke:#3a4553}
+          .eqt{fill:#a3adb9;font:600 11px "IBM Plex Mono",monospace;text-anchor:middle}
+          .lab{fill:#6f7a87;font:500 10.5px "Inter Tight",sans-serif;text-anchor:middle}
+          .vbox{fill:#10151b;stroke:#344050;stroke-width:1}
+          .vk{fill:#6f7a87;font:500 9px "IBM Plex Mono",monospace}
+          .vm{fill:#eef2f6;font:600 12.5px "IBM Plex Mono",monospace}
+          .vs{fill:#62a0e6;font:600 11.5px "IBM Plex Mono",monospace}
+          .valve{stroke:#a3adb9;stroke-width:1.8;fill:#10151b;transition:fill .2s}
+          .valve.open{fill:#8fb8e8} .valve.lift{fill:#e2ad4a} .valve.bad{fill:var(--bad)}
+          .oil{fill:#3a2e17}
+          .fan{transform-box:fill-box;transform-origin:center;animation:spin linear infinite;animation-duration:var(--fan,1s)}
+          @keyframes spin{to{transform:rotate(360deg)}}
+        </style>
+        <!-- working circuit -->
+        <text x="20" y="22" class="lab" style="text-anchor:start;fill:#a3adb9">WORKING CIRCUIT</text>
+        <circle cx="60" cy="150" r="24" class="eq"/><text x="60" y="155" class="eqt">M</text>
+        <path d="M84 150 H104" stroke="#8793a2" stroke-width="5"/>
+        <circle id="eqPump" cx="128" cy="150" r="26" class="eq"/><path d="M128 128 L148 160 H108 Z" fill="#26303b" stroke="#8793a2"/>
+        <text x="128" y="196" class="lab">MP1</text>
+        <path class="p" id="pW1" d="M128 124 V100 H560"/>
+        <!-- check valve -->
+        <path d="M200 92 L214 100 L200 108 Z" fill="#26303b" stroke="#a3adb9"/><path d="M216 92 V108" stroke="#a3adb9"/>
+        <text x="208" y="122" class="lab">check</text>
+        <!-- accumulators -->
+        <g id="accs">
+          <g data-acc="130"><path class="p thin" d="M260 100 V70"/><rect x="248" y="22" width="24" height="48" rx="12" class="eq"/><text x="260" y="16" class="lab">A1 130</text></g>
+          <g data-acc="115"><path class="p thin" d="M300 100 V70"/><rect x="288" y="22" width="24" height="48" rx="12" class="eq"/><text x="300" y="16" class="lab">A2 115</text></g>
+          <g data-acc="100"><path class="p thin" d="M340 100 V70"/><rect x="328" y="22" width="24" height="48" rx="12" class="eq"/><text x="340" y="16" class="lab">A3 100</text></g>
+          <g data-acc="90"><path class="p thin" d="M380 100 V70"/><rect x="368" y="22" width="24" height="48" rx="12" class="eq"/><text x="380" y="16" class="lab">A4 90</text></g>
+        </g>
+        <!-- V8 relief, V9 leak -->
+        <path class="p thin" id="pV8" d="M420 100 V200"/>
+        <g transform="translate(420,150)"><path id="vV8" class="valve" d="M-9,-11 L9,-11 L-9,11 L9,11 Z" transform="rotate(90)"/></g>
+        <text x="420" y="214" class="lab">V8 relief</text>
+        <path class="p thin" id="pV9" d="M470 100 V200"/>
+        <g transform="translate(470,150)"><path id="vV9" class="valve" d="M-11,-9 L11,9 L11,-9 L-11,9 Z" transform="rotate(90)"/></g>
+        <text x="470" y="214" class="lab">V9 leak</text>
+        <!-- V10 -->
+        <g transform="translate(560,100)"><path id="vV10" class="valve" d="M-13,-10 L13,10 L13,-10 L-13,10 Z"/></g>
+        <text x="560" y="82" class="lab" id="v10Lab">V10</text>
+        <!-- V11, FS1, F1 -->
+        <path class="p" id="pW2" d="M573 100 H760 V200"/>
+        <g transform="translate(650,100)"><path id="vV11" class="valve open" d="M-13,-10 L13,10 L13,-10 L-13,10 Z"/></g>
+        <path d="M640 114 L660 86" stroke="#a3adb9" stroke-width="1.4"/>
+        <text x="650" y="82" class="lab">V11 load</text>
+        <circle cx="720" cy="100" r="9" class="eq"/><text x="720" y="104" class="eqt" style="font-size:8px">FS1</text>
+        <rect x="748" y="150" width="24" height="26" class="eq"/><text x="790" y="167" class="lab">F1</text>
+        <!-- tank -->
+        <rect x="80" y="230" width="740" height="60" rx="4" class="eq"/><rect x="82" y="248" width="736" height="40" class="oil"/>
+        <text x="450" y="244" class="lab" style="fill:#c9a35a">TANK 40 l</text>
+        <path class="p thin" d="M128 176 V230"/>
+        <path class="p thin" d="M420 200 V230 M470 200 V230 M760 176 V230"/>
+        <!-- cooling circuit -->
+        <text x="20" y="330" class="lab" style="text-anchor:start;fill:#a3adb9">COOLING-FILTRATION CIRCUIT</text>
+        <path class="p cool" id="pC" d="M700 290 V400 H260 V290"/>
+        <circle cx="640" cy="400" r="18" class="eq"/><text x="640" y="404" class="eqt" style="font-size:9px">SP1</text>
+        <rect id="eqCooler" x="420" y="372" width="70" height="56" rx="4" class="eq"/>
+        <g transform="translate(455,400)"><g class="fan" id="fan"><path d="M0,0 L0,-20 A6,6 0 0 1 8,-14 Z M0,0 L20,0 A6,6 0 0 1 14,8 Z M0,0 L0,20 A6,6 0 0 1 -8,14 Z M0,0 L-20,0 A6,6 0 0 1 -14,-8 Z" fill="#59b8d8" opacity=".75"/></g></g>
+        <text x="455" y="444" class="lab" id="coolLab">C1 cooler</text>
+        <circle cx="330" cy="400" r="9" class="eq"/><text x="330" y="404" class="eqt" style="font-size:8px">FS2</text>
+        <!-- value boxes -->
+        <g transform="translate(150,30)"><rect class="vbox" width="88" height="48" rx="4"/><text x="7" y="13" class="vk">PS1 bar</text><text x="7" y="29" class="vm" id="bPS1m">—</text><text x="7" y="43" class="vs" id="bPS1s">—</text></g>
+        <g transform="translate(590,124)"><rect class="vbox" width="88" height="48" rx="4"/><text x="7" y="13" class="vk">PS2 bar</text><text x="7" y="29" class="vm" id="bPS2m">—</text><text x="7" y="43" class="vs" id="bPS2s">—</text></g>
+        <g transform="translate(790,30)"><rect class="vbox" width="96" height="48" rx="4"/><text x="7" y="13" class="vk">FS1 l/min</text><text x="7" y="29" class="vm" id="bFS1m">—</text><text x="7" y="43" class="vs" id="bFS1s">—</text></g>
+        <g transform="translate(8,186)"><rect class="vbox" width="96" height="40" rx="4"/><text x="7" y="13" class="vk">EPS1 W</text><text x="7" y="28" class="vm" id="bEPS1m">—</text></g>
+        <g transform="translate(8,240)"><rect class="vbox" width="66" height="44" rx="4"/><text x="6" y="13" class="vk">TS1 °C</text><text x="6" y="27" class="vm" id="bTS1m">—</text><text x="6" y="40" class="vs" id="bTS1s">—</text></g>
+        <g transform="translate(520,330)"><rect class="vbox" width="80" height="44" rx="4"/><text x="6" y="13" class="vk">TS3 °C in</text><text x="6" y="27" class="vm" id="bTS3m">—</text><text x="6" y="40" class="vs" id="bTS3s">—</text></g>
+        <g transform="translate(330,330)"><rect class="vbox" width="80" height="44" rx="4"/><text x="6" y="13" class="vk">TS4 °C out</text><text x="6" y="27" class="vm" id="bTS4m">—</text><text x="6" y="40" class="vs" id="bTS4s">—</text></g>
+        <g transform="translate(150,420)"><rect class="vbox" width="96" height="40" rx="4"/><text x="7" y="13" class="vk">FS2 l/min</text><text x="7" y="28" class="vm" id="bFS2m">—</text></g>
+        <g transform="translate(760,420)"><rect class="vbox" width="130" height="44" rx="4" style="stroke:#62a0e6;stroke-dasharray:4 3"/><text x="7" y="13" class="vk" style="fill:#62a0e6">VIRTUAL · model only</text><text x="7" y="27" class="vs" id="bRPM">—</text><text x="7" y="40" class="vs" id="bAccV">—</text></g>
+      </svg>
+      <div class="legend"><span><b></b>white: measured</span><span><b class="m"></b>blue: the twin's model</span><span>component outline: the twin's reading (green healthy, amber degraded, red failed)</span></div>
+    </div>
+
+    <div class="pane">
+      <h2>Component health <em>read from the sensors, no labels</em></h2>
+      <div class="cards" id="cards"></div>
+      <h2 style="margin-top:14px">Oil temperature: the last 90 minutes and the next hour <em id="fcSync">—</em></h2>
+      <canvas id="tchart" width="560" height="230"></canvas>
+      <p class="forecast" id="fcText">—</p>
+      <div class="legend"><span><b></b>TS1 measured</span><span><b class="m"></b>thermal model</span><span><b class="f"></b>forecast, as is</span><span><b class="x"></b>forecast if the cooler failed now</span></div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="pane">
+      <h2>This cycle, live <em>measured against the model synced to the twin's reading</em></h2>
+      <canvas id="trend" width="900" height="300"></canvas>
+      <div class="legend"><span><b></b>measured</span><span><b class="m"></b>model</span></div>
+    </div>
+    <div class="pane">
+      <h2>Twin log</h2>
+      <ul class="log" id="log"></ul>
+    </div>
+  </div>
+
+  <p class="foot">
+    <b>What this is.</b> The ZeMA rig's published recording (2205 cycles of 60 s, 36.75 h), replayed from the Wolfram Cloud one cycle a minute, as if it were running now. The clock decides which cycle is on screen, so everyone sees the same moment; the recording loops every 36.75 hours.
+    Each cycle the twin reads the components' condition from the sensors alone: the pump leak from the flow the pump is missing against the System Modeler model at the measured oil temperature;
+    the switching valve V10 from when the pressure falls after it opens; the accumulator from how fast the pressure rises when V10 shuts; the cooler from its cooling efficiency;
+    the load valve V11 from the pressure after V10 against the model. The oil-temperature forecast comes from the thermal model, started from the measured state.<br>
+    <b>Honest limits.</b> The model runs for each cycle were computed beforehand with System Modeler; this page replays them with the measurements. It is a replay of a recorded run, not a live machine. One rig, emulated faults.
+    Data: UCI ML Repository 447, Helwig, Pignanelli, Schütze (ZeMA), CC BY 4.0. Model: HydraulicSensing.ZeMARig and ZeMAThermal, Wolfram System Modeler 15.1 + Hydraulic library 3.0.
+    Data: <code id="binId"></code>.
+  </p>
+</div>
+<script>
+// ---------- data: the replay, in hourly chunks, in the Wolfram Cloud ----------
+// The recording (2205 cycles of 60 s) lives in the Wolfram Cloud. The page works out which cycle is "now" from the clock:
+// minutes since EPOCH, modulo 2205, so every visitor sees the same cycle at the same second, and the recording loops
+// every 36.75 hours. No server, no scheduled task: the cloud holds the data, the clock drives the replay.
+const CLOUD = 'https://www.wolframcloud.com/obj/ankitn/PumpTwin/chunks/';
+const $ = id => document.getElementById(id);
+$('binId').textContent = CLOUD.replace('https://', '');
+const fmt = (v, d) => (v == null || isNaN(v)) ? '—' : Number(v).toFixed(d);
+let INDEX = null, cur = null, curIdx = -1, shownTruth = false, loading = false;
+const chunkCache = {};
+function chunk(k) {
+  if (!chunkCache[k]) chunkCache[k] = fetch(CLOUD + 'h' + String(k).padStart(2, '0')).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(j => j.cycles).catch(e => { delete chunkCache[k]; throw e; });
+  return chunkCache[k];
+}
+async function cycleAt(i) { const n = INDEX.cycles, k = ((i % n) + n) % n; return (await chunk(Math.floor(k / INDEX.chunkCycles)))[k % INDEX.chunkCycles]; }
+function clockNow() { const ms = Date.now() - Date.parse(INDEX.epoch), n = INDEX.cycles; return { idx: ((Math.floor(ms / 60000) % n) + n) % n, sec: (((ms / 1000) % 60) + 60) % 60 }; }
+async function show(idx) {
+  loading = true;
+  try {
+    const e = await cycleAt(idx);
+    const back = await Promise.all(Array.from({ length: 90 }, (_, j) => cycleAt(idx - 89 + j)));   // the last 90 minutes (two chunks)
+    e.hist = back.map(x => [x.c, x.temp.TS1, x.tempModel.TS1, x.temp.TS3, x.tempModel.TS3, x.temp.room, x.read.leak, x.read.valve, x.read.acc, x.read.duty, +x.read.v11]);
+    cur = e; curIdx = idx; source = 'cloud'; onNewCycle(e);
+    if (idx % INDEX.chunkCycles >= INDEX.chunkCycles - 2) chunk(Math.floor(((idx + 2) % INDEX.cycles) / INDEX.chunkCycles));   // fetch the next hour ahead
+  } catch (err) { $('lamp').className = 'lamp'; $('src').textContent = 'cannot reach the Wolfram Cloud (' + err.message + ')'; }
+  loading = false;
+}
+let source = 'cloud';
+
+// ---------- per cycle ----------
+const LEAK = ['no leak', 'weak leak', 'severe leak'];
+function state(card, cls) { return cls === 0 ? '' : cls === 1 ? 'warn' : 'bad'; }
+function onNewCycle(e) {
+  const R = e.read, T = e.truth;
+  $('lamp').className = 'lamp on';
+  $('src').textContent = 'live · replayed from the Wolfram Cloud';
+  $('cyc').textContent = `cycle ${e.c} of 2205 · hour ${e.h.toFixed(2)} of the recording`;
+  const bad = R.v11 || R.leak === 2 || R.valve <= 73 || R.acc <= 90, warn = R.leak === 1 || R.valve < 100 || R.acc < 130 || R.duty < 100;
+  $('verdict').className = 'verdict' + (bad ? ' bad' : warn ? ' warn' : '');
+  $('vk').textContent = bad ? 'ALARM' : warn ? 'ATTENTION' : 'HEALTHY'; $('vt').textContent = e.verdict;
+  // health cards
+  const cards = [
+    { k: 'Pump MP1', v: R.v11 ? 'not read' : LEAK[R.leak], n: R.v11 ? 'suspended while V11 misbehaves' : `${fmt(R.missing, 0)} ml/min missing vs model`, s: R.v11 ? 1 : R.leak, truth: LEAK[T.leak], ok: R.v11 ? null : R.leak === T.leak },
+    { k: 'Valve V10', v: R.valve === 100 ? 'switching on time' : `${R.valve} % condition`, n: `pressure falls at ${fmt(R.tFall, 2)} s`, s: R.valve === 100 ? 0 : R.valve >= 80 ? 1 : 2, truth: `${T.valve} %`, ok: R.valve === T.valve },
+    { k: 'Accumulator', v: `~${R.acc} bar gas`, n: `rises 160→185 bar in ${fmt(R.tRise, 2)} s`, s: R.acc === 130 ? 0 : R.acc >= 100 ? 1 : 2, truth: `${T.acc} bar`, ok: R.acc === T.acc },
+    { k: 'Cooler C1', v: `${R.duty} % capacity`, n: `UA ${fmt(R.UA, 0)} W/K from its efficiency`, s: R.duty === 100 ? 0 : R.duty >= 20 ? 1 : 2, truth: `${T.cooler} %`, ok: R.duty === T.cooler },
+    { k: 'Load valve V11', v: R.v11 ? 'stuck high' : 'following set', n: `PS2 ${R.dPS2 >= 0 ? '+' : ''}${fmt(R.dPS2, 1)} bar vs model`, s: R.v11 ? 2 : 0, truth: T.excluded ? 'collapsed block' : 'not labelled', ok: R.v11 === T.excluded }
+  ];
+  $('cards').innerHTML = cards.map(c => `<div class="card ${state(0, c.s)}"><div class="k">${c.k}</div><div class="v">${c.v}</div><div class="n">${c.n}</div>` +
+    (shownTruth ? `<div class="t ${c.ok === null ? '' : c.ok ? 'match' : 'miss'}">log: ${c.truth}${c.ok === null ? '' : c.ok ? ' ✓' : ' ✗'}</div>` : '') + `</div>`).join('');
+  // schematic colouring
+  const cls = s => s === 0 ? 'eq ok' : s === 1 ? 'eq warn' : 'eq bad';
+  $('eqPump').setAttribute('class', cls(cards[0].s)); $('eqCooler').setAttribute('class', cls(cards[3].s));
+  document.querySelectorAll('#accs g').forEach(g => { const on = +g.dataset.acc === R.acc; g.querySelector('rect').setAttribute('class', on ? cls(cards[2].s) : 'eq dim'); });
+  $('v10Lab').textContent = `V10 · ${R.valve} %`; $('coolLab').textContent = `C1 cooler · fan ${R.duty} %`;
+  $('vV11').setAttribute('class', 'valve ' + (R.v11 ? 'bad' : 'open'));
+  $('vV9').classList.toggle('open', R.leak > 0);
+  $('fan').style.setProperty('--fan', (R.duty >= 100 ? 0.6 : R.duty >= 20 ? 1.8 : 8) + 's');
+  // temperatures
+  $('bTS1m').textContent = fmt(e.temp.TS1, 1) + ' m'; $('bTS1s').textContent = fmt(e.tempModel.TS1, 1) + ' tw';
+  $('bTS3m').textContent = fmt(e.temp.TS3, 1) + ' m'; $('bTS3s').textContent = fmt(e.tempModel.TS3, 1) + ' tw';
+  $('bTS4m').textContent = fmt(e.temp.TS4, 1) + ' m'; $('bTS4s').textContent = fmt(e.tempModel.TS4, 1) + ' tw';
+  $('bFS2m').textContent = fmt(e.temp.FS2, 2); $('bRPM').textContent = fmt(e.virt.rpm, 0) + ' rpm motor';
+  drawTemps(e);
+  // log
+  const li = document.createElement('li'); li.className = bad ? 'bad' : warn ? 'warn' : '';
+  li.textContent = `cycle ${e.c} · ${e.temp.TS1.toFixed(1)} °C · ${e.verdict}`; $('log').prepend(li);
+  while ($('log').children.length > 60) $('log').lastChild.remove();
+}
+
+// ---------- the oil temperature: last 90 min, the next hour ----------
+const tc = $('tchart'), tg = tc.getContext('2d');
+function fitC(c, ratio) { const w = c.clientWidth, r = devicePixelRatio || 1; c.width = w * r; c.height = Math.round(w * ratio) * r; c.getContext('2d').setTransform(r, 0, 0, r, 0, 0); }
+function drawTemps(e) {
+  if (!e) return; fitC(tc, 0.42); const W = tc.clientWidth, H = tc.height / (devicePixelRatio || 1), L = 40, R = 10, Tp = 8, B = 22;
+  const hist = e.hist, f = e.forecast, n = hist.length;
+  const all = hist.flatMap(h => [h[1], h[2]]).concat(f.asis, f.coolerFail); let lo = Math.floor(Math.min(...all) - 1), hi = Math.ceil(Math.max(...all) + 1);
+  const X = m => L + (W - L - R) * (m + 90) / 150, Y = v => Tp + (H - Tp - B) * (1 - (v - lo) / (hi - lo));
+  tg.clearRect(0, 0, W, H); tg.font = '10.5px "IBM Plex Mono", monospace'; tg.fillStyle = '#6f7a87'; tg.strokeStyle = '#27313d';
+  for (let v = Math.ceil(lo / 5) * 5; v <= hi; v += 5) { tg.beginPath(); tg.moveTo(L, Y(v)); tg.lineTo(W - R, Y(v)); tg.stroke(); tg.textAlign = 'right'; tg.fillText(v + '°', L - 4, Y(v) + 3); }
+  tg.textAlign = 'center'; [-90, -60, -30, 0, 30, 60].forEach(m => tg.fillText(m === 0 ? 'now' : (m > 0 ? '+' : '') + m + ' min', X(m), H - 6));
+  tg.strokeStyle = 'rgba(226,173,74,.5)'; tg.beginPath(); tg.moveTo(X(0), Tp); tg.lineTo(X(0), H - B); tg.stroke();
+  const line = (pts, col, dash, w) => { tg.strokeStyle = col; tg.lineWidth = w; tg.setLineDash(dash); tg.beginPath(); pts.forEach((p, i) => i ? tg.lineTo(X(p[0]), Y(p[1])) : tg.moveTo(X(p[0]), Y(p[1]))); tg.stroke(); tg.setLineDash([]); };
+  line(hist.map((h, i) => [i - (n - 1), h[1]]), '#eef2f6', [], 1.6);
+  line(hist.map((h, i) => [i - (n - 1), h[2]]), '#62a0e6', [5, 4], 1.6);
+  line(f.minutes.map((m, i) => [m, f.asis[i]]), '#e2ad4a', [], 2.2);
+  line(f.minutes.map((m, i) => [m, f.coolerFail[i]]), '#ec6a5a', [6, 4], 1.8);
+  const a = f.asis[f.asis.length - 1], c = f.coolerFail[f.coolerFail.length - 1];
+  $('fcText').innerHTML = `Now <b>${fmt(e.temp.TS1, 1)} °C</b>. In an hour, as things are: <b>${fmt(a, 1)} °C</b>. If the cooler failed now: <b>${fmt(c, 1)} °C</b>` +
+    (c > 55 ? ' — above the 55 °C the rig ran at with its cooler nearly off.' : '.');
+  $('fcSync').textContent = `forecast started from the measured state (model corrected by ${f.sync >= 0 ? '+' : ''}${fmt(f.sync, 1)} K)`;
+}
+
+// ---------- the cycle, live ----------
+const cv = $('trend'), g = cv.getContext('2d');
+const STRIPS = [{ k: 'PS1', n: 'PS1 bar' }, { k: 'FS1', n: 'FS1 l/min' }, { k: 'EPS1', n: 'EPS1 W' }];
+function drawTrend(e, s) {
+  fitC(cv, 0.33); const W = cv.clientWidth, H = cv.height / (devicePixelRatio || 1), L = 74, R = 10, gap = 8, sh = (H - 18 - gap * 2) / 3;
+  g.clearRect(0, 0, W, H); g.font = '10.5px "IBM Plex Mono", monospace';
+  const X = t => L + (W - L - R) * t / 60, k = Math.min(59, Math.floor(s));
+  STRIPS.forEach((S, i) => {
+    const y0 = i * (sh + gap), m = e.meas[S.k], md = e.model[S.k], all = m.concat(md).filter(v => S.k !== 'PS1' || v > 100);
+    const lo = Math.min(...all), hi = Math.max(...all) + 1e-6, Y = v => y0 + sh * (1 - (v - lo) / (hi - lo));
+    g.fillStyle = '#10151b'; g.fillRect(L, y0, W - L - R, sh); g.fillStyle = '#a3adb9'; g.textAlign = 'left'; g.fillText(S.n, 4, y0 + 12);
+    g.fillStyle = '#6f7a87'; g.textAlign = 'right'; g.fillText(fmt(hi, S.k === 'FS1' ? 1 : 0), L - 4, y0 + 10); g.fillText(fmt(lo, S.k === 'FS1' ? 1 : 0), L - 4, y0 + sh - 2);
+    const ln = (a, col, dash, w) => { g.strokeStyle = col; g.lineWidth = w; g.setLineDash(dash); g.beginPath(); for (let j = 0; j <= k; j++) { const p = [X(j + 0.5), Y(Math.max(lo, Math.min(hi, a[j])))]; j ? g.lineTo(...p) : g.moveTo(...p); } g.stroke(); g.setLineDash([]); };
+    ln(md, '#62a0e6', [6, 4], 2); ln(m, '#eef2f6', [], 1.4);
+    g.strokeStyle = 'rgba(226,173,74,.8)'; g.beginPath(); g.moveTo(X(s), y0); g.lineTo(X(s), y0 + sh); g.stroke();
+  });
+  g.fillStyle = '#6f7a87'; g.textAlign = 'center'; for (let t = 0; t <= 60; t += 10) g.fillText(t + ' s', X(t), H - 4);
+}
+function tick() {
+  if (INDEX) {
+    const c = clockNow();
+    if (c.idx !== curIdx && !loading) show(c.idx);
+    if (cur && c.idx === curIdx) {
+      const s = Math.min(59.99, c.sec), k = Math.min(59, Math.floor(s)), m = cur.meas, md = cur.model;
+      $('clk').textContent = `t = ${s.toFixed(1).padStart(4, '0')} s`;
+      $('bPS1m').textContent = fmt(m.PS1[k], 1) + ' m'; $('bPS1s').textContent = fmt(md.PS1[k], 1) + ' tw';
+      $('bPS2m').textContent = fmt(m.PS2[k], 1) + ' m'; $('bPS2s').textContent = fmt(md.PS2[k], 1) + ' tw';
+      $('bFS1m').textContent = fmt(m.FS1[k], 2) + ' m'; $('bFS1s').textContent = fmt(md.FS1[k], 2) + ' tw';
+      $('bEPS1m').textContent = fmt(m.EPS1[k], 0); $('bAccV').textContent = fmt(cur.virt.accV[k], 0) + ' ml in accumulator';
+      const open = m.FS1[k] > 1, relief = m.PS1[k] > 185;
+      $('vV10').classList.toggle('open', open); $('vV8').classList.toggle('lift', relief);
+      $('phase').textContent = open ? (cur.read.v11 ? 'V11 stuck: the flow goes over V8' : 'V10 open: load plateau') : 'V10 shut: V8 holds 190 bar';
+      const dur = (8 / Math.max(m.FS1[k], 1) * 0.9).toFixed(2) + 's';
+      ['pW1', 'pW2'].forEach(id => { $(id).classList.toggle('flow', id === 'pW1' || open); $(id).style.setProperty('--dur', dur); });
+      $('pV8').classList.toggle('flow', relief); $('pV9').classList.toggle('flow', cur.read.leak > 0); $('pC').classList.add('flow');
+      drawTrend(cur, s);
+    }
+  }
+  requestAnimationFrame(tick);
+}
+$('truth').onchange = () => { shownTruth = $('truth').checked; if (cur) onNewCycle(cur); };
+window.addEventListener('resize', () => cur && drawTemps(cur));
+fetch(CLOUD + 'index').then(r => r.json()).then(j => { INDEX = j; requestAnimationFrame(tick); })
+  .catch(err => { $('src').textContent = 'cannot reach the Wolfram Cloud (' + err.message + ')'; });
+</script>
+</body>
+</html>
