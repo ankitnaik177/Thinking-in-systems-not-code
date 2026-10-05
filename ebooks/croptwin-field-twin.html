@@ -52,7 +52,7 @@
   <header class="hero">
     <div class="kicker">Digital twin series · part 1 of 5</div>
     <h1>Tracking Crop Growth</h1>
-    <p class="deck">Part 1 of 5 — a digital twin of a winter-wheat field outside Linköping, built from a satellite, a weather service, a system model and a databin.</p>
+    <p class="deck">Part 1 of 5—a digital twin of a winter-wheat field outside Linköping, built from a satellite, a weather service, a system model and a databin.</p>
     <a class="home" href="../index.html">← systemsnotcode.com</a>
   </header>
 
@@ -64,7 +64,7 @@
   </section>
 
   <section>
-    <span class="num">01 — THE CASE</span>
+    <span class="num">01—THE CASE</span>
     <h2>One field, west of Linköping</h2>
     <p class="lede">Winter wheat is sown in September and harvested the next August. This twin's job is to tell the farmer, every day, when the crop will flower, when it will be ready to harvest and how much it will yield, and to raise a flag when the field strays from its expected course.</p>
     <figure><img src="croptwin/map_marked.jpg" alt="Map of the plain west of Linköping with the field marked">
@@ -72,7 +72,7 @@
   </section>
 
   <section>
-    <span class="num">02 — FROM SPACE</span>
+    <span class="num">02—FROM SPACE</span>
     <h2>How to watch it from space</h2>
     <p class="lede">A satellite like Sentinel-2 watches the field from space. It passes over the field every two to three days and sees 10 m per pixel; the data is free. Here is what it saw on 4 July 2026, rendered as a photo.</p>
     <figure><img src="croptwin/truecolor_outlined.jpg" alt="Sentinel-2 photo with the field outlined and the read point marked">
@@ -98,7 +98,7 @@
   </section>
 
   <section>
-    <span class="num">03 — THE DRIVERS</span>
+    <span class="num">03—THE DRIVERS</span>
     <h2>What drives the growth</h2>
     <div class="cards">
       <div class="card"><div class="u">Light</div><div class="t">400–700 nm</div><p>The part a plant can use is called PAR. Roughly 3 g of dry matter is created per MJ of energy intercepted.</p></div>
@@ -111,7 +111,7 @@
   </section>
 
   <section>
-    <span class="num">04 — THE DATA</span>
+    <span class="num">04—THE DATA</span>
     <h2>Data from reliable sources</h2>
     <p class="lede">Weather comes from SMHI, Sweden's meteorological institute, whose station 85240 at Malmslätt is 13 km from the field.</p>
 <pre>field = {15.35, 58.40};   <span class="c">(* longitude, latitude of the field *)</span>
@@ -177,11 +177,11 @@ Dataset[observations]
 (*  2026-09-06  0.413   2026-09-09  0.425   2026-09-09  0.481   2026-09-17  0.702
     2026-09-20  0.781   2026-09-22  0.783   2026-09-22  0.790  *)</pre>
     <p>9 and 22 September appear twice: the field lies where two tiles overlap, so one pass yields two scenes. The daily run averages them.</p>
-    <div class="note"><span>⚠</span><span><b>Three traps.</b> STRÅNG marks missing days with −999 — test for that value, never for the sign (a <code>v &gt; 0</code> guard deletes every frost day). Subtract 1000 from every band on scenes processed since 2022. At 58°N, distrust any pass with the sun below 25° — low sun reads green that is not there.</span></div>
+    <div class="note"><span>⚠</span><span><b>Three traps.</b> STRÅNG marks missing days with −999—test for that value, never for the sign (a <code>v &gt; 0</code> guard deletes every frost day). Subtract 1000 from every band on scenes processed since 2022. At 58°N, distrust any pass with the sun below 25°—low sun reads green that is not there.</span></div>
   </section>
 
   <section>
-    <span class="num">05 — THE MODEL</span>
+    <span class="num">05—THE MODEL</span>
     <h2>Modelling the crop as a system</h2>
     <p class="lede">Here is the crop year as a flow diagram, the process the model has to reproduce:</p>
     <figure><img src="croptwin/crop-stages.png" alt="The crop year as a flowchart: eight stages and the three drivers" style="border:0;max-width:520px">
@@ -199,7 +199,7 @@ SystemModelPlot[sim]</pre>
   </section>
 
   <section>
-    <span class="num">06 — DOES IT HOLD UP</span>
+    <span class="num">06—DOES IT HOLD UP</span>
     <h2>Does it hold up?</h2>
     <p class="lede">Five completed seasons, the model driven by weather alone, the satellite as the data source:</p>
     <figure><img src="croptwin/five-seasons.png" alt="Model against satellite for five seasons">
@@ -207,7 +207,7 @@ SystemModelPlot[sim]</pre>
   </section>
 
   <section>
-    <span class="num">07 — THE SYNC</span>
+    <span class="num">07—THE SYNC</span>
     <h2>The sync: the satellite corrects the model</h2>
     <p class="lede">So far the satellite data has only been laid over the model. A twin needs the data to change the model, because no model represents every factor at work in the field; it has to be corrected toward what is actually there.</p>
     <p>After every clear pass, the twin pulls its leaf area toward what the satellite implies, over two days. (It is one extra flow into the leaf stock: nudging, the simplest form of data assimilation.) A corrected state restarts the forecast from the field as it is.</p>
@@ -216,8 +216,8 @@ SystemModelPlot[sim]</pre>
     <p>Be honest about what that buys. Two months ahead the gain is small: 0.076 → 0.073, 0.072 → 0.067, 0.121 → 0.123 and 0.107 → 0.104. Nudging corrects the leaf area, not the crop's clock, so the flowering and harvest dates the decisions run on barely move, and a single low pass can pull the line down for a few days, as in early July 2022. Correcting the clock as well, and weighting each pass by its noise, is the next step. Part 5 of this series is about exactly that: the twin that corrects itself.</p>
     <p><b>Once we have the twin, it can be used to support decisions, every day:</b></p>
     <ul>
-      <li>flowering and harvest-ready dates, as ranges over five weather years, re-issued every day so you can watch them settle — today 17 June and 8 August 2027;</li>
-      <li>grain yield, twin and model alone — today about 7.8–9.3 t/ha at 14 % moisture, taken as 0.45 of the 14.9–17.8 t/ha of above-ground dry matter the model computes. Issued in September, before the crop has emerged, it is still climatology: the range is the five weather years;</li>
+      <li>flowering and harvest-ready dates, as ranges over five weather years, re-issued every day so you can watch them settle—today 17 June and 8 August 2027;</li>
+      <li>grain yield, twin and model alone—today about 7.8–9.3 t/ha at 14 % moisture, taken as 0.45 of the 14.9–17.8 t/ha of above-ground dry matter the model computes. Issued in September, before the crop has emerged, it is still climatology: the range is the five weather years;</li>
       <li>a divergence alert when a pass lands more than 2.5 standard deviations from what the twin expected the day before, and one line saying what to do.</li>
     </ul>
     <p>Each day's line goes to the Databin and to a sync log, so the loop can be audited.</p>
@@ -225,7 +225,7 @@ SystemModelPlot[sim]</pre>
   </section>
 
   <section>
-    <span class="num">08 — THE CLOUD</span>
+    <span class="num">08—THE CLOUD</span>
     <h2>Keeping the numbers in the cloud</h2>
     <p class="lede">The simulation needs System Modeler, so it runs on one computer once a day. The result goes to a Wolfram Databin, so the dashboard can read it from any browser. The daily script writes the full entry; here is its shape, from the live season with the sync on, into a scratch bin:</p>
 <pre>bin = CreateDatabin[];
@@ -250,11 +250,11 @@ DatabinAdd[bin, &lt;|"kind" -&gt; "today", "date" -&gt; entry["date"], "json" -&
 <span class="c">(* read it back, in Wolfram Language or from a browser *)</span>
 ImportString[Last[Normal[bin]]["json"], "RawJSON"];
 URLExecute["https://datadrop.wolframcloud.com/api/v1.0/Recent?bin=" &lt;&gt; bin["ShortID"], "Text"]</pre>
-    <div class="note"><span>ℹ</span><span>The public endpoint returns Wolfram syntax and the five newest entries only — so each entry carries its whole payload as one JSON string, and the daily entry is written last.</span></div>
+    <div class="note"><span>ℹ</span><span>The public endpoint returns Wolfram syntax and the five newest entries only—so each entry carries its whole payload as one JSON string, and the daily entry is written last.</span></div>
   </section>
 
   <section>
-    <span class="num">09 — THE FACE</span>
+    <span class="num">09—THE FACE</span>
     <h2>A dashboard, with your favourite LLM</h2>
     <p class="lede">Decide what matters here: the field itself, what the satellite sees against what the twin expects, what the satellite changed today, the decisions, the warmth accumulated, and the yield the twin foresees. Then let an LLM write the HTML. The page reads the databin when it opens and can be hosted anywhere.</p>
     <figure><img src="croptwin/croptwin.gif" alt="The model alone and the twin while satellite passes land on them" style="border:0">
@@ -265,12 +265,12 @@ URLExecute["https://datadrop.wolframcloud.com/api/v1.0/Recent?bin=" &lt;&gt; bin
   </section>
 
   <section>
-    <span class="num">10 — THE STACK</span>
+    <span class="num">10—THE STACK</span>
     <h2>Technologies used</h2>
     <table>
       <thead><tr><th>Layer</th><th>Technology</th><th>Job</th></tr></thead>
       <tbody>
-        <tr><td>Data</td><td>Wolfram Language</td><td><code>URLExecute</code> to SMHI, STRÅNG, the Planetary Computer and Jordbruksverket — one Association per source</td></tr>
+        <tr><td>Data</td><td>Wolfram Language</td><td><code>URLExecute</code> to SMHI, STRÅNG, the Planetary Computer and Jordbruksverket—one Association per source</td></tr>
         <tr><td>Model</td><td>Wolfram System Modeler</td><td>the crop as stocks and flows; <code>SystemModelSimulate</code> predicts from the weather</td></tr>
         <tr><td>Memory</td><td>Wolfram Databin</td><td>one entry per day, readable by anyone with the ID</td></tr>
         <tr><td>Face</td><td>HTML + JavaScript</td><td>reads the bin in the browser, draws the field and the charts</td></tr>
