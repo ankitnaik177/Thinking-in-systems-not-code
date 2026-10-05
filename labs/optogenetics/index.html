@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A light switch for neurons: an optogenetics demo</title>
+<meta name="description" content="Shine light into the brain of a cartoon mouse and watch what happens. The light switch behind the 2026 Nobel Prize in Physiology or Medicine, with brain cells computed live from a Wolfram System Modeler model.">
+<meta property="og:title" content="A light switch for neurons: an optogenetics demo">
+<meta property="og:description" content="Wake a sleeping mouse, recall a fear memory, move whiskers: the light switch behind the 2026 Nobel Prize in Physiology or Medicine, with brain cells computed live.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.systemsnotcode.com/labs/optogenetics/">
+<meta property="og:image" content="https://www.systemsnotcode.com/labs/optogenetics/cover.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="../../assets/favicon.svg">
+<style>
+  :root {
+    --bg: #f6f7f9; --panel: #ffffff; --ink: #1d2433; --muted: #5b6475; --line: #dde1e8;
+    --blue: #1f6fd1; --accent: #0a84ff; --green: #1f8a4c; --red: #c0392b; --amber: #d98e04;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--ink); background: var(--bg); }
+  header { padding: 18px 24px 8px; }
+  header h1 { margin: 0 0 4px; font-size: 22px; }
+  header p { margin: 0; color: var(--muted); max-width: 980px; }
+  .disclaimer { display: inline-block; margin-top: 8px; padding: 4px 10px; border-radius: 999px; background: #fff4d6; color: #7a5300; font-size: 13px; }
+  nav.tabs { display: flex; gap: 8px; padding: 10px 24px 0; flex-wrap: wrap; }
+  nav.tabs button { border: 1px solid var(--line); background: var(--panel); padding: 8px 14px; border-radius: 999px; cursor: pointer; font: inherit; color: var(--ink); }
+  nav.tabs button[aria-selected="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+  main { display: grid; grid-template-columns: 320px 1fr 380px; gap: 16px; padding: 16px 24px 24px; }
+  @media (max-width: 1150px) { main { grid-template-columns: 1fr; } }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; }
+  .panel h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  label { display: block; font-size: 13px; color: var(--muted); margin: 10px 0 4px; }
+  input[type=range] { width: 100%; }
+  .row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { border: 1px solid var(--line); background: #fff; border-radius: 8px; padding: 5px 9px; cursor: pointer; font: inherit; font-size: 13px; }
+  .chip[aria-pressed="true"] { outline: 2px solid var(--ink); }
+  .swatch { display: inline-block; width: 14px; height: 14px; border-radius: 50%; vertical-align: -2px; margin-right: 5px; border: 1px solid rgba(0,0,0,.2); }
+  .bigbtn { width: 100%; margin-top: 12px; padding: 12px; font: 600 16px system-ui, sans-serif; border-radius: 10px; border: none; cursor: pointer; color: #fff; background: #444; transition: box-shadow .15s; }
+  .bigbtn.on { box-shadow: 0 0 0 4px rgba(10,132,255,.25), 0 0 24px var(--glow, #0a84ff); }
+  .value { float: right; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .stat { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px dashed var(--line); font-size: 14px; }
+  .stat:last-child { border-bottom: none; }
+  .stat b { font-variant-numeric: tabular-nums; }
+  .steps { display: grid; gap: 6px; margin-top: 6px; }
+  .steps button { text-align: left; border: 1px solid var(--line); background: #fff; padding: 8px 10px; border-radius: 8px; cursor: pointer; font: inherit; font-size: 14px; }
+  .steps button.done { background: #eaf6ee; border-color: #b9e0c6; }
+  .steps button:disabled { opacity: .45; cursor: default; }
+  .steps button.done:disabled { opacity: 1; }
+  #arena { width: 100%; height: auto; display: block; border-radius: 10px; background: #eef1f5; }
+  .caption { color: var(--muted); font-size: 13px; margin-top: 8px; min-height: 2.6em; }
+  canvas { width: 100%; display: block; }
+  .narrative { grid-column: 1 / -1; }
+  .narrative h3 { margin: 0 0 6px; font-size: 16px; }
+  .narrative p { margin: 6px 0; max-width: 1100px; }
+  .cite { color: var(--muted); font-size: 13px; }
+  .legend { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .welcome { margin: 10px 24px 0; padding: 16px 20px; border-radius: var(--radius); background: #eef6ff; border: 1px solid #c7defa; display: grid; grid-template-columns: 1fr auto; gap: 12px 24px; align-items: start; }
+  .welcome h2 { margin: 0 0 6px; font-size: 18px; }
+  .welcome ol { margin: 6px 0 0; padding-left: 22px; }
+  .welcome li { margin: 4px 0; max-width: 900px; }
+  .welcome .note { color: var(--muted); font-size: 13px; margin-top: 8px; }
+  .welcome button { border: none; background: var(--blue); color: #fff; font: 600 15px system-ui, sans-serif; padding: 10px 18px; border-radius: 10px; cursor: pointer; }
+  @media (max-width: 700px) { .welcome { grid-template-columns: 1fr; } }
+  .glossary { margin: 10px 24px 0; font-size: 13px; color: var(--muted); }
+  .glossary b { color: var(--ink); }
+  .leftcol { display: grid; gap: 16px; align-content: start; }
+  .guide { background: #fffbea; border: 2px solid #f1cf5a; }
+  .guide h2 { color: #8a6500; }
+  .guide ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .guide li { border-radius: 8px; padding: 8px 10px 8px 36px; position: relative; font-size: 14.5px; background: #fff; border: 1px solid #f3e3a6; color: var(--muted); }
+  .guide li::before { content: attr(data-n); position: absolute; left: 9px; top: 8px; width: 20px; height: 20px; border-radius: 50%; background: #e9e2c8; color: #6b5a1e; font-size: 12px; font-weight: 700; text-align: center; line-height: 20px; }
+  .guide li.current { color: var(--ink); border-color: #e0b12c; box-shadow: 0 0 0 3px rgba(241, 207, 90, .35); }
+  .guide li.current::before { background: #e0b12c; color: #fff; }
+  .guide li.done { color: var(--ink); background: #eef8f1; border-color: #bfe3cb; }
+  .guide li.done::before { content: "\2713"; background: var(--green); color: #fff; }
+  .guide .why { display: block; margin-top: 4px; font-size: 13px; color: #2d6b45; }
+  .guide .skip { margin-top: 8px; background: none; border: none; color: var(--muted); font: inherit; font-size: 12px; text-decoration: underline; cursor: pointer; padding: 0; }
+  .guide .finish { margin-top: 10px; padding: 10px; border-radius: 8px; background: #eaf6ee; color: #1d5c37; font-size: 14px; }
+  .guide .finish button { margin-top: 8px; border: none; background: var(--green); color: #fff; padding: 8px 12px; border-radius: 8px; cursor: pointer; font: 600 14px system-ui, sans-serif; }
+  kbd { border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 4px; font-size: 12px; background: #fff; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Light switches behaviour</h1>
+  <p>The 2026 Nobel Prize in Physiology or Medicine (Deisseroth, Hegemann, Nagel) was for a light switch for brain cells.
+     Here you can use that switch yourself: shine light into the brain of a (cartoon) mouse and see what happens.</p>
+  <span class="disclaimer">Neurons: computed live from the equations of the Optogenetics Modelica library. Mouse: a descriptive illustration, not a model of behaviour.</span>
+</header>
+
+<section class="welcome" id="welcome" aria-label="What is this?">
+  <div>
+    <h2>New here? Start with this</h2>
+    <ol>
+      <li>Your brain is made of billions of tiny cells called <b>neurons</b>. They talk to each other with tiny electric pulses, called <b>spikes</b>.</li>
+      <li>In a green pond alga, scientists found a protein that works like a <b>light switch</b>: when blue light shines on it, it opens and lets electric charge flow in.</li>
+      <li>Put that switch into a few brain cells of a mouse, shine light through a thin glass fibre, and you can make exactly those cells fire. That is called <b>optogenetics</b>.</li>
+      <li><b>Try it:</b> pick an experiment below and follow the numbered steps in the yellow <b>Try this</b> box on the left. The steps tick themselves off when you have done them.</li>
+    </ol>
+    <div class="note">No real mouse here. The brain cells are a computer model (the same equations as the Modelica library behind this page); the mouse is a cartoon that shows what the real experiments found.</div>
+  </div>
+  <button id="welcomeClose">Got it, let's start</button>
+</section>
+<div class="glossary"><b>neuron</b> = brain cell &nbsp;·&nbsp; <b>spike</b> = one electric pulse of a neuron &nbsp;·&nbsp; <b>ChR2</b> = the light switch from algae, reacts to blue &nbsp;·&nbsp; <b>NpHR</b> = an "off" switch, reacts to yellow &nbsp;·&nbsp; <b>Hz</b> = flashes per second</div>
+
+<nav class="tabs" role="tablist" aria-label="Experiment">
+  <button role="tab" id="tab-wake" aria-selected="true" data-s="wake">1 · Wake a sleeping mouse</button>
+  <button role="tab" id="tab-fear" aria-selected="false" data-s="fear">2 · Recall a fear memory</button>
+  <button role="tab" id="tab-whisk" aria-selected="false" data-s="whisk">3 · Move whiskers, then silence them</button>
+</nav>
+
+<main>
+  <div class="leftcol">
+  <section class="panel guide" aria-label="Try this" aria-live="polite">
+    <h2>Try this</h2>
+    <ol id="guideList"></ol>
+    <div id="guideFinish"></div>
+    <button class="skip" id="guideSkip">skip this step</button>
+  </section>
+  <section class="panel" aria-label="Light controls">
+    <h2>Light</h2>
+    <label for="wl">Colour (wavelength) <span class="value" id="wlv"></span></label>
+    <input id="wl" type="range" min="400" max="680" step="1" value="470">
+    <div class="row" id="presets">
+      <button class="chip" data-wl="470"><span class="swatch" style="background:#00a9ff"></span>blue 470 nm</button>
+      <button class="chip" data-wl="590"><span class="swatch" style="background:#ffd000"></span>yellow 590 nm</button>
+      <button class="chip" data-wl="630"><span class="swatch" style="background:#ff4b00"></span>red 630 nm</button>
+    </div>
+    <label for="irr">Brightness (irradiance at the fibre tip) <span class="value" id="irrv"></span></label>
+    <input id="irr" type="range" min="0" max="20" step="0.5" value="10">
+    <label>Rhythm: how the light flashes</label>
+    <div class="row" id="modes">
+      <button class="chip" data-f="0">continuous</button>
+      <button class="chip" data-f="5">5 Hz</button>
+      <button class="chip" data-f="10">10 Hz</button>
+      <button class="chip" data-f="20" aria-pressed="true">20 Hz</button>
+      <button class="chip" data-f="40">40 Hz</button>
+    </div>
+    <button class="bigbtn" id="lightBtn" aria-pressed="false">Light off: click or hold <kbd>Space</kbd></button>
+    <label style="margin-top:14px">Who absorbs this colour?</label>
+    <canvas id="spectrum" width="560" height="200" aria-label="Approximate action spectra of ChR2 and NpHR with the chosen wavelength"></canvas>
+    <div class="legend"><span class="swatch" style="background:#1f6fd1"></span>ChR2 (switches cells on) &nbsp; <span class="swatch" style="background:#d98e04"></span>NpHR (switches cells off). The dashed line is your colour. Approximate shapes.</div>
+  </section>
+  </div>
+
+  <section class="panel" aria-label="Mouse">
+    <h2 id="arenaTitle">Mouse</h2>
+    <svg id="arena" viewBox="0 0 640 380" role="img" aria-labelledby="arenaTitle">
+      <defs>
+        <radialGradient id="glow" r="0.5"><stop offset="0" stop-color="#0af" stop-opacity=".9"/><stop offset="1" stop-color="#0af" stop-opacity="0"/></radialGradient>
+        <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0V24" fill="none" stroke="#c9ced8" stroke-width="2"/></pattern>
+      </defs>
+      <g id="boxA" style="display:none">
+        <rect x="40" y="40" width="560" height="300" rx="8" fill="url(#grid)" stroke="#9aa3b2" stroke-width="3"/>
+        <text x="56" y="66" fill="#5b6475" font-size="16">Box A: grid floor</text>
+      </g>
+      <g id="boxB" style="display:none">
+        <ellipse cx="320" cy="190" rx="285" ry="150" fill="#f3ead9" stroke="#b8a37f" stroke-width="3"/>
+        <text x="70" y="66" fill="#7a6a4c" font-size="16">Box B: round, safe</text>
+      </g>
+      <g id="nest" style="display:none">
+        <ellipse cx="320" cy="215" rx="190" ry="95" fill="#e9dcc3" stroke="#c6b18c" stroke-width="3"/>
+        <text x="56" y="66" fill="#7a6a4c" font-size="16">Home cage, light phase: sleeping time</text>
+      </g>
+      <g id="mouse">
+        <g id="mouseBody">
+          <path id="tail" d="M-70 10 C -110 20, -130 -10, -165 5" fill="none" stroke="#c98f8f" stroke-width="5" stroke-linecap="round"/>
+          <ellipse cx="-10" cy="0" rx="70" ry="42" fill="#9aa0a8"/>
+          <ellipse cx="62" cy="-6" rx="34" ry="27" fill="#a6acb3"/>
+          <circle cx="48" cy="-34" r="16" fill="#a6acb3"/><circle cx="48" cy="-34" r="9" fill="#e6b8b8"/>
+          <circle id="eye" cx="78" cy="-12" r="4.5" fill="#1d2433"/>
+          <path id="eyeClosed" d="M73 -12 q5 4 10 0" stroke="#1d2433" stroke-width="2.5" fill="none" style="display:none"/>
+          <circle cx="96" cy="-2" r="5" fill="#e48b8b"/>
+          <g id="whiskers" stroke="#3b4150" stroke-width="1.6" stroke-linecap="round">
+            <line x1="92" y1="0" x2="128" y2="-12"/><line x1="92" y1="2" x2="130" y2="2"/><line x1="92" y1="4" x2="126" y2="16"/>
+          </g>
+          <g id="fiber">
+            <line x1="44" y1="-26" x2="40" y2="-92" stroke="#6b7280" stroke-width="5"/>
+            <rect x="34" y="-34" width="18" height="10" rx="2" fill="#4b5563"/>
+            <circle id="fiberGlow" cx="44" cy="-30" r="30" fill="url(#glow)" opacity="0"/>
+            <line id="cable" x1="40" y1="-92" x2="40" y2="-300" stroke="#9aa3b2" stroke-width="2"/>
+          </g>
+        </g>
+      </g>
+      <g id="labels">
+        <g id="zzz" fill="#5b6475" font-size="22" font-weight="700" style="display:none">
+          <text x="70" y="-70">z</text><text x="88" y="-92" font-size="28">z</text><text x="110" y="-118" font-size="34">Z</text>
+        </g>
+        <text id="freezeMark" x="-45" y="-60" fill="#c0392b" font-size="22" font-weight="700" style="display:none">freezing</text>
+      </g>
+      <g id="shock" style="display:none"><text x="250" y="365" fill="#c0392b" font-size="18" font-weight="700">mild foot shock</text></g>
+    </svg>
+    <div class="caption" id="caption" aria-live="polite"></div>
+    <div id="behaviourStats" style="margin-top:8px"></div>
+  </section>
+
+  <section class="panel" aria-label="Neurons">
+    <h2 id="neuronTitle">Neurons under the fibre</h2>
+    <canvas id="raster" width="740" height="250" aria-label="Spike raster of the targeted neurons"></canvas>
+    <div class="legend" id="rasterLegend">Each row is one brain cell; each black tick is one spike. Coloured bars on top: when the light was on.</div>
+    <canvas id="trace" width="740" height="170" aria-label="Membrane potential of one targeted neuron" style="margin-top:10px"></canvas>
+    <div class="legend">Membrane potential of one targeted neuron (Hodgkin-Huxley, -80 to +50 mV), last 1 s; in experiment 2 the first tagged cell.</div>
+    <div id="neuronStats" style="margin-top:8px"></div>
+    <div id="fearSteps" class="steps" style="display:none; margin-top:12px">
+      <button id="stepExplore">1. Explore box A: nothing tagged yet</button>
+      <button id="stepShock">2. Fear learning in box A: tag the active cells</button>
+      <button id="stepMove">3. Move the mouse to the safe box B</button>
+      <button id="stepReset">Start over</button>
+    </div>
+  </section>
+
+  <section class="panel narrative" aria-label="Explanation">
+    <h3 id="nTitle"></h3>
+    <div id="nBody"></div>
+  </section>
+</main>
+
+<script>
+"use strict";
+// ---------------------------------------------------------------------------
+// Physics: the same equations and parameters as the Optogenetics library.
+//   ChR2: three-state photocycle C -> O -> D -> C (Kinetics.ChR2Photocycle)
+//   Neuron: Hodgkin-Huxley, -65 mV rest, 20 um sphere (Cells.Neuron)
+//   NpHR: light-driven chloride pump, first-order activation (illustrative)
+// Units inside the loop: mV, ms, uA/cm^2, mS/cm^2, uF/cm^2.
+// ---------------------------------------------------------------------------
+const AREA_CM2 = Math.PI * Math.pow(20e-4, 2);           // 1.2566e-5 cm^2
+const G_CHR2 = 15e-9 / AREA_CM2 * 1e3;                    // 15 nS -> mS/cm^2 (library default 11 nS; more headroom here)
+const TAU_OFF = 9.8, TAU_REC = 10700, LIGHT_REC = 0.1;    // ms
+const EPS = 0.5, SIGMA = 1.2e-20, H = 6.62607015e-34, C0 = 299792458;
+const DT = 0.02;                                          // ms
+const N = 12;
+
+function vtrap(x, y) { return Math.abs(x / y) < 1e-6 ? y * (1 - x / y / 2) : x / (Math.exp(x / y) - 1); }
+const am = v => 0.1 * vtrap(-(v + 40), 10), bm = v => 4 * Math.exp(-(v + 65) / 18);
+const ah = v => 0.07 * Math.exp(-(v + 65) / 20), bh = v => 1 / (1 + Math.exp(-(v + 35) / 10));
+const an = v => 0.01 * vtrap(-(v + 55), 10), bn = v => 0.125 * Math.exp(-(v + 65) / 80);
+
+// Approximate action spectra (normalised to 1 at the peak).
+function chr2Spectrum(l) { const s = l < 470 ? 45 : 32; return Math.exp(-0.5 * Math.pow((l - 470) / s, 2)); }
+function nphrSpectrum(l) { const s = l < 590 ? 45 : 35; return Math.exp(-0.5 * Math.pow((l - 590) / s, 2)); }
+
+// Excitation rate of one ChR2 molecule, 1/ms, for irradiance in mW/mm^2.
+function excitationRate(irr_mWmm2, lambda_nm) {
+  const I = irr_mWmm2 * 1e3;                          // W/m^2
+  const phi = I * lambda_nm * 1e-9 / (H * C0);       // photons /(m^2 s)
+  return EPS * SIGMA * phi * chr2Spectrum(lambda_nm) / 1000;
+}
+
+function makeCell(gChR2, gNpHR, drive, noise) {
+  const v = -65;
+  return { v, m: am(v) / (am(v) + bm(v)), h: ah(v) / (ah(v) + bh(v)), n: an(v) / (an(v) + bn(v)),
+           o: 0, d: 0, a: 0, gChR2, gNpHR, drive, noise, spikes: [], above: false, tagged: false };
+}
+
+let cells = [];
+let simTime = 0;           // ms
+let lightOn = false, lightOnSince = 0, lightHistory = [];
+
+const ui = {
+  wl: document.getElementById("wl"), wlv: document.getElementById("wlv"),
+  irr: document.getElementById("irr"), irrv: document.getElementById("irrv"),
+  lightBtn: document.getElementById("lightBtn"),
+  caption: document.getElementById("caption"),
+  behaviourStats: document.getElementById("behaviourStats"),
+  neuronStats: document.getElementById("neuronStats"),
+};
+let freq = 20;
+
+function lightIntensityAt(t) {               // mW/mm^2 actually delivered at time t (ms)
+  if (!lightOn) return 0;
+  const irr = +ui.irr.value;
+  if (freq === 0) return irr;
+  const period = 1000 / freq;
+  return ((t - lightOnSince) % period) < 5 ? irr : 0;   // 5 ms flashes
+}
+
+function stepCells(nSteps) {
+  const lambda = +ui.wl.value;
+  for (let k = 0; k < nSteps; k++) {
+    const irr = lightIntensityAt(simTime);
+    const ka = excitationRate(irr, lambda);
+    const kpump = irr * nphrSpectrum(lambda) * 0.02;    // 1/ms, illustrative
+    for (const c of cells) {
+      // ChR2 photocycle (BioChem network in the library; identical mass-action equations)
+      const closed = 1 - c.o - c.d;
+      const kr = 1 / TAU_REC + LIGHT_REC * ka;
+      const dO = ka * closed - c.o / TAU_OFF;
+      const dD = c.o / TAU_OFF - kr * c.d;
+      c.o += DT * dO; c.d += DT * dD;
+      // NpHR pump activation, closes in 10 ms
+      c.a += DT * (kpump * (1 - c.a) - c.a / 10);
+      // Hodgkin-Huxley membrane
+      const v = c.v;
+      const iNa = 120 * c.m ** 3 * c.h * (v - 50);
+      const iK = 36 * c.n ** 4 * (v + 77);
+      const iL = 0.3 * (v + 54.387);
+      const iChR2 = c.gChR2 * c.o * (v - 0);
+      const iNpHR = c.gNpHR * c.a;                        // outward pump current
+      const iExt = c.drive + c.noise * (Math.random() - 0.5) * 2 / Math.sqrt(DT);
+      c.v += DT * (iExt - iNa - iK - iL - iChR2 - iNpHR);
+      c.m += DT * (am(v) * (1 - c.m) - bm(v) * c.m);
+      c.h += DT * (ah(v) * (1 - c.h) - bh(v) * c.h);
+      c.n += DT * (an(v) * (1 - c.n) - bn(v) * c.n);
+      if (!c.above && c.v > 0) { c.spikes.push(simTime); c.above = true; onSpike(c); }
+      if (c.above && c.v < -20) c.above = false;
+    }
+    if (cells.length) { traceBuf[traceIdx] = cells[focusCell()].v; traceIdx = (traceIdx + 1) % TRACE_N; traceCount = Math.min(traceCount + 1, TRACE_N); }
+    simTime += DT;
+  }
+  for (const c of cells) while (c.spikes.length && c.spikes[0] < simTime - 3000) c.spikes.shift();
+}
+const TRACE_N = 50000; const traceBuf = new Float32Array(TRACE_N); let traceIdx = 0, traceCount = 0;
+
+function focusCell() { const i = cells.findIndex(c => c.tagged); return i < 0 ? 0 : i; }
+function rate(c, windowMs) { let n = 0; for (let i = c.spikes.length - 1; i >= 0 && c.spikes[i] > simTime - windowMs; i--) n++; return n * 1000 / windowMs; }
+
+// ---------------------------------------------------------------------------
+// Scenarios
+// ---------------------------------------------------------------------------
+const S = {};
+let scenario = null;
+
+S.wake = {
+  title: "Hypocretin neurons wake a sleeping mouse",
+  neuronTitle: "Hypocretin neurons, lateral hypothalamus (ChR2)",
+  init() {
+    cells = Array.from({ length: N }, () => makeCell(G_CHR2 * (0.75 + 0.5 * Math.random()), 0, 0, 0.6));
+    this.arousal = 0; this.awake = false; this.wokeAt = null; this.startLight = null;
+    show("nest"); setMouse("sleep");
+  },
+  update(dtReal) {
+    const r = popRate(500);
+    // arousal integrates hypocretin firing; tau 2 s, compressed time
+    this.arousal += dtReal / 2000 * (r / 8 - this.arousal);
+    if (!this.awake && this.arousal > 0.5) { this.awake = true; this.wokeAt = performance.now(); setMouse("explore"); }
+    if (this.awake && this.arousal < 0.15 && !lightOn) { this.awake = false; setMouse("sleep"); }
+    ui.caption.textContent = this.awake
+      ? "Awake: the mouse leaves its sleeping posture and explores."
+      : (r > 3 ? "Hypocretin neurons are firing; arousal is building up..." : "Asleep. The hypocretin neurons are almost silent.");
+    stats(ui.behaviourStats, [["Arousal drive", (100 * Math.min(this.arousal / 0.5, 1)).toFixed(0) + " %"], ["State", this.awake ? "awake" : "asleep"]]);
+  },
+  body: `<p><b>What to try.</b> Shine blue light at 5, 10 and 20 Hz and see how fast the mouse wakes. Then try yellow or red light at the same power: ChR2 barely absorbs them, so the neurons stay silent and the mouse sleeps on.</p>
+  <p><b>The real experiment.</b> Adamantidis, Zhang, Aravanis, Deisseroth and de Lecea (2007) put ChR2 into hypocretin (orexin) neurons and delivered light through an optical fibre. Stimulation raised the probability of waking from slow-wave and REM sleep, and the latency to waking depended on the stimulation frequency. It was one of the first demonstrations that the firing of one defined cell type causes a behavioural state.</p>
+  <p class="cite">Here the neurons are 12 Hodgkin-Huxley cells with ChR2, computed live with a 20 &micro;s step; their expression varies &plusmn;25 %. "Arousal" is an illustrative running average of their firing with a compressed time scale; real latencies are tens of seconds.</p>`,
+};
+
+S.fear = {
+  title: "Reactivating a fear engram",
+  neuronTitle: "Dentate gyrus neurons (ChR2 only in tagged cells)",
+  init() {
+    cells = Array.from({ length: N }, () => makeCell(0, 0, 0, 0.6));
+    this.phase = "idle"; this.fear = 0; this.freezeTime = 0; this.totalTime = 0; this.box = "A";
+    show("boxA"); setMouse("explore");
+    document.getElementById("fearSteps").style.display = "grid";
+    setSteps();
+  },
+  leave() { document.getElementById("fearSteps").style.display = "none"; },
+  update(dtReal) {
+    const tagged = cells.filter(c => c.tagged);
+    const r = tagged.length ? tagged.reduce((s, c) => s + rate(c, 500), 0) / tagged.length : 0;
+    this.fear += dtReal / 600 * (r / 10 - this.fear);
+    const freezing = this.box === "B" && this.fear > 0.45;
+    setMouse(freezing ? "freeze" : "explore");
+    if (this.box === "B") { this.totalTime += dtReal; if (freezing) this.freezeTime += dtReal; }
+    let msg;
+    if (this.phase === "idle") msg = "Box A. No cell carries ChR2 yet, so light does nothing. Try it.";
+    else if (this.phase === "tagging") msg = "Fear learning: the neurons active now switch on an activity gene and will express ChR2.";
+    else if (this.box === "A") msg = "Learning is over. Move the mouse to box B, where nothing bad ever happened.";
+    else msg = freezing ? "Freezing in the safe box: light reactivated the cells that stored the memory of box A."
+                        : "Box B is safe and the mouse explores. Now shine blue light on the tagged cells.";
+    ui.caption.textContent = msg;
+    stats(ui.behaviourStats, [["Tagged cells", tagged.length + " of " + N], ["Fear drive", (100 * Math.min(this.fear / 0.45, 1)).toFixed(0) + " %"],
+      ["Freezing in box B", this.totalTime > 0 ? (100 * this.freezeTime / this.totalTime).toFixed(0) + " % of the time" : "-"]]);
+  },
+  body: `<p><b>What to try.</b> Shine light before learning: nothing happens, because no neuron carries the switch. Run step 2: the cells that happen to be active during the fearful experience are tagged and now express ChR2 (blue rows). Move the mouse to box B. It explores calmly until you shine blue light; then it freezes, recalling a fear it never had in this box. Yellow light does nothing.</p>
+  <p><b>The real experiment.</b> Liu, Ramirez, Tonegawa and colleagues (2012) used an activity-dependent gene (c-fos) to put ChR2 only into dentate gyrus neurons that were active while mice learned to fear a context. Reactivating these cells with light in a neutral context made the mice freeze: activating the ensemble was <i>sufficient</i> to recall the memory. Ramirez et al. (2013) went further and created a false memory by pairing the reactivation with a shock elsewhere.</p>
+  <p class="cite">Illustration: which cells get tagged is random here, and "fear drive" is a running average of the tagged cells' firing. Tagging in the real experiment takes days and is gated by a drug (doxycycline).</p>`,
+};
+
+S.whisk = {
+  title: "Moving whiskers with blue light, silencing with yellow",
+  neuronTitle: "Layer 5 motor cortex (ChR2 + NpHR)",
+  init() {
+    cells = Array.from({ length: N }, () => makeCell(G_CHR2 * (0.75 + 0.5 * Math.random()), 4, 3, 1.8));
+    this.deflect = 0;
+    show(null); setMouse("explore", true);
+  },
+  update(dtReal) {
+    this.deflect *= Math.exp(-dtReal / 60);
+    const r = popRate(300);
+    document.getElementById("whiskers").setAttribute("transform", `rotate(${-Math.min(this.deflect, 35)} 92 2)`);
+    const lambda = +ui.wl.value;
+    const blue = chr2Spectrum(lambda), yellow = nphrSpectrum(lambda);
+    ui.caption.textContent = !lightOn ? "Spontaneous activity: the cells fire now and then, and the whiskers twitch a little."
+      : (blue > yellow ? "Blue light drives the motor neurons: each burst deflects the whiskers." : "Yellow light switches on the chloride pump NpHR: the neurons fall silent.");
+    stats(ui.behaviourStats, [["Population rate", r.toFixed(0) + " spikes/s per cell"], ["Whisker deflection", Math.min(this.deflect, 35).toFixed(0) + " deg"]]);
+  },
+  onSpike() { this.deflect += 1.2; },
+  body: `<p><b>What to try.</b> Without light the neurons fire spontaneously. Blue light at 10 to 40 Hz drives them and the whiskers sweep with each flash. Switch to yellow (590 nm), continuous: the neurons carry a second protein, the chloride pump halorhodopsin (NpHR), which silences them. Two colours, two opposite commands, in the same cells.</p>
+  <p><b>The real experiments.</b> Aravanis et al. (2007) delivered blue light through an optical fibre to ChR2-expressing layer 5 neurons of the vibrissal motor cortex and moved the whiskers of living mice. Zhang et al. (2007) and Han and Boyden (2007) adapted NpHR from <i>Natronomonas pharaonis</i> for yellow-light silencing, enabling the first two-colour, bidirectional control.</p>
+  <p class="cite">The NpHR pump here is a first-order activation with an outward current; its strength is illustrative. The spontaneous activity comes from a constant drive plus noise.</p>`,
+};
+
+function popRate(win) { return cells.reduce((s, c) => s + rate(c, win), 0) / cells.length; }
+function onSpike(c) { if (scenario && scenario.onSpike) scenario.onSpike(c); }
+
+// Fear-learning steps
+function setSteps() {
+  const s = S.fear;
+  const b = id => document.getElementById(id);
+  b("stepExplore").classList.toggle("done", s.phase !== "idle");
+  b("stepShock").disabled = s.phase !== "idle" && s.phase !== "explored";
+  b("stepShock").classList.toggle("done", s.phase === "tagged");
+  b("stepMove").disabled = s.phase !== "tagged" || s.box === "B";
+  b("stepMove").classList.toggle("done", s.box === "B");
+}
+document.getElementById("stepExplore").onclick = () => { if (S.fear.phase === "idle") { S.fear.phase = "explored"; setSteps(); } };
+document.getElementById("stepShock").onclick = () => {
+  const s = S.fear; if (s.phase === "tagged" || s.phase === "tagging") return;
+  s.phase = "tagging"; setSteps();
+  document.getElementById("shock").style.display = "";
+  // the cells most active during learning get tagged (random subset, raised firing)
+  const order = cells.map((c, i) => [Math.random(), i]).sort((a, b) => a[0] - b[0]).slice(0, 5).map(x => x[1]);
+  order.forEach(i => { cells[i].drive = 7.5; });
+  setTimeout(() => {
+    order.forEach(i => { cells[i].drive = 0; cells[i].tagged = true; cells[i].gChR2 = G_CHR2 * (0.8 + 0.4 * Math.random()); });
+    s.phase = "tagged"; document.getElementById("shock").style.display = "none"; setSteps();
+  }, 2500);
+};
+document.getElementById("stepMove").onclick = () => { const s = S.fear; if (s.phase !== "tagged") return; s.box = "B"; s.fear = 0; s.freezeTime = 0; s.totalTime = 0; show("boxB"); setSteps(); };
+document.getElementById("stepReset").onclick = () => { S.fear.init(); resetGuide("fear"); };
+
+// ---------------------------------------------------------------------------
+// Mouse illustration
+// ---------------------------------------------------------------------------
+let mouseMode = "explore", mx = 320, my = 200, heading = 0, walkPhase = 0;
+function show(id) { ["boxA", "boxB", "nest"].forEach(b => document.getElementById(b).style.display = b === id ? "" : "none"); }
+function setMouse(mode) { mouseMode = mode; }
+function drawMouse(dtReal) {
+  const body = document.getElementById("mouse");
+  document.getElementById("zzz").style.display = mouseMode === "sleep" ? "" : "none";
+  document.getElementById("freezeMark").style.display = mouseMode === "freeze" ? "" : "none";
+  document.getElementById("eye").style.display = mouseMode === "sleep" ? "none" : "";
+  document.getElementById("eyeClosed").style.display = mouseMode === "sleep" ? "" : "none";
+  let sx = 1, sy = 1, rot = 0, jitter = 0;
+  if (mouseMode === "explore" && scenario !== S.whisk) {
+    walkPhase += dtReal / 1000;
+    heading += (Math.sin(walkPhase * 0.7) * 0.6 + Math.sin(walkPhase * 1.9) * 0.3) * dtReal / 1000;
+    mx += Math.cos(heading) * dtReal * 0.06; my += Math.sin(heading) * dtReal * 0.04;
+    const [cx, cy, rx, ry] = scenario === S.fear && S.fear.box === "B" ? [320, 190, 200, 80] : [320, 200, 220, 95];
+    const ex = (mx - cx) / rx, ey = (my - cy) / ry;
+    if (ex * ex + ey * ey > 1) { heading += Math.PI * 0.9; mx = cx + ex * rx * 0.97; my = cy + ey * ry * 0.97; }
+    rot = Math.cos(heading) < 0 ? 180 : 0;
+    sy = 1 + 0.03 * Math.sin(walkPhase * 18);
+  } else if (mouseMode === "sleep") {
+    mx += (320 - mx) * 0.05; my += (215 - my) * 0.05; sx = 0.9; sy = 0.8; rot = 0;
+  } else if (mouseMode === "freeze") {
+    sy = 0.86; jitter = (Math.random() - 0.5) * 1.5; rot = Math.cos(heading) < 0 ? 180 : 0;
+  } else { mx += (300 - mx) * 0.05; my += (210 - my) * 0.05; }
+  const flip = rot === 180 ? "scale(-1,1)" : "";
+  body.setAttribute("transform", `translate(${mx + jitter},${my}) ${flip} scale(${sx},${sy})`);
+  document.getElementById("labels").setAttribute("transform", `translate(${mx},${my})`);
+  // the fibre stays on the head; glow shows the light colour
+  const glow = document.getElementById("fiberGlow");
+  const on = lightIntensityAt(simTime) > 0;
+  glow.setAttribute("opacity", on ? Math.min(1, 0.25 + +ui.irr.value / 12) : 0);
+  document.querySelector("#glow stop").setAttribute("stop-color", wavelengthToRGB(+ui.wl.value));
+  document.querySelectorAll("#glow stop")[1].setAttribute("stop-color", wavelengthToRGB(+ui.wl.value));
+}
+
+// ---------------------------------------------------------------------------
+// Drawing: raster, trace, spectrum
+// ---------------------------------------------------------------------------
+function drawRaster() {
+  const cv = document.getElementById("raster"), g = cv.getContext("2d"), W = cv.width, Hh = cv.height;
+  g.clearRect(0, 0, W, Hh);
+  const win = 2000, top = 22, rowH = (Hh - top - 6) / N, t0 = simTime - win;
+  // light bars
+  g.fillStyle = wavelengthToRGB(+ui.wl.value);
+  for (const [a, b] of lightHistory) { if (b < t0) continue; const x0 = Math.max(0, (a - t0) / win * W), x1 = Math.min(W, ((b ?? simTime) - t0) / win * W); g.fillRect(x0, 4, Math.max(1, x1 - x0), 10); }
+  if (freq > 0 && lightOn) { /* show flashes */ }
+  cells.forEach((c, i) => {
+    const y = top + i * rowH;
+    if (c.tagged || (scenario !== S.fear && c.gChR2 > 0)) { g.fillStyle = "rgba(31,111,209,.08)"; g.fillRect(0, y, W, rowH - 1); }
+    g.fillStyle = "#1d2433";
+    for (const s of c.spikes) if (s > t0) g.fillRect((s - t0) / win * W, y + 2, 2, rowH - 5);
+  });
+  g.fillStyle = "#5b6475"; g.font = "12px system-ui"; g.fillText("2 s", W - 22, 15);
+}
+function drawTrace() {
+  const cv = document.getElementById("trace"), g = cv.getContext("2d"), W = cv.width, Hh = cv.height;
+  g.clearRect(0, 0, W, Hh);
+  const yOf = v => Hh - 8 - (v + 80) / 130 * (Hh - 16);
+  g.strokeStyle = "#dde1e8"; g.beginPath(); g.moveTo(0, yOf(0)); g.lineTo(W, yOf(0)); g.stroke();
+  const n = traceCount; if (n < 2) return;
+  g.strokeStyle = "#1f6fd1"; g.lineWidth = 1.5; g.beginPath();
+  const step = n / W;
+  for (let x = 0; x < W; x++) {
+    const i0 = Math.floor(x * step), i1 = Math.floor((x + 1) * step);
+    let lo = Infinity, hi = -Infinity;
+    for (let i = i0; i < Math.max(i1, i0 + 1); i++) { const v = traceBuf[(traceIdx - n + i + TRACE_N) % TRACE_N]; if (v < lo) lo = v; if (v > hi) hi = v; }
+    if (x === 0) g.moveTo(x, yOf(hi)); g.lineTo(x, yOf(hi)); g.lineTo(x, yOf(lo));
+  }
+  g.stroke(); g.fillStyle = "#5b6475"; g.font = "12px system-ui"; g.fillText("0 mV", 4, yOf(0) - 3); g.fillText("-65 mV", 4, yOf(-65) - 3);
+}
+function drawSpectrum() {
+  const cv = document.getElementById("spectrum"), g = cv.getContext("2d"), W = cv.width, Hh = cv.height;
+  g.clearRect(0, 0, W, Hh);
+  const x = l => (l - 400) / 280 * (W - 20) + 10, y = s => Hh - 30 - s * (Hh - 50);
+  for (let l = 400; l <= 680; l += 2) { g.fillStyle = wavelengthToRGB(l); g.fillRect(x(l), Hh - 22, (W - 20) / 140 + 1, 10); }
+  for (const [f, col] of [[chr2Spectrum, "#1f6fd1"], [nphrSpectrum, "#d98e04"]]) {
+    g.strokeStyle = col; g.lineWidth = 3; g.beginPath();
+    for (let l = 400; l <= 680; l += 2) { const px = x(l), py = y(f(l)); l === 400 ? g.moveTo(px, py) : g.lineTo(px, py); }
+    g.stroke();
+  }
+  const l = +ui.wl.value; g.strokeStyle = "#1d2433"; g.setLineDash([5, 4]); g.lineWidth = 2;
+  g.beginPath(); g.moveTo(x(l), 8); g.lineTo(x(l), Hh - 24); g.stroke(); g.setLineDash([]);
+  g.fillStyle = "#1d2433"; g.font = "13px system-ui";
+  g.fillText(`ChR2 ${(100 * chr2Spectrum(l)).toFixed(0)} %   NpHR ${(100 * nphrSpectrum(l)).toFixed(0)} %`, 12, 18);
+}
+function stats(el, rows) { el.innerHTML = rows.map(([k, v]) => `<div class="stat"><span>${k}</span><b>${v}</b></div>`).join(""); }
+
+function wavelengthToRGB(l) {
+  let r = 0, g = 0, b = 0;
+  if (l < 440) { r = -(l - 440) / 60; b = 1; } else if (l < 490) { g = (l - 440) / 50; b = 1; }
+  else if (l < 510) { g = 1; b = -(l - 510) / 20; } else if (l < 580) { r = (l - 510) / 70; g = 1; }
+  else if (l < 645) { r = 1; g = -(l - 645) / 65; } else { r = 1; }
+  return `rgb(${Math.round(255 * r)},${Math.round(255 * g)},${Math.round(255 * b)})`;
+}
+
+// ---------------------------------------------------------------------------
+// Controls
+// ---------------------------------------------------------------------------
+function refreshLabels() {
+  ui.wlv.textContent = ui.wl.value + " nm"; ui.irrv.textContent = (+ui.irr.value).toFixed(1) + " mW/mm²";
+  ui.lightBtn.style.background = lightOn ? wavelengthToRGB(+ui.wl.value) : "#444";
+  ui.lightBtn.style.color = lightOn && +ui.wl.value > 480 && +ui.wl.value < 600 ? "#1d2433" : "#fff";
+  ui.lightBtn.style.setProperty("--glow", wavelengthToRGB(+ui.wl.value));
+  ui.lightBtn.classList.toggle("on", lightOn);
+  ui.lightBtn.setAttribute("aria-pressed", lightOn);
+  ui.lightBtn.innerHTML = lightOn ? "Light on: click to stop" : "Light off: click or hold <kbd>Space</kbd>";
+  document.querySelectorAll("#presets .chip").forEach(b => b.setAttribute("aria-pressed", +b.dataset.wl === +ui.wl.value));
+  drawSpectrum();
+}
+function setLight(on) {
+  if (on === lightOn) return;
+  lightOn = on;
+  if (on) { lightOnSince = simTime; lightHistory.push([simTime, null]); }
+  else if (lightHistory.length) lightHistory[lightHistory.length - 1][1] = simTime;
+  refreshLabels();
+}
+ui.wl.oninput = refreshLabels; ui.irr.oninput = refreshLabels;
+document.querySelectorAll("#presets .chip").forEach(b => b.onclick = () => { ui.wl.value = b.dataset.wl; refreshLabels(); });
+document.querySelectorAll("#modes .chip").forEach(b => b.onclick = () => {
+  freq = +b.dataset.f; lightOnSince = simTime;
+  document.querySelectorAll("#modes .chip").forEach(x => x.setAttribute("aria-pressed", x === b));
+});
+ui.lightBtn.onclick = () => setLight(!lightOn);
+let spaceHeld = false;
+window.addEventListener("keydown", e => { if (e.code === "Space" && !spaceHeld && e.target.tagName !== "INPUT") { e.preventDefault(); spaceHeld = true; setLight(true); } });
+window.addEventListener("keyup", e => { if (e.code === "Space") { spaceHeld = false; setLight(false); } });
+
+document.querySelectorAll("nav.tabs button").forEach(b => b.onclick = () => selectScenario(b.dataset.s));
+function selectScenario(name) {
+  if (scenario && scenario.leave) scenario.leave();
+  document.querySelectorAll("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.s === name));
+  scenario = S[name]; setLight(false); resetGuide(name); lightHistory = []; traceIdx = 0; traceCount = 0; simTime = 0;
+  document.getElementById("whiskers").removeAttribute("transform");
+  scenario.init();
+  document.getElementById("nTitle").textContent = scenario.title;
+  document.getElementById("nBody").innerHTML = scenario.body;
+  document.getElementById("neuronTitle").textContent = scenario.neuronTitle;
+}
+
+// ---------------------------------------------------------------------------
+// "Try this" guide: numbered steps that tick off when the viewer has done them
+// ---------------------------------------------------------------------------
+const isBlue = () => chr2Spectrum(+ui.wl.value) > 0.5;
+const isOffColour = () => nphrSpectrum(+ui.wl.value) > 0.5;
+const GUIDE = {
+  wake: [
+    { t: "The mouse is asleep. Look at the <b>brain cells</b> panel (rows of ticks): they are quiet.",
+      why: "These cells keep an animal awake when they are busy. Right now they rest.",
+      check: () => guide.t > 4000 },
+    { t: "Pick <b>blue</b> light and press the big <b>Light</b> button (or hold the space bar).",
+      why: "These cells carry the light switch from algae (ChR2), and it reacts to blue light.",
+      check: () => lightOn && isBlue() },
+    { t: "Keep the blue light on and watch the cells start to click. Does the mouse wake up?",
+      why: "Each black tick is one spike. Many spikes from these cells wake the mouse up.",
+      check: () => S.wake.awake },
+    { t: "Switch the light off and wait until the mouse falls asleep again.",
+      why: "Without light the switch closes and the cells calm down.",
+      check: () => !lightOn && !S.wake.awake },
+    { t: "Now try <b>yellow</b> or <b>red</b> light. Does the mouse wake up this time?",
+      why: "No! The switch ignores yellow and red light. The colour matters.",
+      check: dt => { if (lightOn && !isBlue()) guide.acc += dt; return guide.acc > 3000; } },
+    { t: "Back to <b>blue</b>: try the rhythms <b>5 Hz</b> and <b>40 Hz</b>. Which wakes the mouse faster?",
+      why: "Faster flashing gives more spikes, so the mouse wakes sooner, as in the real experiment.",
+      check: () => { if (lightOn && isBlue() && freq > 0) guide.freqs.add(freq); return guide.freqs.size >= 2; } },
+  ],
+  fear: [
+    { t: "Press the <b>Light</b> button with <b>blue</b> light. Watch the mouse and the cells.",
+      why: "Nothing happens: no brain cell has the light switch yet.",
+      check: dt => { if (lightOn && isBlue()) guide.acc += dt; return guide.acc > 2000; } },
+    { t: "Switch the light off. Then press <b>2. Fear learning</b> (below the brain cells).",
+      why: "The mouse gets a small fright in box A. The cells that are busy right now store this memory, and only they get the light switch.",
+      check: () => S.fear.phase === "tagged" },
+    { t: "Press <b>3. Move the mouse to the safe box B</b>.",
+      why: "Box B looks different and nothing bad ever happens there. The mouse explores calmly.",
+      check: () => S.fear.box === "B" },
+    { t: "Now shine <b>blue</b> light again.",
+      why: "The light switches on only the memory cells. The mouse freezes as if it were back in box A: we replayed a memory!",
+      check: () => mouseMode === "freeze" },
+    { t: "Switch the light off, then try <b>yellow</b> light.",
+      why: "Without blue light the memory cells go quiet and the mouse explores again. Yellow does nothing.",
+      check: dt => { if (lightOn && !isBlue()) guide.acc += dt; return guide.acc > 2000; } },
+  ],
+  whisk: [
+    { t: "Look at the cells and the whiskers: the cells click now and then on their own.",
+      why: "The cells that move the whiskers are a little busy even at rest.",
+      check: () => guide.t > 4000 },
+    { t: "Pick <b>blue</b> light, rhythm <b>20 Hz</b>, and switch it on.",
+      why: "Every flash makes the cells fire together, and the whiskers sweep with each flash.",
+      check: () => lightOn && isBlue() && freq > 0 && S.whisk.deflect > 8 },
+    { t: "Now pick <b>yellow</b> light, rhythm <b>continuous</b>, and switch it on.",
+      why: "These cells also carry a second switch (NpHR) that reacts to yellow and keeps them quiet. Look: the ticks stop.",
+      check: () => lightOn && isOffColour() && !isBlue() && freq === 0 && popRate(1000) < 1 },
+    { t: "Switch back and forth between <b>blue</b> and <b>yellow</b> while the light is on.",
+      why: "Two colours, two opposite commands, in the same cells: on and off with light.",
+      check: () => { if (lightOn) { const c = isBlue() ? "b" : "y"; if (guide.last && c !== guide.last) guide.n++; guide.last = c; } return guide.n >= 2; } },
+  ],
+};
+const NEXT = { wake: "fear", fear: "whisk", whisk: null };
+let guide = { name: "wake", i: 0, t: 0, acc: 0, n: 0, last: null, freqs: new Set() };
+function resetGuide(name) { guide = { name, i: 0, t: 0, acc: 0, n: 0, last: null, freqs: new Set() }; renderGuide(); }
+function renderGuide() {
+  const steps = GUIDE[guide.name];
+  document.getElementById("guideList").innerHTML = steps.map((st, k) =>
+    `<li data-n="${k + 1}" class="${k < guide.i ? "done" : k === guide.i ? "current" : ""}">${st.t}${k < guide.i ? `<span class="why">${st.why}</span>` : ""}</li>`).join("");
+  const fin = document.getElementById("guideFinish");
+  const done = guide.i >= steps.length;
+  document.getElementById("guideSkip").style.display = done ? "none" : "";
+  fin.innerHTML = done ? `<div class="finish"><b>Well done!</b> You just did what the Nobel Prize winners made possible.` +
+    (NEXT[guide.name] ? `<br><button id="guideNext">Next experiment &rarr;</button>` : `<br>You have tried all three experiments.`) + `</div>` : "";
+  if (done && NEXT[guide.name]) document.getElementById("guideNext").onclick = () => selectScenario(NEXT[guide.name]);
+}
+function advanceGuide() { guide.i++; guide.t = 0; guide.acc = 0; guide.n = 0; guide.last = null; renderGuide(); }
+function updateGuide(dt) {
+  const steps = GUIDE[guide.name];
+  if (guide.i >= steps.length) return;
+  guide.t += dt;
+  if (steps[guide.i].check(dt)) advanceGuide();
+}
+document.getElementById("guideSkip").onclick = () => { if (guide.i < GUIDE[guide.name].length) advanceGuide(); };
+document.getElementById("welcomeClose").onclick = () => { document.getElementById("welcome").style.display = "none"; };
+
+// ---------------------------------------------------------------------------
+// Main loop: neurons in real time, 10 us steps
+// ---------------------------------------------------------------------------
+let last = performance.now();
+function frame(now) {
+  const dtReal = Math.min(50, now - last); last = now;
+  stepCells(Math.round(dtReal / DT));
+  scenario.update(dtReal);
+  updateGuide(dtReal);
+  drawMouse(dtReal); drawRaster(); drawTrace();
+  stats(ui.neuronStats, [["Mean firing rate", popRate(1000).toFixed(1) + " spikes/s"],
+    ["Open ChR2, traced neuron", cells.length ? (100 * cells[focusCell()].o).toFixed(1) + " %" : "-"],
+    ["Desensitised ChR2, traced neuron", cells.length ? (100 * cells[focusCell()].d).toFixed(0) + " %" : "-"]]);
+  requestAnimationFrame(frame);
+}
+document.querySelector('#modes .chip[data-f="20"]').setAttribute("aria-pressed", "true");
+selectScenario("wake"); refreshLabels(); requestAnimationFrame(frame);
+</script>
+</body>
+</html>
