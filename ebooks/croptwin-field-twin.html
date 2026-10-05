@@ -76,11 +76,11 @@
     <h2>How to watch it from space</h2>
     <p class="lede">A satellite like Sentinel-2 watches the field from space. It passes over the field every two to three days and sees 10 m per pixel; the data is free. Here is what it saw on 4 July 2026, rendered as a photo.</p>
     <figure><img src="croptwin/truecolor_outlined.jpg" alt="Sentinel-2 photo with the field outlined and the read point marked">
-      <figcaption>The field (outlined) and its neighbours, 4 July 2026. The dot is where every number in this article is read. Contains modified Copernicus Sentinel data.</figcaption></figure>
-    <p style="margin-top:18px">The satellite does not only take photos. On every pass it records thirteen colour bands, each a slice of the spectrum, some beyond what the eye can see. We need two of them. From those two we compute a map of the same area, one number per pixel, which I will call the greenness plot.</p>
+      <figcaption>The field (outlined) and its neighbors, 4 July 2026. The dot is where every number in this article is read. Contains modified Copernicus Sentinel data.</figcaption></figure>
+    <p style="margin-top:18px">The satellite does not only take photos. On every pass it records thirteen color bands, each a slice of the spectrum, some beyond what the eye can see. We need two of them. From those two we compute a map of the same area, one number per pixel, which I will call the greenness plot.</p>
     <figure><img src="croptwin/ndvi-explainer.png" alt="How NDVI is computed from red and near-infrared reflectance" style="border:0">
       <figcaption>The plot is computed from two bands, pixel by pixel: (B08 − B04) / (B08 + B04), where B08 is the near-infrared band (842 nm) and B04 the red band (665 nm).</figcaption></figure>
-    <p style="margin-top:18px">The expression is the NDVI, the normalised difference vegetation index. A living leaf swallows red light for photosynthesis and throws back near-infrared from its cell structure; bare soil reflects both about equally. The contrast is the NDVI: near 0.2 for bare soil, above 0.9 for a field fully covered by leaf.</p>
+    <p style="margin-top:18px">The expression is the NDVI, the normalized difference vegetation index. A living leaf swallows red light for photosynthesis and throws back near-infrared from its cell structure; bare soil reflects both about equally. The contrast is the NDVI: near 0.2 for bare soil, above 0.9 for a field fully covered by leaf.</p>
     <p>Reflectance is the share of sunlight the ground sends back in each band. On 22 September 2025, just after sowing: red 0.061, near-infrared 0.103. NDVI = (0.103 − 0.061) / (0.103 + 0.061) = <b>0.26</b>, bare soil. At the same point on 30 May 2026: red 0.020, near-infrared 0.469. NDVI = (0.469 − 0.020) / (0.469 + 0.020) = <b>0.92</b>, a closed canopy. The leaf swallowed nearly all the red and threw back the infrared. This number, one per clear pass, is what the model is compared against.</p>
     <p>Seven passes over the same field:</p>
     <div class="phases">
@@ -182,11 +182,11 @@ Dataset[observations]
 
   <section>
     <span class="num">05—THE MODEL</span>
-    <h2>Modelling the crop as a system</h2>
+    <h2>Modeling the crop as a system</h2>
     <p class="lede">Here is the crop year as a flow diagram, the process the model has to reproduce:</p>
     <figure><img src="croptwin/crop-stages.png" alt="The crop year as a flowchart: eight stages and the three drivers" style="border:0;max-width:520px">
       <figcaption>Eight stages, three drivers. Warmth sets the pace of emergence and winter, light drives the spring growth, water matters in grain fill.</figcaption></figure>
-    <p style="margin-top:18px">The crop growth can be modelled using the concept of system dynamics, where a <b>stock</b> is something that accumulates and a <b>flow</b> is a rate that fills or drains it. Soil water, green leaf, dry matter and thermal time are the stocks.</p>
+    <p style="margin-top:18px">The crop growth can be modeled using the concept of system dynamics, where a <b>stock</b> is something that accumulates and a <b>flow</b> is a rate that fills or drains it. Soil water, green leaf, dry matter and thermal time are the stocks.</p>
     <figure><img src="croptwin/soilwater.png" alt="System Modeler diagram of the soil-water subsystem">
       <figcaption>One subsystem in full, the soil-water bucket. Purple is water, blue is information. Rain from the cloud at left fills the stock; evapotranspiration leaves to the right, drainage drops out below. The bus at top right brings in rain, sunlight and canopy cover, and takes back the water stress read from the level at bottom right. Diagram in System Modeler, created with the Business Simulation Library.</figcaption></figure>
     <p style="margin-top:18px">Leaf works the same way. Light the canopy catches becomes sugar; a share of that becomes new leaf, which catches more light: until the canopy intercepts nearly all of it and the loop starves. After flowering the same stock drains as the canopy yellows.</p>
@@ -255,7 +255,7 @@ URLExecute["https://datadrop.wolframcloud.com/api/v1.0/Recent?bin=" &lt;&gt; bin
 
   <section>
     <span class="num">09—THE FACE</span>
-    <h2>A dashboard, with your favourite LLM</h2>
+    <h2>A dashboard, with your favorite LLM</h2>
     <p class="lede">Decide what matters here: the field itself, what the satellite sees against what the twin expects, what the satellite changed today, the decisions, the warmth accumulated, and the yield the twin foresees. Then let an LLM write the HTML. The page reads the databin when it opens and can be hosted anywhere.</p>
     <figure><img src="croptwin/croptwin.gif" alt="The model alone and the twin while satellite passes land on them" style="border:0">
       <figcaption>Last frame of the season animation for harvest 2022: the dotted line is the model alone, weather only; the solid line is the twin, pulled toward each satellite pass as it arrived. Error over the year 0.071 → 0.056. The dashboard replays last season the same way, over the field itself.</figcaption></figure>
