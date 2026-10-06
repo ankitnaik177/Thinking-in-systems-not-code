@@ -80,6 +80,9 @@
 <header>
   <h1>Be the patient: seeing again with a light switch from an alga</h1>
   <p>Follow the steps on the left. Move your mouse over the pictures to "move your head".</p>
+  <!-- LinkedIn article: replace ARTICLE_URL and remove the comment markers when the article is published
+  <p><a href="ARTICLE_URL">Read the story behind this demo: Can a blind person see?</a></p>
+  -->
   <span class="disclaimer">Illustration of how the system works, not what the patient saw. The speed limit comes from our ChR2 model, not from the patient's ChrimsonR.</span>
 </header>
 
@@ -266,7 +269,7 @@
   cBrain.addEventListener('click', e => {
     if (current() !== 'locate') return;
     const r = cBrain.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * W - state.head.x, y = (e.clientY - r.top) / r.height * H - state.head.y, n = state.notebook;
-    if (Math.abs(x - n.x) < 26 && Math.abs(y - n.y) < 20) { mark('locate'); say('Found it. The patient did this too: <b>locate</b> an object, and then reach out and <b>touch</b> it.', 'good'); }
+    if (Math.abs(x - n.x) < 26 && Math.abs(y - n.y) < 20) { complete('locate'); say('Found it. The patient did this too: <b>locate</b> an object, and then reach out and <b>touch</b> it.', 'good'); }
     else say('Not there. Move your head a little and look for where the spikes cluster.', 'warn');
   });
 
@@ -282,35 +285,47 @@
   document.getElementById('autoLook').onchange = e => state.autoLook = e.target.checked;
 
   // ---------- guide ----------
+  function setGoggles(on) { if (state.goggles !== on) gBtn.click(); }
+  function setColour(c) { state.colour = c; pick('colourRow', 'colour', c); }
+  function setRate(r) { rate.value = r; rate.oninput(); }
+  function setHealthy(on) { document.getElementById('healthy').checked = on; state.healthy = on; }
+  // each step sets up the controls it needs, so any step can be replayed on its own
+  function base(scene) { showAnswers(false); setHealthy(false); setGoggles(true); setColour('amber'); setRate(10); if (scene) setScene(scene); }
   const GUIDE = [
-    { id: 'blind', text: '1. Look at the brain picture. Nothing?', setup: () => { setScene('cups'); }, msg: 'The patient has a light switch in the eye, but room light is far too dim to open it. Without the goggles, the patient saw nothing.', done: () => !state.goggles && state.t - stepT > 4 },
-    { id: 'goggles', text: '2. Put the goggles on', msg: 'Press <b>Goggles</b> on the right.', done: () => state.goggles },
-    { id: 'look', text: '3. Move your head: move the mouse over the pictures', msg: 'The camera only sees <b>changes</b>. A still table sends nothing, so move your head.', done: () => eventsSeen > 400 },
-    { id: 'count', text: '4. How many cups are on the table?', setup: () => { state.cups = 1 + Math.floor(Math.random() * 4); setScene('cups'); showAnswers(true); }, msg: 'Count the cups using <b>only picture 3</b>. Then press a number below.', done: () => false },
-    { id: 'locate', text: '5. Where is the notebook? Click on it in picture 3', setup: () => { showAnswers(false); state.notebook = { x: 30 + Math.random() * 100, y: 50 + Math.random() * 20 }; setScene('notebook'); }, msg: 'Click where you think the notebook is, in <b>picture 3</b>.', done: () => false },
-    { id: 'street', text: '6. Find the street crossing', setup: () => setScene('street'), msg: 'The patient reported seeing the black and white stripes of a pedestrian crossing. Move your head and look for stripes.', done: () => state.scene === 'street' && spikeLog.length > 60 },
-    { id: 'blue', text: '7. Switch the goggle light to blue', msg: 'The patient's switch answers to <b>amber</b>. Blue light hardly opens it: almost every flash is lost.', done: () => state.colour === 'blue' },
-    { id: 'fast', text: '8. Back to amber, then 40 flashes per second', msg: 'Faster flashes should mean a smoother picture. But tired switches need time to recover: in our model only about 1 in 4 fast flashes gives a spike.', done: () => state.colour === 'amber' && state.rate >= 40 },
-    { id: 'healthy', text: '9. Compare with a healthy eye', msg: 'A healthy eye sends colour and fine detail, even of things that do not move. The alga\'s switch gives back light, not the eye.', done: () => state.healthy },
+    { id: 'blind', text: '1. Look at the brain picture. Nothing?', setup: () => { base('cups'); setGoggles(false); }, msg: 'The patient has a light switch in the eye, but room light is far too dim to open it. Without the goggles, the patient saw nothing.', done: () => state.t - stepT > 4 },
+    { id: 'goggles', text: '2. Put the goggles on', setup: () => { base('cups'); setGoggles(false); }, msg: 'Press <b>Goggles</b> on the right.', done: () => state.goggles },
+    { id: 'look', text: '3. Move your head: move the mouse over the pictures', setup: () => base('cups'), msg: 'The camera only sees <b>changes</b>. A still table sends nothing, so move your head.', done: () => eventsSeen - eventsAtStep > 400 },
+    { id: 'count', text: '4. How many cups are on the table?', setup: () => { base(); state.cups = 1 + Math.floor(Math.random() * 4); setScene('cups'); showAnswers(true); }, msg: 'Count the cups using <b>only picture 3</b>. Then press a number below.', done: () => false },
+    { id: 'locate', text: '5. Where is the notebook? Click on it in picture 3', setup: () => { base(); state.notebook = { x: 30 + Math.random() * 100, y: 50 + Math.random() * 20 }; setScene('notebook'); }, msg: 'Click where you think the notebook is, in <b>picture 3</b>.', done: () => false },
+    { id: 'street', text: '6. Find the street crossing', setup: () => base('street'), msg: 'The patient reported seeing the black and white stripes of a pedestrian crossing. Move your head and look for stripes.', done: () => state.scene === 'street' && spikeLog.length > 60 && state.t - stepT > 1 },
+    { id: 'blue', text: '7. Switch the goggle light to blue', setup: () => base('cups'), msg: 'The patient\'s switch answers to <b>amber</b>. Blue light hardly opens it: almost every flash is lost.', done: () => state.colour === 'blue' },
+    { id: 'fast', text: '8. Back to amber, then 40 flashes per second', setup: () => base('cups'), msg: 'Faster flashes should mean a smoother picture. But tired switches need time to recover: in our model only about 1 in 4 fast flashes gives a spike.', done: () => state.colour === 'amber' && state.rate >= 40 },
+    { id: 'healthy', text: '9. Compare with a healthy eye', setup: () => base('cups'), msg: 'A healthy eye sends colour and fine detail, even of things that do not move. The alga\'s switch gives back light, not the eye.', done: () => state.healthy },
   ];
-  const doneSet = new Set(); let cur = 0, started = false, stepT = 0;
+  const doneSet = new Set(); let cur = 0, started = false, stepT = 0, eventsAtStep = 0, visitDone = false;
   const stepsEl = document.getElementById('steps');
   function current() { return GUIDE[cur] ? GUIDE[cur].id : null; }
+  // a step can be opened if it is done, or if it is the first one not yet done
+  function reachable() { const k = GUIDE.findIndex(g => !doneSet.has(g.id)); return k < 0 ? GUIDE.length - 1 : k; }
   function buildSteps() {
-    stepsEl.innerHTML = '';
-    GUIDE.forEach((g, i) => { const b = document.createElement('button'); b.textContent = (doneSet.has(g.id) ? '✓ ' : '') + g.text; b.className = (doneSet.has(g.id) ? 'done ' : '') + (i === cur ? 'current' : ''); b.disabled = i > cur; b.onclick = () => go(i); stepsEl.appendChild(b); });
+    stepsEl.innerHTML = ''; const last = reachable();
+    GUIDE.forEach((g, i) => { const b = document.createElement('button'); b.textContent = (doneSet.has(g.id) ? '\u2713 ' : '') + g.text; b.className = (doneSet.has(g.id) ? 'done ' : '') + (i === cur ? 'current' : ''); b.disabled = i > last && i !== cur; b.onclick = () => go(i); stepsEl.appendChild(b); });
   }
-  function go(i) { cur = i; stepT = state.t; const g = GUIDE[i]; if (g.setup) g.setup(); say(g.msg); buildSteps(); }
-  function mark(id) { if (doneSet.has(id)) return; doneSet.add(id); const i = GUIDE.findIndex(g => g.id === id); if (i === cur && cur < GUIDE.length - 1) setTimeout(() => { if (cur === i) go(i + 1); }, 2600); buildSteps(); }
-  function checkGuide() { if (!started) return; const g = GUIDE[cur]; if (g && !doneSet.has(g.id) && g.done()) { mark(g.id); if (g.id !== 'blind') say('✓ ' + g.msg, 'good'); } }
+  function go(i) { cur = i; stepT = state.t; eventsAtStep = eventsSeen; visitDone = false; const g = GUIDE[i]; if (g.setup) g.setup(); say(g.msg); buildSteps(); }
+  // finish the current step (also when it is replayed) and move on after a pause
+  function complete(id) {
+    if (current() !== id || visitDone) return;
+    visitDone = true; doneSet.add(id); buildSteps();
+    const i = cur; if (i < GUIDE.length - 1) setTimeout(() => { if (cur === i && visitDone) go(i + 1); }, 2600);
+  }
+  function checkGuide() { if (!started) return; const g = GUIDE[cur]; if (g && !visitDone && g.done()) { complete(g.id); if (g.id !== 'blind') say('\u2713 ' + g.msg, 'good'); } }
   function say(html, kind) { const c = document.getElementById('caption'); c.innerHTML = html; c.className = 'caption' + (kind ? ' ' + kind : ''); }
   const ans = document.getElementById('answers');
-  for (let n = 1; n <= 4; n++) { const b = document.createElement('button'); b.textContent = n; b.onclick = () => { if (n === state.cups) { mark('count'); say(`Yes, ${n}. The patient could <b>count</b> objects on a table like this, with the treated eye and the goggles.`, 'good'); } else say('Not quite. Move your head and count the clusters of spikes again.', 'warn'); }; ans.appendChild(b); }
+  for (let n = 1; n <= 4; n++) { const b = document.createElement('button'); b.textContent = n; b.onclick = () => { if (current() !== 'count') return; if (n === state.cups) { complete('count'); say(`Yes, ${n}. The patient could <b>count</b> objects on a table like this, with the treated eye and the goggles.`, 'good'); } else say('Not quite. Move your head and count the clusters of spikes again.', 'warn'); }; ans.appendChild(b); }
   function showAnswers(on) { ans.classList.toggle('show', on); }
-  document.getElementById('resetGuide').onclick = () => { doneSet.clear(); state.goggles = true; gBtn.click(); state.colour = 'amber'; pick('colourRow', 'colour', 'amber'); rate.value = 10; rate.oninput(); document.getElementById('healthy').checked = false; state.healthy = false; eventsSeen = 0; go(0); };
+  document.getElementById('resetGuide').onclick = () => { doneSet.clear(); go(0); };
 
-  document.getElementById('wGo').onclick = () => { document.getElementById('welcome').remove(); started = true; go(0); };
-  buildSteps();
+  document.getElementById('wGo').onclick = () => { document.getElementById('welcome').remove(); started = true; go(0); };  buildSteps();
   window.__demo = { state, tick, GUIDE, fidelity };   // for testing
   setInterval(tick, 1000 * DT);
 })();
