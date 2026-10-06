@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Be the patient: seeing again with a light switch from an alga</title>
+<meta name="description" content="Try the tasks of the first patient who saw again after optogenetic therapy: goggles, a light switch from an alga, and why it is not normal sight.">
+<meta property="og:title" content="Be the patient: seeing again with a light switch from an alga">
+<meta property="og:description" content="Count cups, find a notebook, spot a street crossing with the goggles and the alga's light switch behind the 2026 Nobel Prize in Physiology or Medicine. An illustration, not what the patient saw.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.systemsnotcode.com/labs/optogenetics/patient/">
+<meta property="og:image" content="https://www.systemsnotcode.com/labs/optogenetics/patient/cover.png">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  :root {
+    --bg: #f6f7f9; --panel: #ffffff; --ink: #1d2433; --muted: #5b6475; --line: #dde1e8;
+    --blue: #1f6fd1; --green: #1f8a4c; --red: #c0392b; --amber: #e8960c;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--ink); background: var(--bg); }
+  header { padding: 18px 24px 8px; }
+  header h1 { margin: 0 0 4px; font-size: 22px; }
+  header p { margin: 0; color: var(--muted); max-width: 1000px; }
+  .disclaimer { display: inline-block; margin-top: 8px; padding: 4px 10px; border-radius: 999px; background: #fff4d6; color: #7a5300; font-size: 13px; }
+  main { display: grid; grid-template-columns: 270px 1fr 290px; gap: 16px; padding: 16px 24px 24px; }
+  @media (max-width: 1150px) { main { grid-template-columns: 1fr; } }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; }
+  .panel h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  label { display: block; font-size: 13px; color: var(--muted); margin: 12px 0 4px; }
+  input[type=range] { width: 100%; }
+  .row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { border: 1px solid var(--line); background: #fff; border-radius: 8px; padding: 6px 10px; cursor: pointer; font: inherit; font-size: 13px; }
+  .chip[aria-pressed="true"] { outline: 2px solid var(--ink); background: #f0f2f6; }
+  .swatch { display: inline-block; width: 13px; height: 13px; border-radius: 50%; vertical-align: -2px; margin-right: 5px; border: 1px solid rgba(0,0,0,.2); }
+  .bigbtn { width: 100%; margin-top: 4px; padding: 12px; font: 600 16px system-ui, sans-serif; border-radius: 10px; border: none; cursor: pointer; color: #fff; background: #444; }
+  .bigbtn.on { background: #b86e00; box-shadow: 0 0 0 4px rgba(232,150,12,.25), 0 0 24px #e8960c; }
+  .value { float: right; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .stat { display: flex; justify-content: space-between; gap: 10px; padding: 5px 0; border-bottom: 1px dashed var(--line); font-size: 14px; }
+  .stat:last-child { border-bottom: none; }
+  .stat b { font-variant-numeric: tabular-nums; text-align: right; }
+  .steps { display: grid; gap: 6px; margin-top: 6px; }
+  .steps button { text-align: left; border: 1px solid var(--line); background: #fff; padding: 8px 10px; border-radius: 8px; cursor: pointer; font: inherit; font-size: 14px; }
+  .steps button.done { background: #eaf6ee; border-color: #b9e0c6; }
+  .steps button.current { outline: 2px solid var(--amber); }
+  .steps button:disabled { opacity: .45; cursor: default; }
+  .steps button.done:disabled { opacity: 1; }
+  .views { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  @media (max-width: 800px) { .views { grid-template-columns: 1fr; } }
+  .view h3 { margin: 0 0 6px; font-size: 14px; }
+  .view p { margin: 4px 0 0; font-size: 12.5px; color: var(--muted); }
+  .view canvas { width: 100%; aspect-ratio: 16 / 10; display: block; border-radius: 10px; background: #111; cursor: crosshair; image-rendering: pixelated; }
+  .arrow { text-align: center; color: var(--muted); font-size: 13px; }
+  .caption { margin-top: 12px; padding: 10px 12px; border-radius: 10px; background: #f3f5f8; min-height: 3.2em; font-size: 14.5px; }
+  .caption.good { background: #eaf6ee; } .caption.warn { background: #fff4d6; }
+  .answers { display: none; gap: 6px; margin-top: 8px; } .answers.show { display: flex; }
+  .answers button { width: 44px; height: 38px; font: 600 16px system-ui; border-radius: 8px; border: 1px solid var(--line); background: #fff; cursor: pointer; }
+  dl { margin: 6px 0 0; font-size: 13.5px; } dt { font-weight: 600; margin-top: 8px; } dd { margin: 2px 0 0; color: var(--muted); }
+  footer { padding: 0 24px 24px; color: var(--muted); font-size: 12.5px; max-width: 1100px; }
+  footer a { color: var(--blue); }
+  #welcome { position: fixed; inset: 0; background: rgba(20,24,33,.55); display: flex; align-items: center; justify-content: center; z-index: 10; }
+  #welcome .card { background: #fff; border-radius: 16px; padding: 24px 28px; max-width: 560px; box-shadow: 0 20px 60px rgba(0,0,0,.3); }
+  #welcome h2 { margin: 0 0 8px; }
+  #welcome p { margin: 8px 0; }
+  #welcome button { margin-top: 10px; padding: 10px 18px; border: none; border-radius: 10px; background: var(--ink); color: #fff; font: 600 15px system-ui; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<div id="welcome" role="dialog" aria-modal="true" aria-labelledby="wTitle">
+  <div class="card">
+    <h2 id="wTitle">Be the patient</h2>
+    <p>In 2021 a man who had been blind for years could find and count objects on a table again.</p>
+    <p>Doctors put a <b>light switch from an alga</b> into the nerve cells at the back of his eye. It answers to <b>amber</b> light. He also wore <b>goggles</b>: a camera that sees what changes, and a lamp that flashes amber light into the eye.</p>
+    <p>Here you can try the same tasks and see why it is not normal sight.</p>
+    <button id="wGo">Start</button>
+  </div>
+</div>
+
+<header>
+  <h1>Be the patient: seeing again with a light switch from an alga</h1>
+  <p>Follow the steps on the left. Move your mouse over the pictures to "move your head".</p>
+  <span class="disclaimer">Illustration of how the system works, not what the patient saw. The speed limit comes from our ChR2 model, not from his ChrimsonR.</span>
+</header>
+
+<main>
+  <section class="panel" aria-labelledby="tryTitle">
+    <h2 id="tryTitle">Try this</h2>
+    <div class="steps" id="steps"></div>
+    <button class="chip" id="resetGuide" style="margin-top:10px">Start again</button>
+    <h2 style="margin-top:18px">Words</h2>
+    <dl>
+      <dt>Light switch</dt><dd>A protein from an alga. Light opens it, and the nerve cell fires a spike.</dd>
+      <dt>Spike</dt><dd>A short electrical pulse a nerve cell sends to the brain.</dd>
+      <dt>Goggles</dt><dd>A camera that only sees changes, and an amber lamp that flashes where something changed.</dd>
+    </dl>
+  </section>
+
+  <section class="panel" aria-labelledby="viewTitle">
+    <h2 id="viewTitle">From the table to the brain</h2>
+    <div class="views">
+      <div class="view"><h3>1. What is on the table</h3><canvas id="cScene" width="320" height="200"></canvas><p>What a healthy eye would see.</p></div>
+      <div class="view"><h3>2. What the goggles flash</h3><canvas id="cGoggle" width="320" height="200"></canvas><p>Amber flashes only where the picture changed.</p></div>
+      <div class="view"><h3 id="brainTitle">3. What the brain gets</h3><canvas id="cBrain" width="320" height="200"></canvas><p id="brainNote">Each dot is a spike. A grey ring is a flash that was lost.</p></div>
+    </div>
+    <div class="caption" id="caption">Press <b>Start</b> and follow the steps.</div>
+    <div class="answers" id="answers" aria-label="How many cups?"></div>
+  </section>
+
+  <section class="panel" aria-labelledby="ctrlTitle">
+    <h2 id="ctrlTitle">Controls</h2>
+    <button class="bigbtn" id="goggles" aria-pressed="false">Goggles: off</button>
+    <label>On the table</label>
+    <div class="row" id="sceneRow">
+      <button class="chip" data-scene="cups" aria-pressed="true">Cups</button>
+      <button class="chip" data-scene="notebook" aria-pressed="false">Notebook</button>
+      <button class="chip" data-scene="street" aria-pressed="false">Street crossing</button>
+    </div>
+    <label>Colour of the goggle light</label>
+    <div class="row" id="colourRow">
+      <button class="chip" data-colour="amber" aria-pressed="true"><span class="swatch" style="background:#ffa21a"></span>Amber</button>
+      <button class="chip" data-colour="blue" aria-pressed="false"><span class="swatch" style="background:#1c8cff"></span>Blue</button>
+    </div>
+    <label>Flashes per second <span class="value" id="rateVal">10</span></label>
+    <input type="range" id="rate" min="5" max="40" step="5" value="10">
+    <label><input type="checkbox" id="healthy"> Show a healthy eye instead</label>
+    <label><input type="checkbox" id="autoLook"> Move my head for me</label>
+    <h2 style="margin-top:18px">What is happening</h2>
+    <div class="stat"><span>Light on the switch</span><b id="sLight">room light</b></div>
+    <div class="stat"><span>Switch answers to</span><b>amber</b></div>
+    <div class="stat"><span>Flashes answered</span><b id="sFid">100 %</b></div>
+    <div class="stat"><span>Spikes in the last second</span><b id="sSpk">0</b></div>
+  </section>
+</main>
+
+<footer>
+  Based on Sahel et al., "Partial recovery of visual function in a blind patient after optogenetic therapy", Nature Medicine 27 (2021) 1223&#8211;1229: ChrimsonR in retinal ganglion cells, goggles with a camera that reacts to changes in light and projects amber pulses; with the goggles the patient could perceive, locate, count and touch objects, and without them he could not.
+  The share of flashes answered at each rate is taken from our System Modeler model of channelrhodopsin-2 in a Hodgkin&#8211;Huxley nerve cell (100 % at 5 and 10 per second, 40 % at 20, 23 % at 40). The picture sizes, the blue-light response and the brain view are illustrative.
+</footer>
+
+<script>
+(() => {
+  const W = 160, H = 100;                 // scene resolution (camera pixels)
+  const CELL = 4, GW = W / CELL, GH = H / CELL;   // nerve-cell grid
+  const cScene = document.getElementById('cScene'), cGoggle = document.getElementById('cGoggle'), cBrain = document.getElementById('cBrain');
+  const xs = cScene.getContext('2d'), xg = cGoggle.getContext('2d'), xb = cBrain.getContext('2d');
+  const off = document.createElement('canvas'); off.width = W; off.height = H; const xo = off.getContext('2d', { willReadFrequently: true });
+
+  const state = { goggles: false, scene: 'cups', colour: 'amber', rate: 10, healthy: false, autoLook: false,
+                  cups: 3, notebook: { x: 96, y: 52 }, head: { x: 0, y: 0 }, target: { x: 0, y: 0 }, pointerOver: false, t: 0 };
+  let prevL = null, pending = new Float32Array(W * H), gogFlash = new Float32Array(W * H);
+  const cells = Array.from({ length: GW * GH }, () => ({ spike: 0, lost: 0 }));
+  let spikeLog = [], nextPulse = 0, eventsSeen = 0;
+
+  // share of flashes that give a spike, from the FrequencyFollowing model (11 nS)
+  const FID = [[5, 1], [10, 1], [20, 0.4], [40, 0.225]];
+  function fidelity(f) { for (let i = 1; i < FID.length; i++) if (f <= FID[i][0]) { const [a, fa] = FID[i - 1], [b, fb] = FID[i]; return fa + (fb - fa) * (f - a) / (b - a); } return FID[FID.length - 1][1]; }
+  const colourFactor = () => state.colour === 'amber' ? 1 : 0.12;
+
+  // ---------- scene drawing (in camera pixels, shifted by the head) ----------
+  function cupPositions(n) { const xsPos = { 1: [80], 2: [58, 102], 3: [44, 80, 116], 4: [34, 64, 96, 126] }[n]; return xsPos.map(x => ({ x, y: 58 })); }
+  function drawScene(ctx, s, ox, oy) {
+    ctx.save(); ctx.scale(s, s); ctx.translate(ox, oy);
+    if (state.scene === 'street') {
+      ctx.fillStyle = '#3b3f46'; ctx.fillRect(-20, -20, W + 40, H + 40);
+      ctx.fillStyle = '#8b8f96'; ctx.fillRect(-20, 8, W + 40, 6);
+      ctx.fillStyle = '#f2f2f2'; for (let i = 0; i < 7; i++) ctx.fillRect(14 + i * 20, 30, 11, 56);
+      ctx.fillStyle = '#d7a21b'; ctx.fillRect(-20, 92, W + 40, 2);
+    } else {
+      ctx.fillStyle = '#e9e4dc'; ctx.fillRect(-20, -20, W + 40, 50);        // wall
+      ctx.fillStyle = '#8a5a35'; ctx.fillRect(-20, 30, W + 40, H);          // table
+      ctx.fillStyle = '#6d4426'; ctx.fillRect(-20, 30, W + 40, 3);
+      if (state.scene === 'cups') {
+        for (const c of cupPositions(state.cups)) {
+          ctx.fillStyle = '#fafafa'; ctx.beginPath(); ctx.moveTo(c.x - 9, c.y - 16); ctx.lineTo(c.x + 9, c.y - 16); ctx.lineTo(c.x + 7, c.y + 10); ctx.lineTo(c.x - 7, c.y + 10); ctx.closePath(); ctx.fill();
+          ctx.fillStyle = '#c94c3c'; ctx.fillRect(c.x - 8, c.y - 6, 16, 4);
+          ctx.strokeStyle = '#fafafa'; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(c.x + 10, c.y - 4, 5, -1.3, 1.3); ctx.stroke();
+        }
+      } else {
+        const n = state.notebook; ctx.fillStyle = '#1f3f8f'; ctx.fillRect(n.x - 18, n.y - 12, 36, 26);
+        ctx.fillStyle = '#f4f1e8'; ctx.fillRect(n.x - 15, n.y - 9, 28, 20); ctx.fillStyle = '#9aa7c7'; for (let i = 0; i < 4; i++) ctx.fillRect(n.x - 12, n.y - 5 + i * 5, 22, 1);
+      }
+    }
+    ctx.restore();
+  }
+
+  // ---------- one tick ----------
+  const DT = 1 / 30;
+  function tick() {
+    state.t += DT;
+    if (state.autoLook) { state.target.x = 7 * Math.sin(state.t * 3.1); state.target.y = 4 * Math.sin(state.t * 2.3 + 1); }
+    else if (!state.pointerOver) { state.target.x *= 0.9; state.target.y *= 0.9; }
+    state.head.x += 0.35 * (state.target.x - state.head.x); state.head.y += 0.35 * (state.target.y - state.head.y);
+
+    // camera frame and change events
+    xo.setTransform(1, 0, 0, 1, 0, 0); drawScene(xo, 1, state.head.x, state.head.y);
+    const d = xo.getImageData(0, 0, W, H).data, L = new Float32Array(W * H);
+    for (let i = 0; i < W * H; i++) L[i] = 0.3 * d[4 * i] + 0.59 * d[4 * i + 1] + 0.11 * d[4 * i + 2];
+    if (prevL) for (let i = 0; i < W * H; i++) { const e = Math.abs(L[i] - prevL[i]); if (e > 6) pending[i] = Math.min(1, pending[i] + e / 120); }
+    prevL = L;
+
+    // goggle pulses at the chosen rate
+    nextPulse -= DT;
+    if (nextPulse <= 0) { nextPulse += 1 / state.rate; pulse(); }
+
+    for (let i = 0; i < W * H; i++) gogFlash[i] *= 0.9;
+    for (const c of cells) { c.spike *= 0.92; c.lost *= 0.92; }
+    const now = state.t; spikeLog = spikeLog.filter(t => now - t < 1);
+    render(); updateStats(); checkGuide();
+  }
+
+  function pulse() {
+    let any = 0;
+    if (state.goggles) {
+      for (let i = 0; i < W * H; i++) if (pending[i] > 0.05) { gogFlash[i] = 1; any++; }
+      const fid = fidelity(state.rate) * colourFactor();
+      for (let gy = 0; gy < GH; gy++) for (let gx = 0; gx < GW; gx++) {
+        let s = 0; for (let y = 0; y < CELL; y++) for (let x = 0; x < CELL; x++) s += pending[(gy * CELL + y) * W + gx * CELL + x];
+        if (s / (CELL * CELL) > 0.08) { const c = cells[gy * GW + gx]; if (Math.random() < fid) { c.spike = 1; spikeLog.push(state.t); } else c.lost = 1; }
+      }
+    }
+    eventsSeen += any;
+    pending.fill(0);
+  }
+
+  // ---------- drawing ----------
+  function render() {
+    const s = cScene.width / W;
+    xs.setTransform(1, 0, 0, 1, 0, 0); xs.clearRect(0, 0, cScene.width, cScene.height); drawScene(xs, s, state.head.x, state.head.y);
+
+    // goggles
+    xg.setTransform(1, 0, 0, 1, 0, 0); xg.fillStyle = '#0b0b0d'; xg.fillRect(0, 0, cGoggle.width, cGoggle.height);
+    if (state.goggles) {
+      const img = xg.createImageData(W, H), col = state.colour === 'amber' ? [255, 162, 26] : [28, 140, 255];
+      for (let i = 0; i < W * H; i++) { const a = gogFlash[i]; img.data[4 * i] = col[0] * a; img.data[4 * i + 1] = col[1] * a; img.data[4 * i + 2] = col[2] * a; img.data[4 * i + 3] = 255; }
+      xo.putImageData(img, 0, 0); xg.imageSmoothingEnabled = false; xg.drawImage(off, 0, 0, cGoggle.width, cGoggle.height);
+    } else { xg.fillStyle = '#8a93a3'; xg.font = '15px system-ui'; xg.textAlign = 'center'; xg.fillText('goggles off', cGoggle.width / 2, cGoggle.height / 2); }
+
+    // brain
+    xb.setTransform(1, 0, 0, 1, 0, 0); xb.fillStyle = '#0b0b0d'; xb.fillRect(0, 0, cBrain.width, cBrain.height);
+    if (state.healthy) { xb.save(); xb.filter = 'none'; drawScene(xb, cBrain.width / W, state.head.x, state.head.y); xb.restore(); }
+    else {
+      const cw = cBrain.width / GW;
+      for (let gy = 0; gy < GH; gy++) for (let gx = 0; gx < GW; gx++) {
+        const c = cells[gy * GW + gx], cx = (gx + 0.5) * cw, cy = (gy + 0.5) * cw;
+        if (c.spike > 0.05) { xb.fillStyle = `rgba(255,236,190,${c.spike})`; xb.beginPath(); xb.arc(cx, cy, cw * 0.42, 0, 7); xb.fill(); }
+        if (c.lost > 0.05) { xb.strokeStyle = `rgba(150,156,168,${c.lost})`; xb.lineWidth = 1; xb.beginPath(); xb.arc(cx, cy, cw * 0.32, 0, 7); xb.stroke(); }
+      }
+      if (!state.goggles) { xb.fillStyle = '#8a93a3'; xb.font = '15px system-ui'; xb.textAlign = 'center'; xb.fillText('nothing: room light is too dim', cBrain.width / 2, cBrain.height / 2); }
+    }
+  }
+
+  function updateStats() {
+    document.getElementById('sLight').textContent = state.goggles ? (state.colour === 'amber' ? 'bright amber flashes' : 'bright blue flashes') : 'room light (too dim)';
+    document.getElementById('sFid').textContent = state.goggles ? Math.round(100 * fidelity(state.rate) * colourFactor()) + ' %' : '0 %';
+    document.getElementById('sSpk').textContent = spikeLog.length;
+    document.getElementById('brainTitle').textContent = state.healthy ? '3. What a healthy brain gets' : '3. What the brain gets';
+    document.getElementById('brainNote').textContent = state.healthy ? 'A healthy eye: colour, fine detail, still things too.' : 'Each dot is a spike. A grey ring is a flash that was lost.';
+  }
+
+  // ---------- pointer = head ----------
+  for (const c of [cScene, cGoggle, cBrain]) {
+    c.addEventListener('pointermove', e => { const r = c.getBoundingClientRect(); state.target.x = ((e.clientX - r.left) / r.width - 0.5) * 12; state.target.y = ((e.clientY - r.top) / r.height - 0.5) * 8; state.pointerOver = true; });
+    c.addEventListener('pointerleave', () => state.pointerOver = false);
+  }
+  cBrain.addEventListener('click', e => {
+    if (current() !== 'locate') return;
+    const r = cBrain.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * W - state.head.x, y = (e.clientY - r.top) / r.height * H - state.head.y, n = state.notebook;
+    if (Math.abs(x - n.x) < 26 && Math.abs(y - n.y) < 20) { mark('locate'); say('Found it. He did this too: <b>locate</b> an object, and then reach out and <b>touch</b> it.', 'good'); }
+    else say('Not there. Move your head a little and look for where the spikes cluster.', 'warn');
+  });
+
+  // ---------- controls ----------
+  const gBtn = document.getElementById('goggles');
+  gBtn.onclick = () => { state.goggles = !state.goggles; gBtn.textContent = 'Goggles: ' + (state.goggles ? 'on' : 'off'); gBtn.classList.toggle('on', state.goggles); gBtn.setAttribute('aria-pressed', state.goggles); };
+  function pick(rowId, key, val) { for (const b of document.querySelectorAll('#' + rowId + ' button')) b.setAttribute('aria-pressed', b.dataset[key] === val); }
+  function setScene(sc) { state.scene = sc; pick('sceneRow', 'scene', sc); prevL = null; }
+  for (const b of document.querySelectorAll('#sceneRow button')) b.onclick = () => setScene(b.dataset.scene);
+  for (const b of document.querySelectorAll('#colourRow button')) b.onclick = () => { state.colour = b.dataset.colour; pick('colourRow', 'colour', state.colour); };
+  const rate = document.getElementById('rate'); rate.oninput = () => { state.rate = +rate.value; document.getElementById('rateVal').textContent = rate.value; };
+  document.getElementById('healthy').onchange = e => state.healthy = e.target.checked;
+  document.getElementById('autoLook').onchange = e => state.autoLook = e.target.checked;
+
+  // ---------- guide ----------
+  const GUIDE = [
+    { id: 'blind', text: '1. Look at the brain picture. Nothing?', setup: () => { setScene('cups'); }, msg: 'He has a light switch in his eye, but room light is far too dim to open it. Without the goggles he saw nothing.', done: () => !state.goggles && state.t - stepT > 4 },
+    { id: 'goggles', text: '2. Put the goggles on', msg: 'Press <b>Goggles</b> on the right.', done: () => state.goggles },
+    { id: 'look', text: '3. Move your head: move the mouse over the pictures', msg: 'The camera only sees <b>changes</b>. A still table sends nothing, so move your head.', done: () => eventsSeen > 400 },
+    { id: 'count', text: '4. How many cups are on the table?', setup: () => { state.cups = 1 + Math.floor(Math.random() * 4); setScene('cups'); showAnswers(true); }, msg: 'Count the cups using <b>only picture 3</b>. Then press a number below.', done: () => false },
+    { id: 'locate', text: '5. Where is the notebook? Click on it in picture 3', setup: () => { showAnswers(false); state.notebook = { x: 30 + Math.random() * 100, y: 50 + Math.random() * 20 }; setScene('notebook'); }, msg: 'Click where you think the notebook is, in <b>picture 3</b>.', done: () => false },
+    { id: 'street', text: '6. Find the street crossing', setup: () => setScene('street'), msg: 'He reported seeing the black and white stripes of a pedestrian crossing. Move your head and look for stripes.', done: () => state.scene === 'street' && spikeLog.length > 60 },
+    { id: 'blue', text: '7. Switch the goggle light to blue', msg: 'His switch answers to <b>amber</b>. Blue light hardly opens it: almost every flash is lost.', done: () => state.colour === 'blue' },
+    { id: 'fast', text: '8. Back to amber, then 40 flashes per second', msg: 'Faster flashes should mean a smoother picture. But tired switches need time to recover: in our model only about 1 in 4 fast flashes gives a spike.', done: () => state.colour === 'amber' && state.rate >= 40 },
+    { id: 'healthy', text: '9. Compare with a healthy eye', msg: 'A healthy eye sends colour and fine detail, even of things that do not move. The alga\'s switch gives back light, not the eye.', done: () => state.healthy },
+  ];
+  const doneSet = new Set(); let cur = 0, started = false, stepT = 0;
+  const stepsEl = document.getElementById('steps');
+  function current() { return GUIDE[cur] ? GUIDE[cur].id : null; }
+  function buildSteps() {
+    stepsEl.innerHTML = '';
+    GUIDE.forEach((g, i) => { const b = document.createElement('button'); b.textContent = (doneSet.has(g.id) ? '✓ ' : '') + g.text; b.className = (doneSet.has(g.id) ? 'done ' : '') + (i === cur ? 'current' : ''); b.disabled = i > cur; b.onclick = () => go(i); stepsEl.appendChild(b); });
+  }
+  function go(i) { cur = i; stepT = state.t; const g = GUIDE[i]; if (g.setup) g.setup(); say(g.msg); buildSteps(); }
+  function mark(id) { if (doneSet.has(id)) return; doneSet.add(id); const i = GUIDE.findIndex(g => g.id === id); if (i === cur && cur < GUIDE.length - 1) setTimeout(() => { if (cur === i) go(i + 1); }, 2600); buildSteps(); }
+  function checkGuide() { if (!started) return; const g = GUIDE[cur]; if (g && !doneSet.has(g.id) && g.done()) { mark(g.id); if (g.id !== 'blind') say('✓ ' + g.msg, 'good'); } }
+  function say(html, kind) { const c = document.getElementById('caption'); c.innerHTML = html; c.className = 'caption' + (kind ? ' ' + kind : ''); }
+  const ans = document.getElementById('answers');
+  for (let n = 1; n <= 4; n++) { const b = document.createElement('button'); b.textContent = n; b.onclick = () => { if (n === state.cups) { mark('count'); say(`Yes, ${n}. He could <b>count</b> objects on a table like this, with the treated eye and the goggles.`, 'good'); } else say('Not quite. Move your head and count the clusters of spikes again.', 'warn'); }; ans.appendChild(b); }
+  function showAnswers(on) { ans.classList.toggle('show', on); }
+  document.getElementById('resetGuide').onclick = () => { doneSet.clear(); state.goggles = true; gBtn.click(); state.colour = 'amber'; pick('colourRow', 'colour', 'amber'); rate.value = 10; rate.oninput(); document.getElementById('healthy').checked = false; state.healthy = false; eventsSeen = 0; go(0); };
+
+  document.getElementById('wGo').onclick = () => { document.getElementById('welcome').remove(); started = true; go(0); };
+  buildSteps();
+  window.__demo = { state, tick, GUIDE, fidelity };   // for testing
+  setInterval(tick, 1000 * DT);
+})();
+</script>
+</body>
+</html>
