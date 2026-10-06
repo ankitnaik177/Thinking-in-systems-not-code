@@ -70,8 +70,8 @@
 <div id="welcome" role="dialog" aria-modal="true" aria-labelledby="wTitle">
   <div class="card">
     <h2 id="wTitle">Be the patient</h2>
-    <p>In 2021 a man who had been blind for years could find and count objects on a table again.</p>
-    <p>Doctors put a <b>light switch from an alga</b> into the nerve cells at the back of his eye. It answers to <b>amber</b> light. He also wore <b>goggles</b>: a camera that sees what changes, and a lamp that flashes amber light into the eye.</p>
+    <p>In 2021 a person who had been blind for years could find and count objects on a table again.</p>
+    <p>Doctors put a <b>light switch from an alga</b> into the nerve cells at the back of the eye. It answers to <b>amber</b> light. The patient also wore <b>goggles</b>: a camera that sees what changes, and a lamp that flashes amber light into the eye.</p>
     <p>Here you can try the same tasks and see why it is not normal sight.</p>
     <button id="wGo">Start</button>
   </div>
@@ -80,7 +80,7 @@
 <header>
   <h1>Be the patient: seeing again with a light switch from an alga</h1>
   <p>Follow the steps on the left. Move your mouse over the pictures to "move your head".</p>
-  <span class="disclaimer">Illustration of how the system works, not what the patient saw. The speed limit comes from our ChR2 model, not from his ChrimsonR.</span>
+  <span class="disclaimer">Illustration of how the system works, not what the patient saw. The speed limit comes from our ChR2 model, not from the patient's ChrimsonR.</span>
 </header>
 
 <main>
@@ -134,7 +134,7 @@
 </main>
 
 <footer>
-  Based on Sahel et al., "Partial recovery of visual function in a blind patient after optogenetic therapy", Nature Medicine 27 (2021) 1223&#8211;1229: ChrimsonR in retinal ganglion cells, goggles with a camera that reacts to changes in light and projects amber pulses; with the goggles the patient could perceive, locate, count and touch objects, and without them he could not.
+  Based on Sahel et al., "Partial recovery of visual function in a blind patient after optogenetic therapy", Nature Medicine 27 (2021) 1223&#8211;1229: ChrimsonR in retinal ganglion cells, goggles with a camera that reacts to changes in light and projects amber pulses; with the goggles the patient could perceive, locate, count and touch objects, and without them could not.
   The share of flashes answered at each rate is taken from our System Modeler model of channelrhodopsin-2 in a Hodgkin&#8211;Huxley nerve cell (100 % at 5 and 10 per second, 40 % at 20, 23 % at 40). The picture sizes, the blue-light response and the brain view are illustrative.
 </footer>
 
@@ -266,7 +266,7 @@
   cBrain.addEventListener('click', e => {
     if (current() !== 'locate') return;
     const r = cBrain.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * W - state.head.x, y = (e.clientY - r.top) / r.height * H - state.head.y, n = state.notebook;
-    if (Math.abs(x - n.x) < 26 && Math.abs(y - n.y) < 20) { mark('locate'); say('Found it. He did this too: <b>locate</b> an object, and then reach out and <b>touch</b> it.', 'good'); }
+    if (Math.abs(x - n.x) < 26 && Math.abs(y - n.y) < 20) { mark('locate'); say('Found it. The patient did this too: <b>locate</b> an object, and then reach out and <b>touch</b> it.', 'good'); }
     else say('Not there. Move your head a little and look for where the spikes cluster.', 'warn');
   });
 
@@ -283,13 +283,13 @@
 
   // ---------- guide ----------
   const GUIDE = [
-    { id: 'blind', text: '1. Look at the brain picture. Nothing?', setup: () => { setScene('cups'); }, msg: 'He has a light switch in his eye, but room light is far too dim to open it. Without the goggles he saw nothing.', done: () => !state.goggles && state.t - stepT > 4 },
+    { id: 'blind', text: '1. Look at the brain picture. Nothing?', setup: () => { setScene('cups'); }, msg: 'The patient has a light switch in the eye, but room light is far too dim to open it. Without the goggles, the patient saw nothing.', done: () => !state.goggles && state.t - stepT > 4 },
     { id: 'goggles', text: '2. Put the goggles on', msg: 'Press <b>Goggles</b> on the right.', done: () => state.goggles },
     { id: 'look', text: '3. Move your head: move the mouse over the pictures', msg: 'The camera only sees <b>changes</b>. A still table sends nothing, so move your head.', done: () => eventsSeen > 400 },
     { id: 'count', text: '4. How many cups are on the table?', setup: () => { state.cups = 1 + Math.floor(Math.random() * 4); setScene('cups'); showAnswers(true); }, msg: 'Count the cups using <b>only picture 3</b>. Then press a number below.', done: () => false },
     { id: 'locate', text: '5. Where is the notebook? Click on it in picture 3', setup: () => { showAnswers(false); state.notebook = { x: 30 + Math.random() * 100, y: 50 + Math.random() * 20 }; setScene('notebook'); }, msg: 'Click where you think the notebook is, in <b>picture 3</b>.', done: () => false },
-    { id: 'street', text: '6. Find the street crossing', setup: () => setScene('street'), msg: 'He reported seeing the black and white stripes of a pedestrian crossing. Move your head and look for stripes.', done: () => state.scene === 'street' && spikeLog.length > 60 },
-    { id: 'blue', text: '7. Switch the goggle light to blue', msg: 'His switch answers to <b>amber</b>. Blue light hardly opens it: almost every flash is lost.', done: () => state.colour === 'blue' },
+    { id: 'street', text: '6. Find the street crossing', setup: () => setScene('street'), msg: 'The patient reported seeing the black and white stripes of a pedestrian crossing. Move your head and look for stripes.', done: () => state.scene === 'street' && spikeLog.length > 60 },
+    { id: 'blue', text: '7. Switch the goggle light to blue', msg: 'The patient's switch answers to <b>amber</b>. Blue light hardly opens it: almost every flash is lost.', done: () => state.colour === 'blue' },
     { id: 'fast', text: '8. Back to amber, then 40 flashes per second', msg: 'Faster flashes should mean a smoother picture. But tired switches need time to recover: in our model only about 1 in 4 fast flashes gives a spike.', done: () => state.colour === 'amber' && state.rate >= 40 },
     { id: 'healthy', text: '9. Compare with a healthy eye', msg: 'A healthy eye sends colour and fine detail, even of things that do not move. The alga\'s switch gives back light, not the eye.', done: () => state.healthy },
   ];
@@ -305,7 +305,7 @@
   function checkGuide() { if (!started) return; const g = GUIDE[cur]; if (g && !doneSet.has(g.id) && g.done()) { mark(g.id); if (g.id !== 'blind') say('✓ ' + g.msg, 'good'); } }
   function say(html, kind) { const c = document.getElementById('caption'); c.innerHTML = html; c.className = 'caption' + (kind ? ' ' + kind : ''); }
   const ans = document.getElementById('answers');
-  for (let n = 1; n <= 4; n++) { const b = document.createElement('button'); b.textContent = n; b.onclick = () => { if (n === state.cups) { mark('count'); say(`Yes, ${n}. He could <b>count</b> objects on a table like this, with the treated eye and the goggles.`, 'good'); } else say('Not quite. Move your head and count the clusters of spikes again.', 'warn'); }; ans.appendChild(b); }
+  for (let n = 1; n <= 4; n++) { const b = document.createElement('button'); b.textContent = n; b.onclick = () => { if (n === state.cups) { mark('count'); say(`Yes, ${n}. The patient could <b>count</b> objects on a table like this, with the treated eye and the goggles.`, 'good'); } else say('Not quite. Move your head and count the clusters of spikes again.', 'warn'); }; ans.appendChild(b); }
   function showAnswers(on) { ans.classList.toggle('show', on); }
   document.getElementById('resetGuide').onclick = () => { doneSet.clear(); state.goggles = true; gBtn.click(); state.colour = 'amber'; pick('colourRow', 'colour', 'amber'); rate.value = 10; rate.oninput(); document.getElementById('healthy').checked = false; state.healthy = false; eventsSeen = 0; go(0); };
 
