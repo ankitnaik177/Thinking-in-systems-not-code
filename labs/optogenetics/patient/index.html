@@ -72,7 +72,7 @@
     <h2 id="wTitle">Be the patient</h2>
     <p>In 2021 a person who had been blind for years could find and count objects on a table again.</p>
     <p>Doctors put a <b>light switch from an alga</b> into the nerve cells at the back of the eye. It answers to <b>amber</b> light. The patient also wore <b>goggles</b>: a camera that sees what changes, and a lamp that flashes amber light into the eye.</p>
-    <p>Here you can try the same tasks and see why it is not normal sight.</p>
+    <p>Here you can try the same tasks and see how it differs from normal sight.</p>
     <button id="wGo">Start</button>
   </div>
 </div>
@@ -82,7 +82,7 @@
   <p>Follow the steps on the left. Move your mouse over the pictures to "move your head".</p>
   <p><a href="https://www.linkedin.com/pulse/can-blind-person-see-ankit-anurag-naik-cbdff/" target="_blank" rel="noopener">Read the story behind this demo: Can a blind person see?</a></p>
 
-  <span class="disclaimer">Illustration of how the system works, not what the patient saw. The speed limit comes from our ChR2 model, not from the patient's ChrimsonR.</span>
+  <span class="disclaimer">An illustration of how the system works, which does not show what the patient saw. The speed limit comes from our ChR2 model; the patient received ChrimsonR, which was not modeled.</span>
 </header>
 
 <main>
@@ -103,7 +103,7 @@
     <div class="views">
       <div class="view"><h3>1. What is on the table</h3><canvas id="cScene" width="320" height="200"></canvas><p>What a healthy eye would see.</p></div>
       <div class="view"><h3>2. What the goggles flash</h3><canvas id="cGoggle" width="320" height="200"></canvas><p>Amber flashes only where the picture changed.</p></div>
-      <div class="view"><h3 id="brainTitle">3. What the brain gets</h3><canvas id="cBrain" width="320" height="200"></canvas><p id="brainNote">Each dot is a spike. A grey ring is a flash that was lost.</p></div>
+      <div class="view"><h3 id="brainTitle">3. What the brain gets</h3><canvas id="cBrain" width="320" height="200"></canvas><p id="brainNote">Each dot is a spike. A gray ring is a flash that was lost.</p></div>
     </div>
     <div class="caption" id="caption">Press <b>Start</b> and follow the steps.</div>
     <div class="answers" id="answers" aria-label="How many cups?"></div>
@@ -118,7 +118,7 @@
       <button class="chip" data-scene="notebook" aria-pressed="false">Notebook</button>
       <button class="chip" data-scene="street" aria-pressed="false">Street crossing</button>
     </div>
-    <label>Colour of the goggle light</label>
+    <label>Color of the goggle light</label>
     <div class="row" id="colourRow">
       <button class="chip" data-colour="amber" aria-pressed="true"><span class="swatch" style="background:#ffa21a"></span>Amber</button>
       <button class="chip" data-colour="blue" aria-pressed="false"><span class="swatch" style="background:#1c8cff"></span>Blue</button>
@@ -257,7 +257,7 @@
     document.getElementById('sFid').textContent = state.goggles ? Math.round(100 * fidelity(state.rate) * colourFactor()) + ' %' : '0 %';
     document.getElementById('sSpk').textContent = spikeLog.length;
     document.getElementById('brainTitle').textContent = state.healthy ? '3. What a healthy brain gets' : '3. What the brain gets';
-    document.getElementById('brainNote').textContent = state.healthy ? 'A healthy eye: colour, fine detail, still things too.' : 'Each dot is a spike. A grey ring is a flash that was lost.';
+    document.getElementById('brainNote').textContent = state.healthy ? 'A healthy eye: color, fine detail, still things too.' : 'Each dot is a spike. A gray ring is a flash that was lost.';
   }
 
   // ---------- pointer = head ----------
@@ -291,15 +291,15 @@
   // each step sets up the controls it needs, so any step can be replayed on its own
   function base(scene) { showAnswers(false); setHealthy(false); setGoggles(true); setColour('amber'); setRate(10); if (scene) setScene(scene); }
   const GUIDE = [
-    { id: 'blind', text: '1. Look at the brain picture. Nothing?', setup: () => { base('cups'); setGoggles(false); }, msg: 'The patient has a light switch in the eye, but room light is far too dim to open it. Without the goggles, the patient saw nothing.', done: () => state.t - stepT > 4 },
+    { id: 'blind', text: '1. Look at the brain picture with the goggles off', setup: () => { base('cups'); setGoggles(false); }, msg: 'The patient has a light switch in the eye, but room light is far too dim to open it. Without the goggles, the patient saw nothing.', done: () => state.t - stepT > 4 },
     { id: 'goggles', text: '2. Put the goggles on', setup: () => { base('cups'); setGoggles(false); }, msg: 'Press <b>Goggles</b> on the right.', done: () => state.goggles },
     { id: 'look', text: '3. Move your head: move the mouse over the pictures', setup: () => base('cups'), msg: 'The camera only sees <b>changes</b>. A still table sends nothing, so move your head.', done: () => eventsSeen - eventsAtStep > 400 },
     { id: 'count', text: '4. How many cups are on the table?', setup: () => { base(); state.cups = 1 + Math.floor(Math.random() * 4); setScene('cups'); showAnswers(true); }, msg: 'Count the cups using <b>only picture 3</b>. Then press a number below.', done: () => false },
-    { id: 'locate', text: '5. Where is the notebook? Click on it in picture 3', setup: () => { base(); state.notebook = { x: 30 + Math.random() * 100, y: 50 + Math.random() * 20 }; setScene('notebook'); }, msg: 'Click where you think the notebook is, in <b>picture 3</b>.', done: () => false },
+    { id: 'locate', text: '5. Find the notebook and click on it in picture 3', setup: () => { base(); state.notebook = { x: 30 + Math.random() * 100, y: 50 + Math.random() * 20 }; setScene('notebook'); }, msg: 'Click where you think the notebook is, in <b>picture 3</b>.', done: () => false },
     { id: 'street', text: '6. Find the street crossing', setup: () => base('street'), msg: 'The patient reported seeing the black and white stripes of a pedestrian crossing. Move your head and look for stripes.', done: () => state.scene === 'street' && spikeLog.length > 60 && state.t - stepT > 1 },
     { id: 'blue', text: '7. Switch the goggle light to blue', setup: () => base('cups'), msg: 'The patient\'s switch answers to <b>amber</b>. Blue light hardly opens it: almost every flash is lost.', done: () => state.colour === 'blue' },
-    { id: 'fast', text: '8. Back to amber, then 40 flashes per second', setup: () => base('cups'), msg: 'Faster flashes should mean a smoother picture. But tired switches need time to recover: in our model only about 1 in 4 fast flashes gives a spike.', done: () => state.colour === 'amber' && state.rate >= 40 },
-    { id: 'healthy', text: '9. Compare with a healthy eye', setup: () => base('cups'), msg: 'A healthy eye sends colour and fine detail, even of things that do not move. The alga\'s switch gives back light, not the eye.', done: () => state.healthy },
+    { id: 'fast', text: '8. Back to amber, then 40 flashes per second', setup: () => base('cups'), msg: 'Faster flashes would give a smoother picture, but each switch needs time to recover after it opens: in our model only about 1 in 4 flashes at 40 per second gives a spike.', done: () => state.colour === 'amber' && state.rate >= 40 },
+    { id: 'healthy', text: '9. Compare with a healthy eye', setup: () => base('cups'), msg: 'A healthy eye sends color and fine detail, also of things that do not move. The alga\'s switch restores a response to bright changes in light, which is far less than a healthy eye gives.', done: () => state.healthy },
   ];
   const doneSet = new Set(); let cur = 0, started = false, stepT = 0, eventsAtStep = 0, visitDone = false;
   const stepsEl = document.getElementById('steps');

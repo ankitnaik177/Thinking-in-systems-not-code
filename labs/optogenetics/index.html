@@ -84,24 +84,24 @@
 </head>
 <body>
 <header>
-  <h1>Light switches behaviour</h1>
+  <h1>Light switches behavior</h1>
   <p>The 2026 Nobel Prize in Physiology or Medicine (Deisseroth, Hegemann, Nagel) was for a light switch for brain cells.
      Here you can use that switch yourself: shine light into the brain of a (cartoon) mouse and see what happens.</p>
-  <span class="disclaimer">Neurons: computed live from the equations of the Optogenetics Modelica library. Mouse: a descriptive illustration, not a model of behaviour.</span>
+  <span class="disclaimer">Neurons: computed live from the equations of the Optogenetics Modelica library. Mouse: an illustration of what the published experiments observed.</span>
 </header>
 
-<section class="welcome" id="welcome" aria-label="What is this?">
+<section class="welcome" id="welcome" aria-label="Introduction">
   <div>
-    <h2>New here? Start with this</h2>
+    <h2>How it works</h2>
     <ol>
-      <li>Your brain is made of billions of tiny cells called <b>neurons</b>. They talk to each other with tiny electric pulses, called <b>spikes</b>.</li>
+      <li>Your brain is made of billions of tiny cells called <b>neurons</b>. They talk to each other with short electric pulses, called <b>spikes</b>.</li>
       <li>In a green pond alga, scientists found a protein that works like a <b>light switch</b>: when blue light shines on it, it opens and lets electric charge flow in.</li>
-      <li>Put that switch into a few brain cells of a mouse, shine light through a thin glass fibre, and you can make exactly those cells fire. That is called <b>optogenetics</b>.</li>
-      <li><b>Try it:</b> pick an experiment below and follow the numbered steps in the yellow <b>Try this</b> box on the left. The steps tick themselves off when you have done them.</li>
+      <li>Put that switch into a few brain cells of a mouse, shine light through a thin glass fiber, and you can make exactly those cells fire. That is called <b>optogenetics</b>.</li>
+      <li>Pick an experiment below and follow the numbered steps in the yellow <b>Try this</b> box on the left. The steps tick themselves off when you have done them.</li>
     </ol>
-    <div class="note">No real mouse here. The brain cells are a computer model (the same equations as the Modelica library behind this page); the mouse is a cartoon that shows what the real experiments found.</div>
+    <div class="note">The brain cells are a computer model (the same equations as the Modelica library behind this page); the mouse is a cartoon that shows what the real experiments found.</div>
   </div>
-  <button id="welcomeClose">Got it, let's start</button>
+  <button id="welcomeClose">Start</button>
 </section>
 <div class="glossary"><b>neuron</b> = brain cell &nbsp;·&nbsp; <b>spike</b> = one electric pulse of a neuron &nbsp;·&nbsp; <b>ChR2</b> = the light switch from algae, reacts to blue &nbsp;·&nbsp; <b>NpHR</b> = an "off" switch, reacts to yellow &nbsp;·&nbsp; <b>Hz</b> = flashes per second</div>
 
@@ -121,14 +121,14 @@
   </section>
   <section class="panel" aria-label="Light controls">
     <h2>Light</h2>
-    <label for="wl">Colour (wavelength) <span class="value" id="wlv"></span></label>
+    <label for="wl">Color (wavelength) <span class="value" id="wlv"></span></label>
     <input id="wl" type="range" min="400" max="680" step="1" value="470">
     <div class="row" id="presets">
       <button class="chip" data-wl="470"><span class="swatch" style="background:#00a9ff"></span>blue 470 nm</button>
       <button class="chip" data-wl="590"><span class="swatch" style="background:#ffd000"></span>yellow 590 nm</button>
       <button class="chip" data-wl="630"><span class="swatch" style="background:#ff4b00"></span>red 630 nm</button>
     </div>
-    <label for="irr">Brightness (irradiance at the fibre tip) <span class="value" id="irrv"></span></label>
+    <label for="irr">Brightness (irradiance at the fiber tip) <span class="value" id="irrv"></span></label>
     <input id="irr" type="range" min="0" max="20" step="0.5" value="10">
     <label>Rhythm: how the light flashes</label>
     <div class="row" id="modes">
@@ -139,9 +139,9 @@
       <button class="chip" data-f="40">40 Hz</button>
     </div>
     <button class="bigbtn" id="lightBtn" aria-pressed="false">Light off: click or hold <kbd>Space</kbd></button>
-    <label style="margin-top:14px">Who absorbs this colour?</label>
+    <label style="margin-top:14px">Who absorbs this color?</label>
     <canvas id="spectrum" width="560" height="200" aria-label="Approximate action spectra of ChR2 and NpHR with the chosen wavelength"></canvas>
-    <div class="legend"><span class="swatch" style="background:#1f6fd1"></span>ChR2 (switches cells on) &nbsp; <span class="swatch" style="background:#d98e04"></span>NpHR (switches cells off). The dashed line is your colour. Approximate shapes.</div>
+    <div class="legend"><span class="swatch" style="background:#1f6fd1"></span>ChR2 (switches cells on) &nbsp; <span class="swatch" style="background:#d98e04"></span>NpHR (switches cells off). The dashed line is your color. Approximate shapes.</div>
   </section>
   </div>
 
@@ -197,9 +197,9 @@
   </section>
 
   <section class="panel" aria-label="Neurons">
-    <h2 id="neuronTitle">Neurons under the fibre</h2>
+    <h2 id="neuronTitle">Neurons under the fiber</h2>
     <canvas id="raster" width="740" height="250" aria-label="Spike raster of the targeted neurons"></canvas>
-    <div class="legend" id="rasterLegend">Each row is one brain cell; each black tick is one spike. Coloured bars on top: when the light was on.</div>
+    <div class="legend" id="rasterLegend">Each row is one brain cell; each black tick is one spike. Colored bars on top: when the light was on.</div>
     <canvas id="trace" width="740" height="170" aria-label="Membrane potential of one targeted neuron" style="margin-top:10px"></canvas>
     <div class="legend">Membrane potential of one targeted neuron (Hodgkin-Huxley, -80 to +50 mV), last 1 s; in experiment 2 the first tagged cell.</div>
     <div id="neuronStats" style="margin-top:8px"></div>
@@ -238,7 +238,7 @@ const am = v => 0.1 * vtrap(-(v + 40), 10), bm = v => 4 * Math.exp(-(v + 65) / 1
 const ah = v => 0.07 * Math.exp(-(v + 65) / 20), bh = v => 1 / (1 + Math.exp(-(v + 35) / 10));
 const an = v => 0.01 * vtrap(-(v + 55), 10), bn = v => 0.125 * Math.exp(-(v + 65) / 80);
 
-// Approximate action spectra (normalised to 1 at the peak).
+// Approximate action spectra (normalized to 1 at the peak).
 function chr2Spectrum(l) { const s = l < 470 ? 45 : 32; return Math.exp(-0.5 * Math.pow((l - 470) / s, 2)); }
 function nphrSpectrum(l) { const s = l < 590 ? 45 : 35; return Math.exp(-0.5 * Math.pow((l - 590) / s, 2)); }
 
@@ -343,7 +343,7 @@ S.wake = {
     stats(ui.behaviourStats, [["Arousal drive", (100 * Math.min(this.arousal / 0.5, 1)).toFixed(0) + " %"], ["State", this.awake ? "awake" : "asleep"]]);
   },
   body: `<p><b>What to try.</b> Shine blue light at 5, 10 and 20 Hz and see how fast the mouse wakes. Then try yellow or red light at the same power: ChR2 barely absorbs them, so the neurons stay silent and the mouse sleeps on.</p>
-  <p><b>The real experiment.</b> Adamantidis, Zhang, Aravanis, Deisseroth and de Lecea (2007) put ChR2 into hypocretin (orexin) neurons and delivered light through an optical fibre. Stimulation raised the probability of waking from slow-wave and REM sleep, and the latency to waking depended on the stimulation frequency. It was one of the first demonstrations that the firing of one defined cell type causes a behavioural state.</p>
+  <p><b>The real experiment.</b> Adamantidis, Zhang, Aravanis, Deisseroth and de Lecea (2007) put ChR2 into hypocretin (orexin) neurons and delivered light through an optical fiber. Stimulation raised the probability of waking from slow-wave and REM sleep, and the latency to waking depended on the stimulation frequency. It was one of the first demonstrations that the firing of one defined cell type causes a behavioral state.</p>
   <p class="cite">Here the neurons are 12 Hodgkin-Huxley cells with ChR2, computed live with a 20 &micro;s step; their expression varies &plusmn;25 %. "Arousal" is an illustrative running average of their firing with a compressed time scale; real latencies are tens of seconds.</p>`,
 };
 
@@ -399,8 +399,8 @@ S.whisk = {
     stats(ui.behaviourStats, [["Population rate", r.toFixed(0) + " spikes/s per cell"], ["Whisker deflection", Math.min(this.deflect, 35).toFixed(0) + " deg"]]);
   },
   onSpike() { this.deflect += 1.2; },
-  body: `<p><b>What to try.</b> Without light the neurons fire spontaneously. Blue light at 10 to 40 Hz drives them and the whiskers sweep with each flash. Switch to yellow (590 nm), continuous: the neurons carry a second protein, the chloride pump halorhodopsin (NpHR), which silences them. Two colours, two opposite commands, in the same cells.</p>
-  <p><b>The real experiments.</b> Aravanis et al. (2007) delivered blue light through an optical fibre to ChR2-expressing layer 5 neurons of the vibrissal motor cortex and moved the whiskers of living mice. Zhang et al. (2007) and Han and Boyden (2007) adapted NpHR from <i>Natronomonas pharaonis</i> for yellow-light silencing, enabling the first two-colour, bidirectional control.</p>
+  body: `<p><b>What to try.</b> Without light the neurons fire spontaneously. Blue light at 10 to 40 Hz drives them and the whiskers sweep with each flash. Switch to yellow (590 nm), continuous: the neurons carry a second protein, the chloride pump halorhodopsin (NpHR), which silences them. The same cells are then driven by blue light and silenced by yellow.</p>
+  <p><b>The real experiments.</b> Aravanis et al. (2007) delivered blue light through an optical fiber to ChR2-expressing layer 5 neurons of the vibrissal motor cortex and moved the whiskers of living mice. Zhang et al. (2007) and Han and Boyden (2007) adapted NpHR from <i>Natronomonas pharaonis</i> for yellow-light silencing, enabling the first two-color, bidirectional control.</p>
   <p class="cite">The NpHR pump here is a first-order activation with an outward current; its strength is illustrative. The spontaneous activity comes from a constant drive plus noise.</p>`,
 };
 
@@ -463,7 +463,7 @@ function drawMouse(dtReal) {
   const flip = rot === 180 ? "scale(-1,1)" : "";
   body.setAttribute("transform", `translate(${mx + jitter},${my}) ${flip} scale(${sx},${sy})`);
   document.getElementById("labels").setAttribute("transform", `translate(${mx},${my})`);
-  // the fibre stays on the head; glow shows the light colour
+  // the fiber stays on the head; glow shows the light color
   const glow = document.getElementById("fiberGlow");
   const on = lightIntensityAt(simTime) > 0;
   glow.setAttribute("opacity", on ? Math.min(1, 0.25 + +ui.irr.value / 12) : 0);
@@ -595,7 +595,7 @@ const GUIDE = {
       why: "Without light the switch closes and the cells calm down.",
       check: () => !lightOn && !S.wake.awake },
     { t: "Now try <b>yellow</b> or <b>red</b> light. Does the mouse wake up this time?",
-      why: "No! The switch ignores yellow and red light. The colour matters.",
+      why: "The switch barely reacts to yellow and red light, so the cells stay quiet.",
       check: dt => { if (lightOn && !isBlue()) guide.acc += dt; return guide.acc > 3000; } },
     { t: "Back to <b>blue</b>: try the rhythms <b>5 Hz</b> and <b>40 Hz</b>. Which wakes the mouse faster?",
       why: "Faster flashing gives more spikes, so the mouse wakes sooner, as in the real experiment.",
@@ -612,7 +612,7 @@ const GUIDE = {
       why: "Box B looks different and nothing bad ever happens there. The mouse explores calmly.",
       check: () => S.fear.box === "B" },
     { t: "Now shine <b>blue</b> light again.",
-      why: "The light switches on only the memory cells. The mouse freezes as if it were back in box A: we replayed a memory!",
+      why: "The light switches on only the memory cells. The mouse freezes as if it were back in box A, because the light replays the memory.",
       check: () => mouseMode === "freeze" },
     { t: "Switch the light off, then try <b>yellow</b> light.",
       why: "Without blue light the memory cells go quiet and the mouse explores again. Yellow does nothing.",
@@ -626,10 +626,10 @@ const GUIDE = {
       why: "Every flash makes the cells fire together, and the whiskers sweep with each flash.",
       check: () => lightOn && isBlue() && freq > 0 && S.whisk.deflect > 8 },
     { t: "Now pick <b>yellow</b> light, rhythm <b>continuous</b>, and switch it on.",
-      why: "These cells also carry a second switch (NpHR) that reacts to yellow and keeps them quiet. Look: the ticks stop.",
+      why: "These cells also carry a second switch (NpHR) that reacts to yellow and keeps them quiet. The ticks stop.",
       check: () => lightOn && isOffColour() && !isBlue() && freq === 0 && popRate(1000) < 1 },
     { t: "Switch back and forth between <b>blue</b> and <b>yellow</b> while the light is on.",
-      why: "Two colours, two opposite commands, in the same cells: on and off with light.",
+      why: "Blue turns these cells on and yellow turns them off.",
       check: () => { if (lightOn) { const c = isBlue() ? "b" : "y"; if (guide.last && c !== guide.last) guide.n++; guide.last = c; } return guide.n >= 2; } },
   ],
 };
@@ -643,7 +643,7 @@ function renderGuide() {
   const fin = document.getElementById("guideFinish");
   const done = guide.i >= steps.length;
   document.getElementById("guideSkip").style.display = done ? "none" : "";
-  fin.innerHTML = done ? `<div class="finish"><b>Well done!</b> You just did what the Nobel Prize winners made possible.` +
+  fin.innerHTML = done ? `<div class="finish"><b>Done.</b> You have repeated an experiment that the prize-winning work made possible.` +
     (NEXT[guide.name] ? `<br><button id="guideNext">Next experiment &rarr;</button>` : `<br>You have tried all three experiments.`) + `</div>` : "";
   if (done && NEXT[guide.name]) document.getElementById("guideNext").onclick = () => selectScenario(NEXT[guide.name]);
 }
@@ -658,7 +658,7 @@ document.getElementById("guideSkip").onclick = () => { if (guide.i < GUIDE[guide
 document.getElementById("welcomeClose").onclick = () => { document.getElementById("welcome").style.display = "none"; };
 
 // ---------------------------------------------------------------------------
-// Main loop: neurons in real time, 10 us steps
+// Main loop: neurons in real time, 20 us steps
 // ---------------------------------------------------------------------------
 let last = performance.now();
 function frame(now) {
@@ -669,7 +669,7 @@ function frame(now) {
   drawMouse(dtReal); drawRaster(); drawTrace();
   stats(ui.neuronStats, [["Mean firing rate", popRate(1000).toFixed(1) + " spikes/s"],
     ["Open ChR2, traced neuron", cells.length ? (100 * cells[focusCell()].o).toFixed(1) + " %" : "-"],
-    ["Desensitised ChR2, traced neuron", cells.length ? (100 * cells[focusCell()].d).toFixed(0) + " %" : "-"]]);
+    ["Desensitized ChR2, traced neuron", cells.length ? (100 * cells[focusCell()].d).toFixed(0) + " %" : "-"]]);
   requestAnimationFrame(frame);
 }
 document.querySelector('#modes .chip[data-f="20"]').setAttribute("aria-pressed", "true");

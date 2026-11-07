@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Digital Twin for Predictive Maintenance: a Hydraulic System, live — PumpTwin</title>
+<title>Digital twin for predictive maintenance: a hydraulic system, live — PumpTwin</title>
 <meta name="description" content="A live, physics-based digital twin of the UCI 'Condition monitoring of hydraulic systems' dataset (ZeMA): pump leakage, valve, accumulator and cooler condition read from the existing sensors, and an oil-temperature forecast. Built with Wolfram System Modeler and Wolfram Language.">
-<meta property="og:title" content="Digital Twin for Predictive Maintenance: a Hydraulic System, live">
+<meta property="og:title" content="Digital twin for predictive maintenance: a hydraulic system, live">
 <meta property="og:description" content="Physics-based condition monitoring of the ZeMA hydraulic test rig: every component's health from its own sensors, replayed live from the Wolfram Cloud.">
 <meta property="og:type" content="website">
 <link rel="icon" type="image/png" href="../../assets/favicon.svg">
@@ -74,7 +74,7 @@
 
   <div class="grid">
     <div class="pane">
-      <h2>The rig, as the twin sees it <em id="phase">—</em></h2>
+      <h2>The rig, with the twin's readings <em id="phase">—</em></h2>
       <svg class="pid" id="pid" viewBox="0 0 900 470" aria-label="Schematic of the rig with live values">
         <style>
           .p{fill:none;stroke:var(--pipe);stroke-width:4;stroke-linejoin:round}
@@ -181,13 +181,13 @@
   </div>
 
   <p class="foot">
-    <b>What this is.</b> The ZeMA rig's published recording (2205 cycles of 60 s, 36.75 h), replayed from the Wolfram Cloud one cycle a minute, as if it were running now. The clock decides which cycle is on screen, so everyone sees the same moment; the recording loops every 36.75 hours.
+    <b>What this is.</b> The ZeMA rig's published recording (2205 cycles of 60 s, 36.75 h), replayed from the Wolfram Cloud one cycle a minute, as if it were running now. The page picks the cycle from the clock, so everyone sees the same moment; the recording loops every 36.75 hours.
     Each cycle the twin reads the components' condition from the sensors alone: the pump leak from the flow the pump is missing against the System Modeler model at the measured oil temperature;
     the switching valve V10 from when the pressure falls after it opens; the accumulator from how fast the pressure rises when V10 shuts; the cooler from its cooling efficiency;
     the load valve V11 from the pressure after V10 against the model. The oil-temperature forecast comes from the thermal model, started from the measured state.<br>
-    <b>Honest limits.</b> The model runs for each cycle were computed beforehand with System Modeler; this page replays them with the measurements. It is a replay of a recorded run, not a live machine. One rig, emulated faults.
+    <b>Limits.</b> The model runs for each cycle were computed beforehand with System Modeler; this page replays them with the measurements. No machine is running live. All data come from one rig, with emulated faults.
     Data: UCI ML Repository 447, Helwig, Pignanelli, Schütze (ZeMA), CC BY 4.0. Model: HydraulicSensing.ZeMARig and ZeMAThermal, Wolfram System Modeler 15.1 + Hydraulic library 3.0.
-    Data: <code id="binId"></code>.
+    Replay source: <code id="binId"></code>.
   </p>
 </div>
 <script>
@@ -234,11 +234,11 @@ function onNewCycle(e) {
   $('vk').textContent = bad ? 'ALARM' : warn ? 'ATTENTION' : 'HEALTHY'; $('vt').textContent = e.verdict;
   // health cards
   const cards = [
-    { k: 'Pump MP1', v: R.v11 ? 'not read' : LEAK[R.leak], n: R.v11 ? 'suspended while V11 misbehaves' : `${fmt(R.missing, 0)} ml/min missing vs model`, s: R.v11 ? 1 : R.leak, truth: LEAK[T.leak], ok: R.v11 ? null : R.leak === T.leak },
+    { k: 'Pump MP1', v: R.v11 ? 'not read' : LEAK[R.leak], n: R.v11 ? 'suspended while V11 is faulty' : `${fmt(R.missing, 0)} ml/min missing vs model`, s: R.v11 ? 1 : R.leak, truth: LEAK[T.leak], ok: R.v11 ? null : R.leak === T.leak },
     { k: 'Valve V10', v: R.valve === 100 ? 'switching on time' : `${R.valve} % condition`, n: `pressure falls at ${fmt(R.tFall, 2)} s`, s: R.valve === 100 ? 0 : R.valve >= 80 ? 1 : 2, truth: `${T.valve} %`, ok: R.valve === T.valve },
     { k: 'Accumulator', v: `~${R.acc} bar gas`, n: `rises 160→185 bar in ${fmt(R.tRise, 2)} s`, s: R.acc === 130 ? 0 : R.acc >= 100 ? 1 : 2, truth: `${T.acc} bar`, ok: R.acc === T.acc },
     { k: 'Cooler C1', v: `${R.duty} % capacity`, n: `UA ${fmt(R.UA, 0)} W/K from its efficiency`, s: R.duty === 100 ? 0 : R.duty >= 20 ? 1 : 2, truth: `${T.cooler} %`, ok: R.duty === T.cooler },
-    { k: 'Load valve V11', v: R.v11 ? 'stuck high' : 'following set', n: `PS2 ${R.dPS2 >= 0 ? '+' : ''}${fmt(R.dPS2, 1)} bar vs model`, s: R.v11 ? 2 : 0, truth: T.excluded ? 'collapsed block' : 'not labelled', ok: R.v11 === T.excluded }
+    { k: 'Load valve V11', v: R.v11 ? 'stuck high' : 'following set', n: `PS2 ${R.dPS2 >= 0 ? '+' : ''}${fmt(R.dPS2, 1)} bar vs model`, s: R.v11 ? 2 : 0, truth: T.excluded ? 'collapsed block' : 'not labeled', ok: R.v11 === T.excluded }
   ];
   $('cards').innerHTML = cards.map(c => `<div class="card ${state(0, c.s)}"><div class="k">${c.k}</div><div class="v">${c.v}</div><div class="n">${c.n}</div>` +
     (shownTruth ? `<div class="t ${c.ok === null ? '' : c.ok ? 'match' : 'miss'}">log: ${c.truth}${c.ok === null ? '' : c.ok ? ' ✓' : ' ✗'}</div>` : '') + `</div>`).join('');
@@ -281,7 +281,7 @@ function drawTemps(e) {
   line(f.minutes.map((m, i) => [m, f.coolerFail[i]]), '#ec6a5a', [6, 4], 1.8);
   const a = f.asis[f.asis.length - 1], c = f.coolerFail[f.coolerFail.length - 1];
   $('fcText').innerHTML = `Now <b>${fmt(e.temp.TS1, 1)} °C</b>. In an hour, as things are: <b>${fmt(a, 1)} °C</b>. If the cooler failed now: <b>${fmt(c, 1)} °C</b>` +
-    (c > 55 ? ' — above the 55 °C the rig ran at with its cooler nearly off.' : '.');
+    (c > 55 ? ', above the 55 °C the rig ran at with its cooler nearly off.' : '.');
   $('fcSync').textContent = `forecast started from the measured state (model corrected by ${f.sync >= 0 ? '+' : ''}${fmt(f.sync, 1)} K)`;
 }
 

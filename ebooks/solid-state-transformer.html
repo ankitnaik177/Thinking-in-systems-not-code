@@ -34,10 +34,10 @@
 
     <div style="margin-top:1.0in">
       <span class="kicker">Field note &middot; What's next in transformers</span>
-      <h1>Can the transformer be<br>smaller and safer?</h1>
+      <h1>A smaller and safer<br>transformer</h1>
       <p class="subtitle">The transformer on your street is a 140-year-old design:
-      iron, copper and a tank of oil. The new solid state version is much lighter
-      and compact. Let's compare them using simulations.</p>
+      iron, copper and a tank of oil. The solid state version is much lighter
+      and more compact. This note compares the two in simulation.</p>
     </div>
 
     <div class="byline">
@@ -49,26 +49,26 @@
 
 <!-- ===================== TL;DR ===================== -->
 <section class="page">
-  <span class="kicker">The 60-second version</span>
-  <h1 class="section-title">If you read nothing else</h1>
+  <span class="kicker">Overview</span>
+  <h1 class="section-title">The fault test in four points</h1>
   <hr class="rule">
 
   <ul class="tick">
-    <li><strong>The finding.</strong> I introduced a fault. With the old transformer and breaker, about <b>6&nbsp;000&nbsp;A</b> ran for a tenth of a second before the fault cleared. With the solid state transformer the current never got past <b>430&nbsp;A</b>.</li>
-    <li><strong>Why it matters.</strong> Almost all the damage a fault does, it does while you wait for the breaker. Cut the wait and there is not much damage left.</li>
-    <li><strong>The mechanism.</strong> The old breaker is a machine. A relay decides, contacts swing apart, then an arc keeps conducting until the AC happens to cross zero. The electronic one just stops.</li>
-    <li><strong>Do this.</strong> If your work touches data centers, EV charging or solar-heavy feeders, get familiar with this technology now. That is where it arrives first.</li>
+    <li><strong>The finding.</strong> I introduced a fault. With the old transformer and breaker, about <b>6&nbsp;000&nbsp;A</b> ran for a tenth of a second before the fault cleared. With the solid state transformer the current stayed at or below <b>430&nbsp;A</b>.</li>
+    <li><strong>Why it matters.</strong> Almost all the damage from a fault happens while the breaker is still opening, so a faster response leaves much less damage.</li>
+    <li><strong>The mechanism.</strong> In the old breaker a relay trips, contacts swing apart and an arc keeps conducting until the AC crosses zero. The electronic one limits or cuts the current within a millisecond.</li>
+    <li><strong>Do this.</strong> If your work touches data centers, EV charging or solar-heavy feeders, get familiar with this technology now; those are the first places it is being installed.</li>
   </ul>
 
   <div class="tiles">
-    <div class="tile"><div class="num">100<small>&times;</small></div><div class="label">Smaller magnetics: run the core at 20 kHz instead of 50 Hz</div></div>
+    <div class="tile"><div class="num">100<small>&times;</small></div><div class="label">Smaller magnetics, with the core run at 20 kHz in place of 50 Hz</div></div>
     <div class="tile"><div class="num">6 000 &rarr; 430<small>&nbsp;A</small></div><div class="label">The same fault, old iron vs solid state</div></div>
     <div class="tile"><div class="num">98<small>%</small></div><div class="label">Less fault wear absorbed by the equipment</div></div>
   </div>
 
   <div class="callout">
-    <span class="k">So what</span>
-    <p>Once it is made of electronics, fault protection is a control decision.</p>
+    <span class="k">Consequence</span>
+    <p>Once it is made of electronics, fault protection is set by the control software.</p>
   </div>
 
   <div class="footer">
@@ -81,7 +81,7 @@
 <!-- ===================== CH 1 ===================== -->
 <section class="page">
   <span class="kicker">Chapter 1</span>
-  <h1 class="section-title"><span class="n">01</span> &nbsp;High voltage for the journey</h1>
+  <h1 class="section-title"><span class="n">01</span> &nbsp;High voltage for transmission</h1>
   <hr class="rule">
 
   <p class="lead">Losses in a wire grow with the <em>square</em> of the current, so the
@@ -100,8 +100,8 @@
 
   <ul class="tick">
     <li>Ten times the voltage means one hundredth the loss in the same wire.</li>
-    <li>At 50 Hz each cycle is slow, so the iron core has to swallow a lot of magnetic flux per cycle. <b>Core size scales as 1/frequency.</b> Keep that in mind for chapter 3.</li>
-    <li>The losses come out as heat and the windings need insulation. A tank of mineral oil does both jobs, and it is also why these boxes can leak and burn.</li>
+    <li>At 50 Hz each cycle is slow, so the iron core has to carry a lot of magnetic flux per cycle. <b>Core size scales as 1/frequency.</b> Keep that in mind for chapter 3.</li>
+    <li>The losses come out as heat and the windings need insulation. A tank of mineral oil cools and insulates them, and it is also the reason these boxes can leak and burn.</li>
   </ul>
 
   <figure>
@@ -110,8 +110,7 @@
     <img class="fig-still" src="figures/sst-normal-day.png" alt="A normal day: the feeder, the pole-top transformer and the houses, with the data panel green">
     <figcaption><b>Figure 1.</b> A normal day in the model: 11&nbsp;kV comes in, the
     pole-top transformer delivers 230&nbsp;V and 50&nbsp;kW to the street, and the dial
-    sits at 218&nbsp;A in the green. Nothing happens. That is what normal looks
-    like.</figcaption>
+    sits at 218&nbsp;A in the green.</figcaption>
   </figure>
 
   <div class="footer">
@@ -132,9 +131,9 @@
   217&nbsp;A to about 6&nbsp;000.</p>
 
   <ul class="tick">
-    <li>The relay notices within milliseconds. Then the machine takes over: <b>60&nbsp;ms</b> pass before the contacts even begin to part.</li>
-    <li>When they part the current does not stop. An <b>electric arc</b> keeps conducting between the contacts until the alternating current happens to cross zero.</li>
-    <li>All that time, heat and magnetic force are going into the transformer windings and the cable. The "wear" bar in the film integrates that punishment (&int;i&sup2;dt) and fills for as long as the fault runs.</li>
+    <li>The relay detects the fault within milliseconds. The mechanism then takes <b>60&nbsp;ms</b> before the contacts begin to part.</li>
+    <li>Once they part, an <b>electric arc</b> keeps conducting between the contacts until the alternating current crosses zero.</li>
+    <li>All that time, heat and magnetic force are going into the transformer windings and the cable. The "wear" bar in the film integrates that stress (&int;i&sup2;dt) and fills for as long as the fault runs.</li>
   </ul>
 
   <figure>
@@ -142,15 +141,15 @@
            controls loop muted playsinline preload="metadata"></video>
     <img class="fig-still" src="figures/sst-old-breaker.png" alt="The fault under the old breaker: arc burning at the pole, dial pegged red, wear bar full">
     <figcaption><b>Figure 2.</b> The contacts are open but the arc still carries the
-    full fault current. The dial reads 3&nbsp;619&nbsp;A&mdash;a smoothed average; the raw
-    peaks reach about 6&nbsp;000&nbsp;A&mdash;and the wear bar is filling. By the time the
-    arc dies the street is dark, and the equipment has taken its worst beating in
-    years.</figcaption>
+    full fault current. The dial reads 3&nbsp;619&nbsp;A (a smoothed average; the raw
+    peaks reach about 6&nbsp;000&nbsp;A) and the wear bar is filling. By the time the
+    arc goes out the street is dark, and the equipment has absorbed the full fault
+    stress.</figcaption>
   </figure>
 
   <div class="pullquote">
-    The grid's reflexes are mechanical. Between the fault and the cure, the
-    transformer just has to survive.
+    Grid protection is mechanical. Between the fault and the breaker opening, the
+    transformer has to withstand the full fault current.
   </div>
 
   <div class="footer">
@@ -163,24 +162,24 @@
 <!-- ===================== CH 3 ===================== -->
 <section class="page">
   <span class="kicker">Chapter 3</span>
-  <h1 class="section-title"><span class="n">03</span> &nbsp;The transformer gets a brain</h1>
+  <h1 class="section-title"><span class="n">03</span> &nbsp;A transformer with power electronics</h1>
   <hr class="rule">
 
   <p class="lead">A solid state transformer does the same job with power electronics on
-  either side of a much smaller transformer. The size gain comes from speed.</p>
+  either side of a much smaller transformer. The size gain comes from the switching frequency.</p>
 
   <div class="flow">
     <div class="step"><div class="h">AC &rarr; DC</div><div class="d">Electronics rectify the incoming 11 kV</div></div>
     <div class="arrow">&rarr;</div>
     <div class="step"><div class="h">20 kHz link</div><div class="d">A fist-sized transformer does the ratio and isolation</div></div>
     <div class="arrow">&rarr;</div>
-    <div class="step"><div class="h">DC &rarr; AC</div><div class="d">Clean 230 V out—or DC directly, if you want it</div></div>
+    <div class="step"><div class="h">DC &rarr; AC</div><div class="d">Clean 230 V out, or DC directly if needed</div></div>
   </div>
 
   <ul class="tick">
     <li>The 1/frequency rule from chapter 1 is where the 100&times; comes from: 20&nbsp;kHz is 400&times; faster than 50&nbsp;Hz, so the core shrinks by roughly two orders of magnitude.</li>
-    <li>There is no oil tank, so no fire risk and no containment basin. It can go indoors, on a pole or in a rack.</li>
-    <li>In an iron transformer the ratio is fixed by the windings. Here the ratio, the output voltage and the <b>current limit</b> live in control software and can change in microseconds.</li>
+    <li>Without an oil tank there is no oil fire risk and no containment basin. It can go indoors, on a pole or in a rack.</li>
+    <li>In an iron transformer the ratio is fixed by the windings. Here the ratio, the output voltage and the <b>current limit</b> are set in control software and can change in microseconds.</li>
   </ul>
 
   <figure>
@@ -203,15 +202,15 @@
   <hr class="rule">
 
   <p class="lead">I ran the chapter 2 fault again with the solid state transformer on
-  the pole. Same street, same branch, same instant. Its control loop caps the output at
-  430&nbsp;A and it just sits there.</p>
+  the pole. The street, the branch and the instant are the same. Its control loop caps the output at
+  430&nbsp;A and holds it there.</p>
 
   <table class="tbl">
     <thead><tr><th>Protection</th><th>Peak current</th><th>Time at fault current</th><th>Fault wear absorbed</th></tr></thead>
     <tbody>
       <tr><td>Old breaker (moving parts)</td><td><b>~6 000 A</b></td><td>~100 ms, arc included</td><td>100%</td></tr>
       <tr><td>Solid state breaker</td><td>650 A, then cut</td><td>under 1 ms</td><td>~2%</td></tr>
-      <tr><td>Solid state transformer</td><td><b>430 A, held</b></td><td>never exceeds its limit</td><td>~7%, still serving</td></tr>
+      <tr><td>Solid state transformer</td><td><b>430 A, held</b></td><td>held at its limit</td><td>~7%, still serving</td></tr>
     </tbody>
   </table>
 
@@ -234,18 +233,18 @@
 <!-- ===================== CH 5 ===================== -->
 <section class="page">
   <span class="kicker">Chapter 5</span>
-  <h1 class="section-title"><span class="n">05</span> &nbsp;The honest page</h1>
+  <h1 class="section-title"><span class="n">05</span> &nbsp;Barriers to adoption</h1>
   <hr class="rule">
 
-  <p class="lead">So why isn't this everywhere already? Five reasons, and they are all
-  real engineering.</p>
+  <p class="lead">Five engineering problems keep the solid state transformer from
+  wide use today.</p>
 
   <ul class="tick">
-    <li><strong>Efficiency.</strong> A passive transformer is over 99% efficient, which is hard to beat. Three electronic conversion stages land at 96&ndash;98%, and at megawatt scale every lost percent is a heater somebody has to cool.</li>
-    <li><strong>Cost.</strong> Iron and copper are cheap. Medium-voltage silicon carbide is not, and today an SST costs several times more per kVA.</li>
-    <li><strong>Lifetime.</strong> Utilities expect 40+ years in the sun. Power electronics has proven closer to 15&ndash;20, and a semiconductor tolerates microseconds of overload where a tonne of copper and oil shrugs off seconds.</li>
-    <li><strong>Cooling.</strong> The losses are smaller in percent but they now come out of a box 100&times; smaller. That needs heat sinks, fans, sometimes liquid, and each is one more thing that can fail.</li>
-    <li><strong>Standards.</strong> A century of grid protection assumes big fault currents. A transformer that limits them can blind the legacy protection downstream, and certification moves slowly for good reasons.</li>
+    <li><strong>Efficiency.</strong> A passive transformer is over 99% efficient, which is hard to beat. Three electronic conversion stages reach 96&ndash;98%, and at megawatt scale every lost percent is heat that has to be removed.</li>
+    <li><strong>Cost.</strong> Medium-voltage silicon carbide costs far more than iron and copper, and today an SST costs several times more per kVA.</li>
+    <li><strong>Lifetime.</strong> Utilities expect 40+ years in the sun. Power electronics has proven closer to 15&ndash;20, and a semiconductor tolerates microseconds of overload where a tonne of copper and oil withstands seconds.</li>
+    <li><strong>Cooling.</strong> The losses are smaller in percent but they now come out of a box 100&times; smaller. That needs heat sinks, fans and sometimes liquid cooling, and each is one more part that can fail.</li>
+    <li><strong>Standards.</strong> A century of grid protection assumes big fault currents. A transformer that limits them can keep existing protection downstream from detecting a fault, and certification is slow.</li>
   </ul>
 
   <div class="callout">
@@ -265,17 +264,16 @@
 <!-- ===================== CLOSING ===================== -->
 <section class="page closing">
   <div style="max-width:82%">
-    <span class="kicker">The takeaway</span>
-    <h1>The old grid survives faults.<br>The new one refuses them.</h1>
+    <span class="kicker">Closing</span>
+    <h1>Fault damage depends on<br>how fast protection acts</h1>
     <p>For 140 years the transformer has been a passive machine protected by another
-    machine. Both are turning into electronics. What I take from the simulations: the
-    damage was never in the fault itself, it was in the tenth of a second the old
-    hardware needed to respond.</p>
+    machine. Both are turning into electronics. In the simulations, the damage came from
+    the tenth of a second the old hardware needed to respond.</p>
   </div>
 
   <ul class="tick" style="max-width:84%; margin-top:22px">
-    <li>Judge protection by what gets through while it acts, not by whether it eventually acts.</li>
-    <li>Where downtime is expensive, fast and small wins over big and rugged.</li>
+    <li>Judge protection by the current that gets through while it acts.</li>
+    <li>Where downtime is expensive, a fast electronic device is worth more than a large, rugged one.</li>
     <li>Data centers and EV charging will make this normal long before your street corner sees it.</li>
   </ul>
 
@@ -297,11 +295,11 @@
   t&nbsp;=&nbsp;0.5&nbsp;s. Read the limits before you trust the conclusions.</p>
 
   <ul class="tick">
-    <li><strong>Single-phase equivalents.</strong> The grid is three-phase; these models are single-phase story versions. The protection physics—relay delay, arc-to-zero-crossing, current limiting—carries over; exact amps would not.</li>
+    <li><strong>Single-phase equivalents.</strong> The grid is three-phase; these models are single-phase story versions. The protection physics (relay delay, arc to zero crossing, current limiting) carries over; exact amps would not.</li>
     <li><strong>Ideal transformers.</strong> No core saturation, no inrush, no losses. The mechanical breaker's arc uses the Modelica Standard Library arc model (arc voltage grows until a current zero quenches it).</li>
-    <li><strong>The SST is an averaged model:</strong> an ideal ratio stage plus an electronic current limit. Its converter losses and voltage regulation are not modeled—the 430 A clamp is the one behavior under test. In the real device that limit is enforced cycle-by-cycle by the converter's own switching, roughly every 50&nbsp;&micro;s at 20&nbsp;kHz, which is why the model can treat it as instantaneous.</li>
+    <li><strong>The SST is an averaged model:</strong> an ideal ratio stage plus an electronic current limit. Its converter losses and voltage regulation are not modeled; the 430 A clamp is the one behavior under test. In the real device that limit is enforced cycle-by-cycle by the converter's own switching, roughly every 50&nbsp;&micro;s at 20&nbsp;kHz, which is why the model can treat it as instantaneous.</li>
     <li><strong>Visual license in the films:</strong> the physical arc in this run lasted about 1 ms (the contacts happened to part near a current zero) and is stretched to 120 ms on screen so the eye can see it. The dial shows a smoothed RMS current, not the raw 50 Hz waveform. Fault-window footage runs at 20&times; slow motion.</li>
-    <li><strong>"Wear" is the engineering quantity &int;i&sup2;dt</strong>—the standard measure of the thermal and magnetic stress a fault imposes while protection acts.</li>
+    <li><strong>"Wear" is the engineering quantity &int;i&sup2;dt</strong>, the standard measure of the thermal and magnetic stress a fault imposes while protection acts.</li>
   </ul>
 
   <div class="notes">
