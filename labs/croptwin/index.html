@@ -145,14 +145,14 @@
 <body>
 <div class="wrap">
   <header class="top">
-    <div><h1>Field twin—winter wheat, Linköping</h1><div class="sub" id="siteline">loading…</div></div>
+    <div><h1>Field twin: winter wheat, Linköping</h1><div class="sub" id="siteline">loading…</div></div>
     <div class="stamp mono" id="stamp"></div>
   </header>
 
   <div id="err"></div>
 
   <div class="canvas" id="canvas">
-    <img id="imgTc" src="assets/parcel_tc.jpg" alt="Sentinel-2 true-colour image of the field and its neighbours, 4 July 2026">
+    <img id="imgTc" src="assets/parcel_tc.jpg" alt="Sentinel-2 true-color image of the field and its neighbors, 4 July 2026">
     <img id="imgNdvi" class="hide" src="assets/parcel_ndvi.jpg" alt="The same scene as greenness (NDVI)">
     <img id="imgLapse" class="hide" alt="" aria-hidden="true">
     <svg id="overlay" viewBox="0 0 100 61.667" preserveAspectRatio="none" aria-hidden="true"></svg>
@@ -160,7 +160,7 @@
     <div id="callouts"></div>
     <div class="hud hide" id="hud" aria-live="off"></div>
     <div class="key hide" id="key">
-      <b>Greenness (NDVI)</b>—how much living leaf the satellite sees
+      <b>Greenness (NDVI)</b>: how much living leaf the satellite sees
       <div class="bar"></div>
       <div class="t"><span>bare soil, stubble</span><span>thin cover</span><span>dense crop</span></div>
     </div>
@@ -173,9 +173,9 @@
       <button id="btnNdvi" aria-pressed="false">greenness</button>
     </div>
   </div>
-  <p class="howto" id="howto">The outlined field is the twin. <b>Photo</b> is what you would see; <b>greenness</b> is what the model is compared against. Press <b>replay</b> to watch last season pass over the field while the chart below draws the same days—pause any time to read, ← → step frame by frame.</p>
+  <p class="howto" id="howto">The outlined field is the twin. <b>Photo</b> is what you would see; <b>greenness</b> is what the model is compared against. Press <b>replay</b> to watch last season pass over the field while the chart below draws the same days. Pause any time to read; ← → step frame by frame.</p>
   <div class="panel" id="lastPanel" hidden>
-    <h2>Last season, replayed&mdash;the twin against the satellite, and the model alone</h2>
+    <h2>Last season replayed: the twin and the model alone against the satellite</h2>
     <div class="replay">
       <button id="lastPlay" class="play">&#9654; Replay harvest 2026 &middot; 13 s</button>
       <button id="lastStop" hidden>&#9632; Stop</button>
@@ -189,7 +189,7 @@
       <span><i class="sw dotv" style="background:transparent;border:1.6px solid var(--warn)"></i> satellite, sun too low to trust</span>
       <span><i class="sw" style="background:#c9a227;height:2px"></i> where we are in the replay</span>
     </div>
-    <div class="chartbox"><svg class="chart" id="lastChart" viewBox="0 0 1120 330" role="img" aria-label="Last season: modelled greenness drawn over time with satellite observations"></svg></div>
+    <div class="chartbox"><svg class="chart" id="lastChart" viewBox="0 0 1120 330" role="img" aria-label="Last season: modeled greenness drawn over time with satellite observations"></svg></div>
   </div>
 
   <div class="rotation" id="rotation"></div>
@@ -197,7 +197,7 @@
   <div id="flag"></div>
 
   <div class="panel" id="gapPanel" hidden>
-    <h2>Why they disagree</h2>
+    <h2>Satellite and model disagreement</h2>
     <div class="gap">
       <div><div class="bars" id="gapBars"></div></div>
       <ul id="gapText"></ul>
@@ -208,11 +208,11 @@
   <div class="tiles" id="tiles"></div>
 
   <div class="panel" id="syncPanel" hidden>
-    <h2>The sync&mdash;what the satellite changed, and what the twin decides</h2>
+    <h2>The sync: what the satellite changed and what the twin decides</h2>
     <div class="sync">
       <div class="verdict" id="syncVerdict"></div>
       <div><h3>Model alone vs twin, today</h3><div id="syncRows"></div>
-        <p class="small">After every clear pass the twin pulls its leaf area toward what the satellite implies, over two days, by a Kalman gain: far when the pass is informative, little near bare soil or a saturated canopy. The model alone never sees the satellite; the twin restarts its forecast from the field as it is.</p></div>
+        <p class="small">After every clear pass the twin pulls its leaf area toward what the satellite implies, over two days, by a Kalman gain: strongly when the pass is informative, weakly near bare soil or a saturated canopy. The model alone runs on weather only; the twin restarts its forecast from the field as it is.</p></div>
       <div><h3>Decisions, updated daily</h3><div id="syncDecisions"></div>
         <p class="small">Ranges span the five weather years the forecast runs on; before the crop has emerged they are climatology. Grain is taken as 0.45 of the above-ground dry matter the model computes, quoted at 14 % moisture. The alert fires when a pass lands more than 2.5 standard deviations from what the twin expected the day before.</p></div>
       <div class="proj" id="projBlock" hidden><h3>Projections, re-issued every day</h3>
@@ -220,12 +220,12 @@
           <svg id="projDates" viewBox="0 0 560 230" role="img" aria-label="Expected flowering and harvest-ready dates, as issued each day"></svg>
           <svg id="projYield" viewBox="0 0 560 230" role="img" aria-label="Expected grain yield, as issued each day"></svg>
         </div>
-        <p class="small">Every day the twin re-issues its expected flowering date, harvest-ready date and yield. Bands span the five weather years, the line is the median. They should settle as the season delivers its weather and its passes; a jump is the satellite changing the model's mind.</p></div>
+        <p class="small">Every day the twin re-issues its expected flowering date, harvest-ready date and yield. Bands span the five weather years, the line is the median. They should settle as the season's weather and passes come in; a jump means a satellite pass has corrected the model.</p></div>
     </div>
   </div>
 
   <div class="panel">
-    <h2>The crop year—the twin so far, forecast ahead</h2>
+    <h2>The crop year: the twin so far and the forecast ahead</h2>
     <div class="legend">
       <span><i class="sw" style="background:var(--grow)"></i> twin: model corrected by every clear pass</span>
       <span><i class="sw" style="background:var(--grow);opacity:.35;height:10px"></i> spread of 5 weather years</span>
@@ -234,7 +234,7 @@
       <span><i class="sw dotv" style="background:transparent;border:1.6px solid var(--warn)"></i> satellite, sun too low to trust</span>
       <span><i class="sw" style="background:var(--ink-3);height:0;border-top:2px dashed var(--ink-3)"></i> today</span>
     </div>
-    <div class="chartbox"><svg class="chart" id="ndviChart" viewBox="0 0 1120 330" role="img" aria-label="Modelled greenness across the crop year with satellite observations"></svg></div>
+    <div class="chartbox"><svg class="chart" id="ndviChart" viewBox="0 0 1120 330" role="img" aria-label="Modeled greenness across the crop year with satellite observations"></svg></div>
   </div>
 
 
@@ -248,7 +248,7 @@
       </div>
       <div class="panel">
         <h2>The crop's clock</h2>
-        <p class="cap">Plants count warmth, not days. Flowering starts at the dashed line.</p>
+        <p class="cap">Plants develop with accumulated warmth (thermal time). Flowering starts at the dashed line.</p>
         <div class="chartbox"><svg class="chart" id="ttChart" viewBox="0 0 540 250" role="img" aria-label="Accumulated thermal time against the flowering threshold"></svg></div>
       </div>
     </div>
@@ -257,7 +257,7 @@
       <div class="tblbox"><table id="obsTable"><thead><tr><th>Date</th><th>Day</th><th>Satellite</th><th>Model</th><th>Gap</th><th>Sun</th><th>Trusted</th></tr></thead><tbody></tbody></table></div>
     </div>
     <div class="panel">
-      <h2>Past seasons—how well the model did</h2>
+      <h2>Past seasons: model error</h2>
       <div class="tblbox"><table id="histTable"><thead><tr><th>Season</th><th>Crop emerged</th><th>Error (NDVI)</th><th>Peak leaf area</th><th>Grain yield</th></tr></thead><tbody></tbody></table></div>
     </div>
     <div class="panel">
@@ -324,7 +324,7 @@
     .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.text(); })
     .then(function(t){ var D = fromEntries(parseBin(t)); if (!D) throw new Error('no "today" entry in the bin yet'); render(D); })
     .catch(function(err){ var D = fromLocal(window.CROPTWIN_STATE);
-      if (D){ render(D); note('Live data unavailable (' + err.message + ') — showing the last local state, ' + fmt(D.generated) + '.'); }
+      if (D){ render(D); note('Live data unavailable (' + err.message + '); showing the last local state, ' + fmt(D.generated) + '.'); }
       else note('Live data unavailable (' + err.message + ') and no local state.js. Run update.wls.'); });
 
   // ============ helpers =====================================================
@@ -338,13 +338,13 @@
   // what is happening on the field at a given day of the crop year (1 Sep = day 0)
   function storyFor(day){
     if (day < 28)  return 'After harvest: bare soil, stubble and weeds regrowing.';
-    if (day < 60)  return 'Sown and emerging — the field slowly turns green.';
+    if (day < 60)  return 'Sown and emerging: the field slowly turns green.';
     if (day < 115) return 'Small plants before winter. Low sun makes readings unreliable.';
-    if (day < 185) return 'Winter: snow and darkness. The satellite sees nothing useful.';
+    if (day < 185) return 'Winter: snow and darkness. The satellite gets no usable readings.';
     if (day < 240) return 'Spring: growth restarts as the soil warms.';
-    if (day < 290) return 'The fast phase — leaf area climbs to its peak.';
+    if (day < 290) return 'The fast phase: leaf area climbs to its peak.';
     if (day < 330) return 'Flowering, then the canopy yellows as grain fills.';
-    return 'Ripening and harvest — back to bare soil.';
+    return 'Ripening and harvest, back to bare soil.';
   }
 
   function render(D){
@@ -450,9 +450,9 @@
         '<span>leaf the model’s crop has</span><div class="bar"><i style="width:'+Math.max(1,100*laiMod/mx).toFixed(0)+'%"></i></div><span class="mono">LAI '+laiMod.toFixed(1)+'</span>' +
         '<span>stubble regrowth, 2019 &amp; 2022</span><div class="bar"><i style="width:'+(100*laiRes/mx).toFixed(0)+'%;opacity:.5"></i></div><span class="mono">LAI '+laiRes.toFixed(1)+'</span>';
       document.getElementById('gapText').innerHTML =
-        '<li><b>Greenness ' + latest.ndvi.toFixed(2) + ' = leaf area ' + laiSat.toFixed(1) + '</b> — more than a crop that has not emerged can have (' + laiMod.toFixed(1) + ').</li>' +
-        '<li><b>Most likely: last crop’s stubble regrowing.</b> 2019 and 2022 showed the same before the field was ploughed — then greenness fell to 0.25 in two weeks.</li>' +
-        '<li><b>Watch for the drop.</b> If it never comes, question the winter-wheat assumption, not the model.</li>';
+        '<li><b>Greenness ' + latest.ndvi.toFixed(2) + ' = leaf area ' + laiSat.toFixed(1) + '</b>, more than a crop that has not emerged can have (' + laiMod.toFixed(1) + ').</li>' +
+        '<li><b>Most likely: last crop’s stubble regrowing.</b> 2019 and 2022 showed the same before the field was plowed; greenness then fell to 0.25 in two weeks.</li>' +
+        '<li><b>Watch for the drop.</b> If it does not come, check the winter-wheat assumption first.</li>';
     }
 
     // ---- tiles ----
@@ -619,7 +619,7 @@
         story.textContent = storyFor(Math.round(day));
       }
       function labels(){ btn.innerHTML = !active ? '&#8635; Replay harvest 2026 &middot; 13 s' : (paused ? '&#9654; Resume' : '&#10074;&#10074; Pause'); btnStop.hidden = !active; }
-      function finish(){ hud.innerHTML='<b>Season over.</b> Error across the year: twin <b>'+LS.rmse.toFixed(3)+'</b>' + (LS.rmseOpen ? ', model alone <b>'+LS.rmseOpen.toFixed(3)+'</b>' : '') + ' &middot; grain yield twin <b>'+grain(LS.dm).toFixed(1)+' t/ha</b>' + (LS.dmOpen ? ', model alone <b>'+grain(LS.dmOpen).toFixed(1)+' t/ha</b>' : ''); story.textContent='Every filled dot was a real satellite pass. The dotted line never saw them; the solid line was pulled toward each one as it arrived.'; active=false; paused=false; labels(); cursor.setAttribute('opacity',0); }
+      function finish(){ hud.innerHTML='<b>Season over.</b> Error across the year: twin <b>'+LS.rmse.toFixed(3)+'</b>' + (LS.rmseOpen ? ', model alone <b>'+LS.rmseOpen.toFixed(3)+'</b>' : '') + ' &middot; grain yield twin <b>'+grain(LS.dm).toFixed(1)+' t/ha</b>' + (LS.dmOpen ? ', model alone <b>'+grain(LS.dmOpen).toFixed(1)+' t/ha</b>' : ''); story.textContent='Every filled dot was a real satellite pass. The dotted line ran on weather alone; the solid line was pulled toward each pass as it arrived.'; active=false; paused=false; labels(); cursor.setAttribute('opacity',0); }
       function tick(){ if(!active||paused) return; drawTo(Math.min(379,t)); if (t>=379){ finish(); return; } t+=STEP; timer=setTimeout(tick,260); }
       function stop(){ active=false; paused=false; clearTimeout(timer); t=0; drawTo(379); cursor.setAttribute('opacity',0); labels(); hud.innerHTML='solid: the twin, corrected by every clear pass · dotted: the model alone, weather only · every dot is a satellite pass'; story.textContent=''; }
       function begin(){ active=true; paused=false; t=0; labels(); tick(); }
@@ -648,7 +648,7 @@
       ['Greenness','Copernicus Sentinel-2, 10 m, every 2–3 days; read at one point in the field; only clear pixels'],
       ['Weather','SMHI station '+D.site.station+' (temperature, rain) and STRÅNG (sunlight) at the field'],
       ['Field & crop','Jordbruksverket parcel register: block 64754734581, skifte 26E'],
-      ['Model','CropTwin — stocks and flows in System Modeler; forecast = the model run with five past years’ weather'],
+      ['Model','CropTwin: stocks and flows in System Modeler; forecast = the model run with five past years’ weather'],
       ['Live data','Wolfram Databin '+DATABIN+', refreshed daily by update.wls; trusted readings need the sun ≥ '+D.params.minSunElevation+'° up']
     ].map(function(r){return '<dt>'+r[0]+'</dt><dd>'+r[1]+'</dd>';}).join('');
     if (D.missingDays) note(D.missingDays + ' measured day(s) missing from the bin; the weather chart leaves them blank.');

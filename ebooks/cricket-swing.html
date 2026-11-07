@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bowled by a Late Swinger — Thinking in Systems</title>
+<title>Bowled by a late swinger · Thinking in Systems</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,400;0,600;0,700;1,700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700&display=swap" rel="stylesheet">
@@ -34,10 +34,10 @@
 
     <div style="margin-top:1.0in">
       <span class="kicker">Field note &middot; Cricket</span>
-      <h1>Bowled by a<br>Late Swinger</h1>
+      <h1>Bowled by a<br>late swinger</h1>
       <p class="subtitle">I got out to a ball that pitched on middle and hit off
-      stump. What could I have done differently? Let me check with some
-      simulations.</p>
+      stump. I simulated the delivery to find out what I could have done
+      differently.</p>
     </div>
 
     <div class="byline">
@@ -49,28 +49,28 @@
 
 <!-- ===================== TL;DR ===================== -->
 <section class="page">
-  <span class="kicker">The 60-second version</span>
-  <h1 class="section-title">If you read nothing else</h1>
+  <span class="kicker">Summary</span>
+  <h1 class="section-title">Findings</h1>
   <hr class="rule">
 
   <ul class="tick">
-    <li><strong>The finding.</strong> Length hardly changes how much an outswinger moves. Full, good or short, it swings the same <b>0.38&nbsp;m</b>. What length changes is how much of that movement lands after the bounce. That's probably why it looks late.</li>
-    <li><strong>Why it matters.</strong> There's no variable to guess at. You read a starting line and add a fixed offset.</li>
-    <li><strong>The mechanism.</strong> The sideways force is aerodynamic, set by pace and seam angle. It doesn't know where the ball bounced.</li>
-    <li><strong>Do this.</strong> Meet it further out. Guard outside the crease, or stride to the pitch. Either one halves the movement that arrives after you've committed.</li>
+    <li>Length hardly changes how much an outswinger moves: full, good or short, it swings <b>0.38&nbsp;m</b>. Length changes how much of that movement comes after the bounce, which is probably why the swing looks late.</li>
+    <li>Because the swing is a fixed offset, the batter only has to read the starting line and add the offset.</li>
+    <li>The sideways force is aerodynamic and set by pace and seam angle. It does not depend on where the ball bounced.</li>
+    <li>Meet the ball further out by guarding outside the crease or striding to the pitch. Either halves the movement that arrives after the bat is committed.</li>
   </ul>
 
   <div class="tiles">
     <div class="tile"><div class="num">0.38<small>&nbsp;m</small></div><div class="label">Sideways movement, the same at every length</div></div>
     <div class="tile"><div class="num">96<small>&nbsp;mm</small></div><div class="label">The ball that bowled me: middle to off stump, after pitching</div></div>
-    <div class="tile"><div class="num">2<small>&times;</small></div><div class="label">Extra late movement if you play back instead of at the pitch</div></div>
+    <div class="tile"><div class="num">2<small>&times;</small></div><div class="label">Late movement when playing back at the stumps, relative to meeting the ball at its pitch</div></div>
   </div>
 
   <div class="callout">
-    <span class="k">So what</span>
-    <p>Don't try to guess <em>how much</em> it'll swing. Read where it starts, allow a
-    ball and a half towards off, and meet it early. The movement that beats you is the
-    part arriving after your bat is already committed.</p>
+    <span class="k">Advice</span>
+    <p>Read where the ball starts, allow a ball and a half towards off and meet it
+    early. The movement that beats the bat is the part that arrives after the bat is
+    committed.</p>
   </div>
 
   <div class="footer">
@@ -86,7 +86,7 @@
   <h1 class="section-title"><span class="n">01</span> &nbsp;Swing is independent of length</h1>
   <hr class="rule">
 
-  <p class="lead">I had a wrong assumption: I neglected the movement after the ball
+  <p class="lead">My assumption was wrong: I had neglected the movement after the ball
   pitches.</p>
 
   <table class="tbl">
@@ -103,10 +103,10 @@
            controls loop muted playsinline preload="metadata"></video>
     <img class="fig-still" src="figures/cricket-lengths.png" alt="Three lengths compared, plan view and batsman's eye">
     <figcaption><b>Figure 1.</b> The short ball is airborne 304 ms against 496 ms for a
-    full one, and still swings the same 0.38 m. Look at the plan view: the three paths
-    sit almost on top of each other, and only the crosses where they pitch separate.
-    What length changes is <em>when</em> the movement happens. Off a short ball, 261 mm
-    of it lands after the bounce. Off a full one, 74 mm.</figcaption>
+    full one, and still swings the same 0.38 m. In the plan view the three paths
+    almost overlap; only the crosses marking where they pitch are apart. Length
+    changes <em>when</em> the movement happens: 261 mm of it comes after the bounce
+    off a short ball, and 74 mm off a full one.</figcaption>
   </figure>
 
   <div class="footer">
@@ -119,11 +119,11 @@
 <!-- ===================== CH 2 ===================== -->
 <section class="page">
   <span class="kicker">Chapter 2</span>
-  <h1 class="section-title"><span class="n">02</span> &nbsp;Read the line, not the movement</h1>
+  <h1 class="section-title"><span class="n">02</span> &nbsp;Reading the line</h1>
   <hr class="rule">
 
-  <p class="lead">If the movement's fixed, the only thing left to read is where the ball
-  started. So I changed the release angle and kept everything else the same.</p>
+  <p class="lead">With the movement fixed, the only thing left to read is where the ball
+  started. I changed the release angle and kept everything else the same.</p>
 
   <table class="tbl">
     <thead><tr><th>Released</th><th>Pitches</th><th>Reaches the stumps</th><th>Swing</th></tr></thead>
@@ -135,18 +135,18 @@
   </table>
 
   <ul class="tick">
-    <li>The release angle slides the whole line sideways. The swing stays put.</li>
+    <li>The release angle shifts the whole line sideways and leaves the swing unchanged.</li>
     <li>The middle row is the ball that bowled me, aimed a degree inside the stumps.</li>
-    <li>So the movement is an offset you can learn or predict.</li>
+    <li>The movement is therefore an offset a batter can learn and predict.</li>
   </ul>
 
   <figure>
     <video class="fig-video" src="video/outswinger_line.mp4" poster="figures/cricket-line-poster.jpg"
            controls loop muted playsinline preload="metadata"></video>
     <img class="fig-still" src="figures/cricket-line.png" alt="Three release angles, plan view and batsman's eye">
-    <figcaption><b>Figure 2.</b> Three aims, three parallel curves. Each dotted line is
-    that same ball with the swing switched off, and every solid path sits the same
-    distance from its own twin.</figcaption>
+    <figcaption><b>Figure 2.</b> Three release angles give three parallel curves. Each
+    dotted line is the same ball with the swing switched off, and each solid path is the
+    same distance from its dotted line.</figcaption>
   </figure>
 
   <div class="footer">
@@ -176,8 +176,8 @@
   </table>
 
   <ul class="tick">
-    <li>Standing deep buys me about <b>97 ms</b> more to watch it.</li>
-    <li>It also doubles the late movement: 51 mm becomes 102 mm. A cricket ball is 71 mm in diameter, so that's the middle of the bat against an edge.</li>
+    <li>Playing back at the stumps gives me about <b>97 ms</b> more to watch it.</li>
+    <li>It also doubles the late movement: 51 mm becomes 102 mm. A cricket ball is 71 mm in diameter, so the difference is the middle of the bat against an edge.</li>
   </ul>
 
   <figure>
@@ -198,18 +198,18 @@
 <!-- ===================== CLOSING ===================== -->
 <section class="page closing">
   <div style="max-width:82%">
-    <span class="kicker">The takeaway</span>
-    <h1>Judge the line.<br>Meet it early.</h1>
-    <p>I went looking for a way to predict the swing and found there's nothing to
-    predict. It's the same 0.38 m almost every ball. What varies is where the bowler
-    aimed it, and how much of the drift is still ahead of me when I commit.</p>
+    <span class="kicker">Closing</span>
+    <h1>Judge the line<br>and meet it early</h1>
+    <p>I looked for a way to predict the swing and found that it barely varies: it is
+    0.38 m on almost every ball. What varies is where the bowler aimed it and how much
+    of the drift is still ahead of me when I commit.</p>
   </div>
 
   <ul class="tick" style="max-width:84%; margin-top:22px">
     <li>Read the release and the pitch, then allow about a ball and a half to the off side.</li>
-    <li>Meet it as close to its pitch as possible: guard outside the crease, a full stride, or both. That halves the late movement.</li>
+    <li>Meet it as close to its pitch as possible: guard outside the crease, a full stride or both. That halves the late movement.</li>
     <li>Don't play across it. The ball is already going the other way.</li>
-    <li>Stop saying it swung late. It swung the whole way.</li>
+    <li>The ball swings the whole way from release; the "late" part is the movement after the bounce.</li>
   </ul>
 
   <div style="margin-top:26px"><a class="cta" href="https://www.systemsnotcode.com/#work">More field notes at systemsnotcode.com &rarr;</a></div>
@@ -222,7 +222,7 @@
 
 <!-- ===================== METHOD & LIMITS ===================== -->
 <section class="page">
-  <h1 class="section-title">Method &amp; limits</h1>
+  <h1 class="section-title">Method and limits</h1>
   <hr class="rule">
 
   <p class="lead">The numbers here come from one configuration: a new ball at
@@ -230,18 +230,18 @@
   trust the conclusions.</p>
 
   <ul class="tick">
-    <li><strong>Movement off the seam at the bounce is not modeled.</strong> The ball is a smooth sphere, so the pitch gives bounce and friction but can't catch a raised seam. That effect <em>does</em> depend on length, and it's the one thing that could undercut Chapter 1.</li>
-    <li><strong>Aerodynamic swing only:</strong> drag, a seam-driven side force, and a Magnus force from backspin.</li>
-    <li><strong>Surface state is a single number</strong>, set here to a new ball. Reverse swing exists in the model but is switched off for this study.</li>
-    <li><strong>The model only says <em>where</em> the ball is met, not how you get there.</strong> Taking guard outside the crease and striding to the pitch reach the same point. It says nothing about what standing out costs: being stumped, or handing the bowler a different length.</li>
-    <li><strong>The side-force coefficients are semi-empirical:</strong> picked to reproduce the magnitudes people observe, not fitted to actual data.</li>
+    <li>Movement off the seam at the bounce is not modeled. The ball is a smooth sphere, so the pitch gives bounce and friction but cannot grip a raised seam. Seam movement <em>does</em> depend on length, and it could change the result of Chapter 1.</li>
+    <li>The model has aerodynamic swing only: drag, a seam-driven side force and a Magnus force from backspin.</li>
+    <li>The surface state is a single number, set here to a new ball. Reverse swing is in the model but switched off for this study.</li>
+    <li>The model gives the point where the ball is met. Guarding outside the crease and striding to the pitch reach the same point, and the model does not include what standing out costs: being stumped, or giving the bowler a different length to aim at.</li>
+    <li>The side-force coefficients are semi-empirical: chosen to reproduce the magnitudes observed in play, without a fit to measured data.</li>
   </ul>
 
   <div class="notes">
     <h3>How it was built</h3>
     <ol>
       <li>Ball flight and bounce as a Modelica model: multibody dynamics with a contact model for the pitch, solved in Wolfram System Modeler.</li>
-      <li>Aerodynamics as a custom component: drag, seam side force, Magnus lift, fed by the ball's own velocity and spin.</li>
+      <li>Aerodynamics as a custom component: drag, seam side force and Magnus lift, computed from the ball's velocity and spin.</li>
       <li>Trajectories exported and rendered in Blender, driven headlessly from the simulated data.</li>
       <li>The dotted line in every figure is the same delivery with the side force set to zero.</li>
     </ol>
